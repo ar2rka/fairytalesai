@@ -88,7 +88,7 @@
      * Psychological principle: Measure conversion intent
      */
     function initCTATracking() {
-        const ctaButtons = document.querySelectorAll('a[href="#signup"], .btn-primary, .btn-cta-mobile');
+        const ctaButtons = document.querySelectorAll('a[href="#download"], .btn-primary');
         
         ctaButtons.forEach((button, index) => {
             button.addEventListener('click', function(e) {
@@ -106,83 +106,24 @@
     }
 
     /**
-     * Track form abandonment
-     * Psychological principle: Identify friction points
+     * Track store button clicks
+     * Track App Store and Google Play button clicks
      */
-    function initFormAbandonmentTracking() {
-        const form = document.getElementById('signupForm');
-        if (!form) return;
-
-        const emailInput = form.querySelector('input[type="email"]');
-        let formStarted = false;
-        let formFocused = false;
-
-        // Track when user starts filling form
-        emailInput.addEventListener('focus', function() {
-            if (!formStarted) {
-                formStarted = true;
-                formFocused = true;
-                trackEvent('form_started', {
+    function initStoreButtonTracking() {
+        const storeButtons = document.querySelectorAll('.store-button');
+        
+        storeButtons.forEach((button) => {
+            button.addEventListener('click', function(e) {
+                const storeType = this.classList.contains('app-store') ? 'app_store' : 'google_play';
+                const storeUrl = this.getAttribute('href');
+                
+                trackEvent('store_button_click', {
+                    store: storeType,
+                    url: storeUrl,
                     timestamp: Date.now()
                 });
-            }
-        });
-
-        // Track when user leaves form without submitting
-        emailInput.addEventListener('blur', function() {
-            if (formStarted && formFocused && !form.querySelector('input[type="email"]').value) {
-                trackEvent('form_abandoned', {
-                    timestamp: Date.now()
-                });
-            }
-        });
-
-        // Track successful form submission
-        form.addEventListener('submit', function(e) {
-            e.preventDefault(); // Prevent default for demo - remove in production
-            
-            const email = emailInput.value;
-            
-            trackEvent('form_submitted', {
-                email: email, // Hash this in production for privacy
-                timestamp: Date.now()
             });
-
-            // Show success message or redirect
-            showFormSuccess();
         });
-    }
-
-    /**
-     * Show form success message
-     */
-    function showFormSuccess() {
-        const form = document.getElementById('signupForm');
-        const formGroup = form.querySelector('.form-group');
-        const submitButton = form.querySelector('button[type="submit"]');
-        
-        // Create success message
-        const successMessage = document.createElement('div');
-        successMessage.className = 'form-success';
-        successMessage.style.cssText = `
-            background: #2ECC71;
-            color: white;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            text-align: center;
-            animation: fadeIn 0.3s ease;
-        `;
-        successMessage.textContent = '✨ Success! Check your email to get started.';
-        
-        form.insertBefore(successMessage, formGroup);
-        
-        // Disable form
-        submitButton.disabled = true;
-        submitButton.textContent = 'Check Your Email!';
-        
-        // In production, redirect to signup page or show next step
-        // window.location.href = '/signup?email=' + encodeURIComponent(email);
     }
 
     // ============================================
@@ -284,46 +225,6 @@
         });
     }
 
-    // ============================================
-    // STICKY MOBILE CTA
-    // ============================================
-
-    /**
-     * Show/hide sticky mobile CTA based on scroll position
-     */
-    function initStickyMobileCTA() {
-        const stickyCTA = document.getElementById('stickyCtaMobile');
-        if (!stickyCTA) return;
-
-        const heroSection = document.getElementById('hero');
-        const heroBottom = heroSection ? heroSection.offsetHeight : 0;
-        let lastScrollY = window.scrollY;
-
-        function handleScroll() {
-            const currentScrollY = window.scrollY;
-            
-            // Show sticky CTA after scrolling past hero section
-            if (currentScrollY > heroBottom && currentScrollY > lastScrollY) {
-                stickyCTA.style.display = 'block';
-            } else if (currentScrollY < heroBottom || currentScrollY < lastScrollY) {
-                stickyCTA.style.display = 'none';
-            }
-            
-            lastScrollY = currentScrollY;
-        }
-
-        // Throttle scroll events
-        let ticking = false;
-        window.addEventListener('scroll', function() {
-            if (!ticking) {
-                window.requestAnimationFrame(function() {
-                    handleScroll();
-                    ticking = false;
-                });
-                ticking = true;
-            }
-        }, { passive: true });
-    }
 
     // ============================================
     // SMOOTH SCROLLING FOR ANCHOR LINKS
@@ -978,11 +879,10 @@
         // Core tracking
         initScrollDepthTracking();
         initCTATracking();
-        initFormAbandonmentTracking();
+        initStoreButtonTracking();
         
         // Conversion features
         initExitIntentPopup();
-        initStickyMobileCTA();
         
         // UX enhancements
         initScrollReveal();

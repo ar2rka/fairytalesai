@@ -325,6 +325,47 @@ img {
     animation: fadeInUp 1.2s ease;
 }
 
+.store-buttons {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: var(--spacing-md);
+}
+
+.store-button {
+    display: inline-block;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    text-decoration: none;
+}
+
+.store-button:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+}
+
+.store-button:active {
+    transform: scale(0.98);
+}
+
+.store-button img {
+    display: block;
+    height: auto;
+    max-width: 100%;
+}
+
+@media (max-width: 768px) {
+    .store-buttons {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+    
+    .store-button img {
+        height: 50px;
+    }
+}
+
 .cta-note {
     margin-top: var(--spacing-sm);
     font-size: 0.875rem;
@@ -561,6 +602,10 @@ img {
 .cta-section {
     text-align: center;
     margin-top: var(--spacing-xl);
+}
+
+.cta-section .store-buttons {
+    margin-top: var(--spacing-md);
 }
 
 /* ============================================
@@ -877,41 +922,6 @@ img {
     margin: 0;
 }
 
-/* ============================================
-   STICKY MOBILE CTA
-   ============================================ */
-
-.sticky-cta-mobile {
-    display: none;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: white;
-    padding: var(--spacing-sm) var(--spacing-md);
-    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    animation: slideUp 0.3s ease;
-}
-
-@media (max-width: 767px) {
-    .sticky-cta-mobile {
-        display: block;
-    }
-}
-
-.btn-cta-mobile {
-    width: 100%;
-    padding: 0.875rem;
-    background-color: var(--color-primary);
-    color: white;
-    text-align: center;
-    border-radius: var(--radius-md);
-    font-weight: 600;
-    font-size: 1rem;
-    display: block;
-    box-shadow: var(--shadow-md);
-}
 
 /* ============================================
    EXIT INTENT POPUP
@@ -1128,7 +1138,6 @@ img {
    ============================================ */
 
 @media print {
-    .sticky-cta-mobile,
     .exit-popup,
     .hero-image,
     .footer {

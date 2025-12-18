@@ -170,10 +170,6 @@
     </script>
 </head>
 <body>
-    <!-- Sticky Mobile CTA Bar -->
-    <div class="sticky-cta-mobile" id="stickyCtaMobile">
-        <a href="#signup" class="btn-cta-mobile" data-i18n="mobile.cta">Create Free Story</a>
-    </div>
 
     <main>
     <!-- Hero Section: Primacy Effect & First Impressions -->
@@ -203,19 +199,19 @@
                 Create magical moments every night with stories made just for them.
             </p>
             
-            <!-- Primary CTA: High contrast, action-oriented -->
+            <!-- Primary CTA: App Store and Google Play buttons -->
             <div class="hero-cta">
-                <a href="#signup" class="btn btn-primary" id="heroCta" data-i18n="hero.cta">
-                    Create Your First Story Free
-                </a>
-                <p class="cta-note" data-i18n="hero.ctaNote">✨ No credit card required • Cancel anytime</p>
+                <div class="store-buttons">
+                    <a href="https://apps.apple.com/app/your-app-id" class="store-button app-store" target="_blank" rel="noopener noreferrer" aria-label="Download on the App Store">
+                        <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83&releaseDate=1289433600" alt="Download on the App Store" style="height: 60px; width: auto;">
+                    </a>
+                    <a href="https://play.google.com/store/apps/details?id=your.package.name" class="store-button google-play" target="_blank" rel="noopener noreferrer" aria-label="Get it on Google Play">
+                        <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" style="height: 60px; width: auto;">
+                    </a>
+                </div>
             </div>
             
             <!-- Social Proof: Real-time activity -->
-            <div class="social-proof-realtime">
-                <span class="activity-indicator">🔔</span>
-                <span class="activity-text" data-i18n="hero.activity">Anna from Limassol just created a story</span>
-            </div>
             
             <!-- Hero Image: Emotional visual -->
             
@@ -329,41 +325,34 @@
             
             <!-- CTA after features -->
             <div class="cta-section">
-                <a href="#signup" class="btn btn-primary btn-large" data-i18n="features.cta">Start Creating Magical Stories</a>
+                <div class="store-buttons">
+                    <a href="https://apps.apple.com/app/your-app-id" class="store-button app-store" target="_blank" rel="noopener noreferrer" aria-label="Download on the App Store">
+                        <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83&releaseDate=1289433600" alt="Download on the App Store" style="height: 60px; width: auto;">
+                    </a>
+                    <a href="https://play.google.com/store/apps/details?id=your.package.name" class="store-button google-play" target="_blank" rel="noopener noreferrer" aria-label="Get it on Google Play">
+                        <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" style="height: 60px; width: auto;">
+                    </a>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Final CTA Section -->
-    <section class="final-cta-section" id="signup" aria-labelledby="cta-headline">
+    <section class="final-cta-section" id="download" aria-labelledby="cta-headline">
         <div class="container">
             <div class="cta-content">
                 <h2 class="cta-headline" id="cta-headline" data-i18n="cta.headline">Ready to Create Magic?</h2>
-                <p class="cta-subheadline" data-i18n="cta.subheadline">Join thousands of parents creating unforgettable bedtime moments</p>
+                <p class="cta-subheadline" data-i18n="cta.subheadline">Download the app and start creating magical bedtime stories today</p>
                 
-                <!-- Signup Form -->
-                <form class="signup-form" id="signupForm" aria-label="Sign up for free story">
-                    <div class="form-group">
-                        <label for="email" class="sr-only">Email address</label>
-                        <input 
-                            type="email" 
-                            id="email" 
-                            name="email" 
-                            data-i18n-placeholder="cta.emailPlaceholder"
-                            placeholder="Enter your email" 
-                            required
-                            aria-label="Email address"
-                            aria-required="true"
-                            autocomplete="email"
-                        >
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-large btn-block" data-i18n="cta.submit" aria-label="Submit form to create free story">
-                        Create My Child's First Story Free
-                    </button>
-                    <p class="form-note" data-i18n="cta.formNote">
-                        ✨ No credit card required • Start in 30 seconds • Cancel anytime
-                    </p>
-                </form>
+                <!-- App Store and Google Play buttons -->
+                <div class="store-buttons">
+                    <a href="https://apps.apple.com/app/your-app-id" class="store-button app-store" target="_blank" rel="noopener noreferrer" aria-label="Download on the App Store">
+                        <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83&releaseDate=1289433600" alt="Download on the App Store" style="height: 60px; width: auto;">
+                    </a>
+                    <a href="https://play.google.com/store/apps/details?id=your.package.name" class="store-button google-play" target="_blank" rel="noopener noreferrer" aria-label="Get it on Google Play">
+                        <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" style="height: 60px; width: auto;">
+                    </a>
+                </div>
                 
                 <!-- Trust Badges -->
                 <div class="trust-badges">
@@ -382,9 +371,9 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-links">
-                    <a href="#signup" data-i18n="footer.privacy">Privacy</a>
-                    <a href="#signup" data-i18n="footer.terms">Terms</a>
-                    <a href="#signup" data-i18n="footer.safety">Safety</a>
+                    <a href="#download" data-i18n="footer.privacy">Privacy</a>
+                    <a href="#download" data-i18n="footer.terms">Terms</a>
+                    <a href="#download" data-i18n="footer.safety">Safety</a>
                 </div>
             </div>
             <div class="footer-bottom">
@@ -398,9 +387,16 @@
         <div class="exit-popup-content">
             <button class="exit-popup-close" id="exitPopupClose" aria-label="Close">×</button>
             <h3 data-i18n="popup.title">Wait! Don't Miss Out</h3>
-            <p data-i18n="popup.text">Get your first story absolutely free - no credit card required!</p>
-            <a href="#signup" class="btn btn-primary" data-i18n="popup.cta">Yes, I Want My Free Story</a>
-            <button class="exit-popup-dismiss" id="exitPopupDismiss" data-i18n="popup.dismiss">No thanks, I'll pass</button>
+            <p data-i18n="popup.text">Download the app and start creating magical stories today!</p>
+            <div class="store-buttons" style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
+                <a href="https://apps.apple.com/app/your-app-id" class="store-button app-store" target="_blank" rel="noopener noreferrer" aria-label="Download on the App Store">
+                    <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83&releaseDate=1289433600" alt="Download on the App Store" style="height: 50px; width: auto;">
+                </a>
+                <a href="https://play.google.com/store/apps/details?id=your.package.name" class="store-button google-play" target="_blank" rel="noopener noreferrer" aria-label="Get it on Google Play">
+                    <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" style="height: 50px; width: auto;">
+                </a>
+            </div>
+            <button class="exit-popup-dismiss" id="exitPopupDismiss" data-i18n="popup.dismiss" style="margin-top: 1rem;">No thanks, I'll pass</button>
         </div>
     </div>
 
