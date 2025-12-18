@@ -351,8 +351,16 @@ img {
 
 .store-button img {
     display: block;
-    height: auto;
+    height: 60px;
+    width: auto;
     max-width: 100%;
+}
+
+/* Ensure App Store button matches Google Play button size */
+.store-button.app-store img {
+    height: 40px; /* Slightly smaller to match Google Play visual size */
+    width: auto;
+    object-fit: contain;
 }
 
 @media (max-width: 768px) {
