@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  tale-generator:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    depends_on:
+      - supabase
+    networks:
+      - tale-network
+
+  supabase:
+    image: supabase/postgres:15.1.1.10
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_PORT=5432
+    volumes:
+      - supabase_data:/var/lib/postgresql/data
+    networks:
+      - tale-network
+
+networks:
+  tale-network:
+    driver: bridge
+
+volumes:
+  supabase_data:

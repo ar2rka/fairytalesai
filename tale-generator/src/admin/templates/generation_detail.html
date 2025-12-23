@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Детали генерации - Tale Generator</title>
+    <link rel="stylesheet" href="/admin/static/css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .detail-container {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        .info-section {
+            margin-bottom: 2rem;
+        }
+        
+        .info-section h2 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .info-item {
+            padding: 1rem;
+            background: var(--light-color);
+            border-radius: 4px;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: var(--gray-color);
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .info-value {
+            font-size: 1rem;
+            color: var(--dark-color);
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-timeout {
+            background: #f5c6cb;
+            color: #721c24;
+        }
+        
+        .story-type-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .type-child {
+            background: #cfe2ff;
+            color: #084298;
+        }
+        
+        .type-hero {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+        
+        .type-combined {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .model-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            background: #e9ecef;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .attempts-section {
+            margin-top: 2rem;
+        }
+        
+        .attempt-card {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            background: white;
+        }
+        
+        .attempt-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .attempt-number {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 1rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+        
+        .code-block pre {
+            margin: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .json-viewer {
+            background: #f8f9fa;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 1rem;
+            margin: 1rem 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .json-viewer pre {
+            margin: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .error-box {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            padding: 1rem;
+            margin: 1rem 0;
+            color: #721c24;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray-color);
+        }
+        
+        .expandable {
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .expandable:hover {
+            background: var(--light-color);
+        }
+        
+        .collapsed {
+            display: none;
+        }
+        
+        .expand-icon {
+            margin-right: 0.5rem;
+            transition: transform 0.3s;
+        }
+        
+        .expanded .expand-icon {
+            transform: rotate(90deg);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-info-circle"></i> Детали генерации</h1>
+            <p>Подробная информация о генерации истории</p>
+        </header>
+
+        <main>
+            <a href="/admin/generations" class="back-link">
+                <i class="fas fa-arrow-left"></i> Назад к списку генераций
+            </a>
+
+            <div id="loading" class="loading">
+                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                <p>Загрузка данных...</p>
+            </div>
+
+            <div id="error-container"></div>
+
+            <div id="detail-container" class="detail-container hidden">
+                <!-- General Info Section -->
+                <div class="info-section">
+                    <h2><i class="fas fa-info-circle"></i> Общая информация</h2>
+                    <div class="info-grid" id="general-info-grid">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Latest Attempt Section -->
+                <div class="info-section" id="latest-attempt-section">
+                    <h2><i class="fas fa-star"></i> Последняя попытка</h2>
+                    <div id="latest-attempt-content">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- All Attempts Section -->
+                <div class="info-section attempts-section">
+                    <h2><i class="fas fa-list"></i> Все попытки (<span id="attempts-count">0</span>)</h2>
+                    <div id="attempts-container">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 Tale Generator. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        const API_BASE = '/api/v1';
+        
+        // Get generation_id from URL
+        // Try to get from query parameter first, then from path
+        const urlParams = new URLSearchParams(window.location.search);
+        let generationId = urlParams.get('id');
+        
+        // If not in query, extract from path (e.g., /admin/generations/{id})
+        if (!generationId) {
+            const pathParts = window.location.pathname.split('/').filter(p => p);
+            const generationsIndex = pathParts.indexOf('generations');
+            if (generationsIndex !== -1 && pathParts.length > generationsIndex + 1) {
+                generationId = pathParts[generationsIndex + 1];
+            }
+        }
+        
+        async function loadGenerationDetail() {
+            const loading = document.getElementById('loading');
+            const errorContainer = document.getElementById('error-container');
+            const detailContainer = document.getElementById('detail-container');
+            
+            loading.classList.remove('hidden');
+            errorContainer.innerHTML = '';
+            detailContainer.classList.add('hidden');
+            
+            console.log('Loading generation detail for ID:', generationId);
+            console.log('API URL:', `${API_BASE}/admin/generations/${generationId}`);
+            
+            try {
+                const response = await fetch(`${API_BASE}/admin/generations/${generationId}`);
+                
+                console.log('Response status:', response.status);
+                console.log('Response ok:', response.ok);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Error response:', errorText);
+                    
+                    if (response.status === 404) {
+                        throw new Error(`Генерация с ID ${generationId} не найдена`);
+                    }
+                    throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+                }
+                
+                const data = await response.json();
+                console.log('Received data:', data);
+                
+                renderGenerationDetail(data);
+                detailContainer.classList.remove('hidden');
+            } catch (error) {
+                console.error('Error loading generation detail:', error);
+                errorContainer.innerHTML = `
+                    <div class="error-message">
+                        <strong>Ошибка загрузки данных:</strong> ${error.message}
+                        <br><small>ID генерации: ${generationId}</small>
+                        <br><small>Проверьте консоль браузера для деталей</small>
+                    </div>
+                `;
+            } finally {
+                loading.classList.add('hidden');
+            }
+        }
+        
+        function renderGenerationDetail(data) {
+            const latest = data.latest_attempt;
+            
+            // Render general info
+            renderGeneralInfo(latest);
+            
+            // Render latest attempt
+            if (latest) {
+                renderAttempt(latest, 'latest-attempt-content', true);
+            }
+            
+            // Render all attempts
+            renderAllAttempts(data.all_attempts);
+            document.getElementById('attempts-count').textContent = data.total_attempts;
+        }
+        
+        function renderGeneralInfo(attempt) {
+            if (!attempt) return;
+            
+            const grid = document.getElementById('general-info-grid');
+            
+            const statusClass = `status-${attempt.status}`;
+            const statusText = {
+                'success': 'Успешно',
+                'failed': 'Ошибка',
+                'pending': 'В процессе',
+                'timeout': 'Таймаут'
+            }[attempt.status] || attempt.status;
+            
+            const storyTypeClass = `type-${attempt.story_type}`;
+            const storyTypeText = {
+                'child': 'Ребенок',
+                'hero': 'Герой',
+                'combined': 'Комбинированная'
+            }[attempt.story_type] || attempt.story_type;
+            
+            const createdDate = attempt.created_at ? new Date(attempt.created_at).toLocaleString('ru-RU') : '-';
+            const completedDate = attempt.completed_at ? new Date(attempt.completed_at).toLocaleString('ru-RU') : '-';
+            
+            grid.innerHTML = `
+                <div class="info-item">
+                    <div class="info-label">ID генерации</div>
+                    <div class="info-value"><code>${attempt.generation_id}</code></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Статус</div>
+                    <div class="info-value"><span class="status-badge ${statusClass}">${statusText}</span></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Тип истории</div>
+                    <div class="info-value"><span class="story-type-badge ${storyTypeClass}">${storyTypeText}</span></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Модель</div>
+                    <div class="info-value"><span class="model-badge">${attempt.model_used || '-'}</span></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Длина (мин)</div>
+                    <div class="info-value">${attempt.story_length || '-'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Мораль</div>
+                    <div class="info-value">${escapeHtml(attempt.moral || '-')}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Внешность героя</div>
+                    <div class="info-value">${escapeHtml(attempt.hero_appearance || '-')}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Описание отношений</div>
+                    <div class="info-value">${escapeHtml(attempt.relationship_description || '-')}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Создано</div>
+                    <div class="info-value">${createdDate}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Завершено</div>
+                    <div class="info-value">${completedDate}</div>
+                </div>
+            `;
+        }
+        
+        function renderAllAttempts(attempts) {
+            const container = document.getElementById('attempts-container');
+            container.innerHTML = '';
+            
+            if (!attempts || attempts.length === 0) {
+                container.innerHTML = '<div class="empty-state">Нет попыток для отображения</div>';
+                return;
+            }
+            
+            attempts.forEach((attempt, index) => {
+                const card = document.createElement('div');
+                card.className = 'attempt-card';
+                renderAttempt(attempt, card, false);
+                container.appendChild(card);
+            });
+        }
+        
+        function renderAttempt(attempt, container, isLatest) {
+            const statusClass = `status-${attempt.status}`;
+            const statusText = {
+                'success': 'Успешно',
+                'failed': 'Ошибка',
+                'pending': 'В процессе',
+                'timeout': 'Таймаут'
+            }[attempt.status] || attempt.status;
+            
+            const createdDate = attempt.created_at ? new Date(attempt.created_at).toLocaleString('ru-RU') : '-';
+            const completedDate = attempt.completed_at ? new Date(attempt.completed_at).toLocaleString('ru-RU') : '-';
+            
+            const attemptId = `attempt-${attempt.attempt_number}`;
+            
+            let html = '';
+            if (!isLatest) {
+                html = `
+                    <div class="attempt-header">
+                        <div class="attempt-number">Попытка #${attempt.attempt_number}</div>
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </div>
+                `;
+            }
+            
+            html += `
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Модель</div>
+                        <div class="info-value"><span class="model-badge">${attempt.model_used || '-'}</span></div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Статус</div>
+                        <div class="info-value"><span class="status-badge ${statusClass}">${statusText}</span></div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Создано</div>
+                        <div class="info-value">${createdDate}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Завершено</div>
+                        <div class="info-value">${completedDate}</div>
+                    </div>
+                </div>
+            `;
+            
+            // Error message
+            if (attempt.error_message) {
+                html += `
+                    <div class="error-box">
+                        <strong><i class="fas fa-exclamation-triangle"></i> Ошибка:</strong>
+                        <pre>${escapeHtml(attempt.error_message)}</pre>
+                    </div>
+                `;
+            }
+            
+            // Prompt
+            html += `
+                <div class="expandable" onclick="toggleSection('${attemptId}-prompt')">
+                    <h3><i class="fas fa-chevron-right expand-icon"></i> Промпт</h3>
+                </div>
+                <div id="${attemptId}-prompt" class="collapsed">
+                    <div class="code-block">
+                        <pre>${escapeHtml(attempt.prompt || '-')}</pre>
+                    </div>
+                </div>
+            `;
+            
+            // Full response
+            if (attempt.full_response) {
+                html += `
+                    <div class="expandable" onclick="toggleSection('${attemptId}-response')">
+                        <h3><i class="fas fa-chevron-right expand-icon"></i> Полный ответ API</h3>
+                    </div>
+                    <div id="${attemptId}-response" class="collapsed">
+                        <div class="json-viewer">
+                            <pre>${JSON.stringify(attempt.full_response, null, 2)}</pre>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (typeof container === 'string') {
+                document.getElementById(container).innerHTML = html;
+            } else {
+                container.innerHTML = html;
+            }
+        }
+        
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            const expandable = section.previousElementSibling;
+            
+            if (section.classList.contains('collapsed')) {
+                section.classList.remove('collapsed');
+                expandable.classList.add('expanded');
+            } else {
+                section.classList.add('collapsed');
+                expandable.classList.remove('expanded');
+            }
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '-';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Load on page load
+        if (generationId) {
+            loadGenerationDetail();
+        } else {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('error-container').innerHTML = `
+                <div class="error-message">
+                    <strong>Ошибка:</strong> ID генерации не указан
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+

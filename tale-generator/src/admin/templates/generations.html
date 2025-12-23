@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Просмотр генераций - Tale Generator</title>
+    <link rel="stylesheet" href="/admin/static/css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .generations-container {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+        
+        .filters-section {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--light-color);
+            border-radius: 8px;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .filter-group label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--dark-color);
+        }
+        
+        .filter-group select,
+        .filter-group input {
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .generations-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .generations-table th {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .generations-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .generations-table tr:hover {
+            background: var(--light-color);
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-timeout {
+            background: #f5c6cb;
+            color: #721c24;
+        }
+        
+        .prompt-preview {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+        
+        .prompt-full {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            max-width: 80%;
+            max-height: 80vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+        
+        .prompt-full.show {
+            display: block;
+        }
+        
+        .prompt-full pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        
+        .close-prompt {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        
+        .model-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            background: #e9ecef;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .story-type-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .type-child {
+            background: #cfe2ff;
+            color: #084298;
+        }
+        
+        .type-hero {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+        
+        .type-combined {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray-color);
+        }
+        
+        .refresh-btn {
+            margin-left: auto;
+        }
+        
+        .generations-table a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .generations-table a:hover {
+            color: var(--secondary-color);
+            text-decoration: underline;
+        }
+        
+        .generations-table a code {
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-database"></i> Просмотр генераций</h1>
+            <p>Просмотр всех сгенерированных историй с деталями промптов и моделей</p>
+        </header>
+
+        <main>
+            <div class="generations-container">
+                <div class="filters-section">
+                    <div class="filter-group">
+                        <label for="status-filter">Статус:</label>
+                        <select id="status-filter">
+                            <option value="">Все статусы</option>
+                            <option value="success">Успешно</option>
+                            <option value="failed">Ошибка</option>
+                            <option value="pending">В процессе</option>
+                            <option value="timeout">Таймаут</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="story-type-filter">Тип истории:</label>
+                        <select id="story-type-filter">
+                            <option value="">Все типы</option>
+                            <option value="child">Ребенок</option>
+                            <option value="hero">Герой</option>
+                            <option value="combined">Комбинированная</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="model-filter">Модель:</label>
+                        <input type="text" id="model-filter" placeholder="Фильтр по модели">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="limit-input">Лимит:</label>
+                        <input type="number" id="limit-input" value="100" min="1" max="500">
+                    </div>
+                    
+                    <button id="refresh-btn" class="btn-primary refresh-btn">
+                        <i class="fas fa-sync-alt"></i> Обновить
+                    </button>
+                </div>
+
+                <div id="loading" class="loading hidden">
+                    <i class="fas fa-spinner fa-spin fa-2x"></i>
+                    <p>Загрузка данных...</p>
+                </div>
+
+                <div id="error-container"></div>
+
+                <div id="table-container">
+                    <table class="generations-table">
+                        <thead>
+                            <tr>
+                                <th>ID генерации</th>
+                                <th>Попытка</th>
+                                <th>Статус</th>
+                                <th>Модель</th>
+                                <th>Тип истории</th>
+                                <th>Длина (мин)</th>
+                                <th>Мораль</th>
+                                <th>Промпт</th>
+                                <th>Создано</th>
+                                <th>Завершено</th>
+                                <th>Ошибка</th>
+                            </tr>
+                        </thead>
+                        <tbody id="generations-tbody">
+                            <tr>
+                                <td colspan="11" class="empty-state">
+                                    <i class="fas fa-spinner fa-spin"></i> Загрузка...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 Tale Generator. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <!-- Modal for full prompt view -->
+    <div id="prompt-modal" class="prompt-full">
+        <button class="close-prompt" onclick="closePromptModal()">&times;</button>
+        <h3>Полный промпт</h3>
+        <pre id="prompt-content"></pre>
+    </div>
+
+    <script>
+        const API_BASE = '/api/v1';
+        
+        async function loadGenerations() {
+            const status = document.getElementById('status-filter').value;
+            const storyType = document.getElementById('story-type-filter').value;
+            const model = document.getElementById('model-filter').value;
+            const limit = parseInt(document.getElementById('limit-input').value) || 100;
+            
+            const loading = document.getElementById('loading');
+            const errorContainer = document.getElementById('error-container');
+            const tbody = document.getElementById('generations-tbody');
+            
+            loading.classList.remove('hidden');
+            errorContainer.innerHTML = '';
+            tbody.innerHTML = '<tr><td colspan="11" class="empty-state"><i class="fas fa-spinner fa-spin"></i> Загрузка...</td></tr>';
+            
+            try {
+                const params = new URLSearchParams({ limit: limit.toString() });
+                if (status) params.append('status', status);
+                if (storyType) params.append('story_type', storyType);
+                if (model) params.append('model_used', model);
+                
+                const response = await fetch(`${API_BASE}/admin/generations?${params}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.generations && data.generations.length > 0) {
+                    renderGenerations(data.generations);
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="11" class="empty-state">Нет данных для отображения</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading generations:', error);
+                errorContainer.innerHTML = `
+                    <div class="error-message">
+                        <strong>Ошибка загрузки данных:</strong> ${error.message}
+                    </div>
+                `;
+                tbody.innerHTML = '<tr><td colspan="11" class="empty-state">Ошибка загрузки данных</td></tr>';
+            } finally {
+                loading.classList.add('hidden');
+            }
+        }
+        
+        function renderGenerations(generations) {
+            const tbody = document.getElementById('generations-tbody');
+            tbody.innerHTML = '';
+            
+            generations.forEach(gen => {
+                const row = document.createElement('tr');
+                
+                const statusClass = `status-${gen.status}`;
+                const statusText = {
+                    'success': 'Успешно',
+                    'failed': 'Ошибка',
+                    'pending': 'В процессе',
+                    'timeout': 'Таймаут'
+                }[gen.status] || gen.status;
+                
+                const storyTypeClass = `type-${gen.story_type}`;
+                const storyTypeText = {
+                    'child': 'Ребенок',
+                    'hero': 'Герой',
+                    'combined': 'Комбинированная'
+                }[gen.story_type] || gen.story_type;
+                
+                const promptPreview = gen.prompt ? 
+                    (gen.prompt.length > 100 ? gen.prompt.substring(0, 100) + '...' : gen.prompt) : 
+                    '-';
+                
+                const createdDate = gen.created_at ? new Date(gen.created_at).toLocaleString('ru-RU') : '-';
+                const completedDate = gen.completed_at ? new Date(gen.completed_at).toLocaleString('ru-RU') : '-';
+                
+                row.innerHTML = `
+                    <td>
+                        <a href="/admin/generations/${gen.generation_id}" style="color: var(--primary-color); text-decoration: none;">
+                            <code style="font-size: 0.8rem;">${gen.generation_id.substring(0, 8)}...</code>
+                            <i class="fas fa-external-link-alt" style="margin-left: 0.5rem; font-size: 0.7rem;"></i>
+                        </a>
+                    </td>
+                    <td>${gen.attempt_number}</td>
+                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                    <td><span class="model-badge">${gen.model_used || '-'}</span></td>
+                    <td><span class="story-type-badge ${storyTypeClass}">${storyTypeText}</span></td>
+                    <td>${gen.story_length || '-'}</td>
+                    <td>${gen.moral || '-'}</td>
+                    <td class="prompt-preview" onclick="showFullPrompt('${escapeHtml(gen.prompt || '')}')" title="Кликните для просмотра полного промпта">
+                        ${escapeHtml(promptPreview)}
+                    </td>
+                    <td>${createdDate}</td>
+                    <td>${completedDate}</td>
+                    <td>${gen.error_message ? `<span style="color: var(--danger-color);">${escapeHtml(gen.error_message.substring(0, 50))}${gen.error_message.length > 50 ? '...' : ''}</span>` : '-'}</td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+        
+        function showFullPrompt(prompt) {
+            const modal = document.getElementById('prompt-modal');
+            const content = document.getElementById('prompt-content');
+            content.textContent = prompt;
+            modal.classList.add('show');
+        }
+        
+        function closePromptModal() {
+            const modal = document.getElementById('prompt-modal');
+            modal.classList.remove('show');
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Close modal on outside click
+        document.getElementById('prompt-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePromptModal();
+            }
+        });
+        
+        // Event listeners
+        document.getElementById('refresh-btn').addEventListener('click', loadGenerations);
+        document.getElementById('status-filter').addEventListener('change', loadGenerations);
+        document.getElementById('story-type-filter').addEventListener('change', loadGenerations);
+        document.getElementById('model-filter').addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') {
+                loadGenerations();
+            }
+        });
+        
+        // Load on page load
+        loadGenerations();
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+

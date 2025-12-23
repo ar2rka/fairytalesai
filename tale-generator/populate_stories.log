@@ -1,0 +1,476 @@
+2025-12-02 21:05:22,146 - tale_generator.populate - INFO - Initializing clients...
+2025-12-02 21:05:22,209 - tale_generator.supabase_async - INFO - Async Supabase client wrapper initialized
+2025-12-02 21:05:22,210 - tale_generator.populate - INFO - Clients initialized in 0.06s
+2025-12-02 21:05:22,210 - tale_generator.populate - INFO - Starting to save children to database...
+2025-12-02 21:05:23,018 - httpx - INFO - HTTP Request: POST https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/children "HTTP/2 201 Created"
+2025-12-02 21:05:23,022 - tale_generator.populate - INFO - Saved child: Emma with ID: 6f440a73-5c21-4c7e-ae66-24d84af653be in 0.81s
+2025-12-02 21:05:23,154 - httpx - INFO - HTTP Request: POST https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/children "HTTP/2 201 Created"
+2025-12-02 21:05:23,156 - tale_generator.populate - INFO - Saved child: Liam with ID: d71dc16b-3acb-431e-ae22-3f7850a342ed in 0.13s
+2025-12-02 21:05:23,284 - httpx - INFO - HTTP Request: POST https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/children "HTTP/2 201 Created"
+2025-12-02 21:05:23,286 - tale_generator.populate - INFO - Saved child: Olivia with ID: 998dd86a-500d-48e4-9f01-c24d954441ea in 0.13s
+2025-12-02 21:05:23,409 - httpx - INFO - HTTP Request: POST https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/children "HTTP/2 201 Created"
+2025-12-02 21:05:23,411 - tale_generator.populate - INFO - Saved child: Noah with ID: f0193f60-fcc8-41c8-b655-30a61783d39c in 0.12s
+2025-12-02 21:05:23,537 - httpx - INFO - HTTP Request: POST https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/children "HTTP/2 201 Created"
+2025-12-02 21:05:23,538 - tale_generator.populate - INFO - Saved child: Ava with ID: fa3f1afa-456e-47e0-83bc-6a6ca9dadff0 in 0.13s
+2025-12-02 21:05:23,539 - tale_generator.populate - INFO - Processed all children in 1.33s
+2025-12-02 21:05:23,539 - tale_generator.populate - INFO - Children saving completed in 1.33s
+2025-12-02 21:05:23,539 - tale_generator.populate - INFO - Generating 10 sample stories...
+2025-12-02 21:05:23,539 - tale_generator.populate - INFO - Created 10 story generation tasks in 0.00s
+2025-12-02 21:05:23,540 - tale_generator.populate - INFO - Generating child story 1/10 for Emma with moral 'kindness' using openai/gpt-4o-mini in en...
+2025-12-02 21:05:23,540 - tale_generator.populate - INFO - Starting child story prompt creation
+2025-12-02 21:05:23,540 - tale_generator.populate - INFO - Converted child data to character in 0.00s
+2025-12-02 21:05:23,540 - tale_generator.populate - INFO - Built prompt in 0.00s
+2025-12-02 21:05:23,540 - tale_generator.populate - INFO - Completed child story prompt creation in 0.00s
+2025-12-02 21:05:23,540 - tale_generator.populate - INFO - Prompt creation took 0.00s
+2025-12-02 21:05:23,678 - tale_generator.populate - INFO - Generating hero story 2/10 for Liam with moral 'honesty' using anthropic/claude-3-haiku in ru...
+2025-12-02 21:05:23,678 - tale_generator.populate - INFO - Starting hero story prompt creation for language ru
+2025-12-02 21:05:23,699 - tale_generator.supabase_async - INFO - Async Supabase client wrapper initialized
+2025-12-02 21:05:23,699 - tale_generator.populate - INFO - Generating combined story 3/10 for Olivia with moral 'bravery' using meta-llama/llama-3.1-8b-instruct in en...
+2025-12-02 21:05:23,700 - tale_generator.populate - INFO - Starting combined story prompt creation for language en
+2025-12-02 21:05:23,729 - tale_generator.supabase_async - INFO - Async Supabase client wrapper initialized
+2025-12-02 21:05:23,729 - tale_generator.populate - INFO - Generating child story 4/10 for Noah with moral 'friendship' using google/gemma-2-27b-it in ru...
+2025-12-02 21:05:23,729 - tale_generator.populate - INFO - Starting child story prompt creation
+2025-12-02 21:05:23,729 - tale_generator.populate - INFO - Converted child data to character in 0.00s
+2025-12-02 21:05:23,729 - tale_generator.populate - INFO - Built prompt in 0.00s
+2025-12-02 21:05:23,729 - tale_generator.populate - INFO - Completed child story prompt creation in 0.00s
+2025-12-02 21:05:23,729 - tale_generator.populate - INFO - Prompt creation took 0.00s
+2025-12-02 21:05:23,730 - tale_generator.populate - INFO - Generating hero story 5/10 for Ava with moral 'perseverance' using mistralai/mixtral-8x22b-instruct in en...
+2025-12-02 21:05:23,730 - tale_generator.populate - INFO - Starting hero story prompt creation for language en
+2025-12-02 21:05:23,762 - tale_generator.supabase_async - INFO - Async Supabase client wrapper initialized
+2025-12-02 21:05:23,762 - tale_generator.populate - INFO - Generating combined story 6/10 for Emma with moral 'empathy' using x-ai/grok-4.1-fast:free in ru...
+2025-12-02 21:05:23,763 - tale_generator.populate - INFO - Starting combined story prompt creation for language ru
+2025-12-02 21:05:23,795 - tale_generator.supabase_async - INFO - Async Supabase client wrapper initialized
+2025-12-02 21:05:23,795 - tale_generator.populate - INFO - Generating child story 7/10 for Liam with moral 'respect' using google/gemini-2.0-flash-exp:free in en...
+2025-12-02 21:05:23,796 - tale_generator.populate - INFO - Starting child story prompt creation
+2025-12-02 21:05:23,796 - tale_generator.populate - INFO - Converted child data to character in 0.00s
+2025-12-02 21:05:23,796 - tale_generator.populate - INFO - Built prompt in 0.00s
+2025-12-02 21:05:23,796 - tale_generator.populate - INFO - Completed child story prompt creation in 0.00s
+2025-12-02 21:05:23,796 - tale_generator.populate - INFO - Prompt creation took 0.00s
+2025-12-02 21:05:23,796 - tale_generator.populate - INFO - Generating hero story 8/10 for Olivia with moral 'responsibility' using openai/gpt-4o-mini in ru...
+2025-12-02 21:05:23,796 - tale_generator.populate - INFO - Starting hero story prompt creation for language ru
+2025-12-02 21:05:23,825 - tale_generator.supabase_async - INFO - Async Supabase client wrapper initialized
+2025-12-02 21:05:23,825 - tale_generator.populate - INFO - Generating combined story 9/10 for Noah with moral 'kindness' using anthropic/claude-3-haiku in en...
+2025-12-02 21:05:23,826 - tale_generator.populate - INFO - Starting combined story prompt creation for language en
+2025-12-02 21:05:23,853 - tale_generator.supabase_async - INFO - Async Supabase client wrapper initialized
+2025-12-02 21:05:23,853 - tale_generator.populate - INFO - Generating child story 10/10 for Ava with moral 'honesty' using meta-llama/llama-3.1-8b-instruct in ru...
+2025-12-02 21:05:23,853 - tale_generator.populate - INFO - Starting child story prompt creation
+2025-12-02 21:05:23,853 - tale_generator.populate - INFO - Converted child data to character in 0.00s
+2025-12-02 21:05:23,853 - tale_generator.populate - INFO - Built prompt in 0.00s
+2025-12-02 21:05:23,853 - tale_generator.populate - INFO - Completed child story prompt creation in 0.00s
+2025-12-02 21:05:23,853 - tale_generator.populate - INFO - Prompt creation took 0.00s
+2025-12-02 21:05:23,913 - httpx - INFO - HTTP Request: GET https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/heroes?select=%2A "HTTP/2 200 OK"
+2025-12-02 21:05:23,915 - tale_generator.populate - INFO - Retrieved 5 heroes in 0.22s
+2025-12-02 21:05:23,915 - tale_generator.populate - INFO - Filtered heroes by language in 0.00s, found 3 heroes
+2025-12-02 21:05:23,915 - tale_generator.populate - INFO - Selected hero Ледяная Волшебница in 0.00s
+2025-12-02 21:05:23,915 - tale_generator.populate - INFO - Converted hero entity in 0.00s
+2025-12-02 21:05:23,915 - tale_generator.populate - INFO - Built prompt in 0.00s
+2025-12-02 21:05:23,915 - tale_generator.populate - INFO - Completed hero story prompt creation in 0.24s
+2025-12-02 21:05:23,915 - tale_generator.populate - INFO - Prompt creation took 0.24s
+2025-12-02 21:05:23,946 - httpx - INFO - HTTP Request: GET https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/heroes?select=%2A "HTTP/2 200 OK"
+2025-12-02 21:05:23,947 - tale_generator.populate - INFO - Retrieved 5 heroes in 0.22s
+2025-12-02 21:05:23,947 - tale_generator.populate - INFO - Filtered heroes by language in 0.00s, found 2 heroes
+2025-12-02 21:05:23,947 - tale_generator.populate - INFO - Selected hero Captain Wonder in 0.00s
+2025-12-02 21:05:23,947 - tale_generator.populate - INFO - Converted child data to character in 0.00s
+2025-12-02 21:05:23,947 - tale_generator.populate - INFO - Converted hero entity in 0.00s
+2025-12-02 21:05:23,947 - tale_generator.populate - INFO - Created relationship description in 0.00s
+2025-12-02 21:05:23,947 - tale_generator.populate - INFO - Created combined character in 0.00s
+2025-12-02 21:05:23,947 - tale_generator.populate - INFO - Built prompt in 0.00s
+2025-12-02 21:05:23,947 - tale_generator.populate - INFO - Completed combined story prompt creation in 0.25s
+2025-12-02 21:05:23,947 - tale_generator.populate - INFO - Prompt creation took 0.25s
+2025-12-02 21:05:23,987 - httpx - INFO - HTTP Request: GET https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/heroes?select=%2A "HTTP/2 200 OK"
+2025-12-02 21:05:23,988 - tale_generator.populate - INFO - Retrieved 5 heroes in 0.23s
+2025-12-02 21:05:23,988 - tale_generator.populate - INFO - Filtered heroes by language in 0.00s, found 2 heroes
+2025-12-02 21:05:23,988 - tale_generator.populate - INFO - Selected hero Captain Wonder in 0.00s
+2025-12-02 21:05:23,988 - tale_generator.populate - INFO - Converted hero entity in 0.00s
+2025-12-02 21:05:23,988 - tale_generator.populate - INFO - Built prompt in 0.00s
+2025-12-02 21:05:23,988 - tale_generator.populate - INFO - Completed hero story prompt creation in 0.26s
+2025-12-02 21:05:23,988 - tale_generator.populate - INFO - Prompt creation took 0.26s
+2025-12-02 21:05:24,014 - httpx - INFO - HTTP Request: GET https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/heroes?select=%2A "HTTP/2 200 OK"
+2025-12-02 21:05:24,016 - tale_generator.populate - INFO - Retrieved 5 heroes in 0.22s
+2025-12-02 21:05:24,016 - tale_generator.populate - INFO - Filtered heroes by language in 0.00s, found 3 heroes
+2025-12-02 21:05:24,016 - tale_generator.populate - INFO - Selected hero Ёжик-хуёжик in 0.00s
+2025-12-02 21:05:24,016 - tale_generator.populate - INFO - Converted child data to character in 0.00s
+2025-12-02 21:05:24,016 - tale_generator.populate - INFO - Converted hero entity in 0.00s
+2025-12-02 21:05:24,016 - tale_generator.populate - INFO - Created relationship description in 0.00s
+2025-12-02 21:05:24,016 - tale_generator.populate - INFO - Created combined character in 0.00s
+2025-12-02 21:05:24,016 - tale_generator.populate - INFO - Built prompt in 0.00s
+2025-12-02 21:05:24,016 - tale_generator.populate - INFO - Completed combined story prompt creation in 0.25s
+2025-12-02 21:05:24,016 - tale_generator.populate - INFO - Prompt creation took 0.25s
+2025-12-02 21:05:24,038 - httpx - INFO - HTTP Request: GET https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/heroes?select=%2A "HTTP/2 200 OK"
+2025-12-02 21:05:24,039 - tale_generator.populate - INFO - Retrieved 5 heroes in 0.21s
+2025-12-02 21:05:24,039 - tale_generator.populate - INFO - Filtered heroes by language in 0.00s, found 3 heroes
+2025-12-02 21:05:24,039 - tale_generator.populate - INFO - Selected hero Ледяная Волшебница in 0.00s
+2025-12-02 21:05:24,039 - tale_generator.populate - INFO - Converted hero entity in 0.00s
+2025-12-02 21:05:24,039 - tale_generator.populate - INFO - Built prompt in 0.00s
+2025-12-02 21:05:24,039 - tale_generator.populate - INFO - Completed hero story prompt creation in 0.24s
+2025-12-02 21:05:24,039 - tale_generator.populate - INFO - Prompt creation took 0.24s
+2025-12-02 21:05:24,052 - httpx - INFO - HTTP Request: GET https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/heroes?select=%2A "HTTP/2 200 OK"
+2025-12-02 21:05:24,052 - tale_generator.populate - INFO - Retrieved 5 heroes in 0.20s
+2025-12-02 21:05:24,052 - tale_generator.populate - INFO - Filtered heroes by language in 0.00s, found 2 heroes
+2025-12-02 21:05:24,052 - tale_generator.populate - INFO - Selected hero Captain Wonder in 0.00s
+2025-12-02 21:05:24,052 - tale_generator.populate - INFO - Converted child data to character in 0.00s
+2025-12-02 21:05:24,052 - tale_generator.populate - INFO - Converted hero entity in 0.00s
+2025-12-02 21:05:24,052 - tale_generator.populate - INFO - Created relationship description in 0.00s
+2025-12-02 21:05:24,052 - tale_generator.populate - INFO - Created combined character in 0.00s
+2025-12-02 21:05:24,053 - tale_generator.populate - INFO - Built prompt in 0.00s
+2025-12-02 21:05:24,053 - tale_generator.populate - INFO - Completed combined story prompt creation in 0.23s
+2025-12-02 21:05:24,053 - tale_generator.populate - INFO - Prompt creation took 0.23s
+2025-12-02 21:05:24,917 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-02 21:05:25,060 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-02 21:05:25,065 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-02 21:05:25,198 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-02 21:05:25,302 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-02 21:05:25,654 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-02 21:05:25,766 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-02 21:05:26,678 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-12-02 21:05:26,682 - openai._base_client - INFO - Retrying request to /chat/completions in 0.437432 seconds
+2025-12-02 21:05:27,277 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-02 21:05:27,281 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-02 21:05:28,338 - tale_generator.openrouter - INFO - Successfully generated story with model anthropic/claude-3-haiku
+2025-12-02 21:05:28,338 - tale_generator.populate - INFO - Story generation took 4.29s
+2025-12-02 21:05:28,338 - tale_generator.populate - INFO - Title extraction took 0.00s
+2025-12-02 21:05:28,338 - tale_generator.populate - INFO - DateTime formatting took 0.00s
+2025-12-02 21:05:28,338 - tale_generator.populate - INFO - Hero field preparation took 0.00s
+2025-12-02 21:05:28,339 - tale_generator.populate - INFO - Story object creation took 0.00s
+2025-12-02 21:05:28,502 - httpx - INFO - HTTP Request: POST https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/stories "HTTP/2 201 Created"
+2025-12-02 21:05:28,507 - tale_generator.populate - INFO - Story saved with ID: a15081b2-ad04-46ea-b9f2-3fa06075c745, Type: combined in 0.17s
+2025-12-02 21:05:28,507 - tale_generator.populate - INFO - Total story generation process took 4.68s
+2025-12-02 21:05:29,559 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-12-02 21:05:29,560 - openai._base_client - INFO - Retrying request to /chat/completions in 0.875791 seconds
+2025-12-02 21:05:30,762 - tale_generator.openrouter - INFO - Successfully generated story with model anthropic/claude-3-haiku
+2025-12-02 21:05:30,763 - tale_generator.populate - INFO - Story generation took 6.85s
+2025-12-02 21:05:30,763 - tale_generator.populate - INFO - Title extraction took 0.00s
+2025-12-02 21:05:30,763 - tale_generator.populate - INFO - DateTime formatting took 0.00s
+2025-12-02 21:05:30,763 - tale_generator.populate - INFO - Hero field preparation took 0.00s
+2025-12-02 21:05:30,763 - tale_generator.populate - INFO - Story object creation took 0.00s
+2025-12-02 21:05:30,921 - httpx - INFO - HTTP Request: POST https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/stories "HTTP/2 201 Created"
+2025-12-02 21:05:30,925 - tale_generator.populate - INFO - Story saved with ID: 8e929bf9-43c0-4d3c-86f6-713b503e792d, Type: hero in 0.16s
+2025-12-02 21:05:30,925 - tale_generator.populate - INFO - Total story generation process took 7.25s
+2025-12-02 21:05:31,217 - tale_generator.openrouter - INFO - Successfully generated story with model mistralai/mixtral-8x22b-instruct
+2025-12-02 21:05:31,218 - tale_generator.populate - INFO - Story generation took 7.23s
+2025-12-02 21:05:31,218 - tale_generator.populate - INFO - Title extraction took 0.00s
+2025-12-02 21:05:31,218 - tale_generator.populate - INFO - DateTime formatting took 0.00s
+2025-12-02 21:05:31,218 - tale_generator.populate - INFO - Hero field preparation took 0.00s
+2025-12-02 21:05:31,219 - tale_generator.populate - INFO - Story object creation took 0.00s
+2025-12-02 21:05:31,357 - httpx - INFO - HTTP Request: POST https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/stories "HTTP/2 201 Created"
+2025-12-02 21:05:31,360 - tale_generator.populate - INFO - Story saved with ID: a8e625ee-4f88-4538-b101-90bae79f16a7, Type: hero in 0.14s
+2025-12-02 21:05:31,360 - tale_generator.populate - INFO - Total story generation process took 7.63s
+2025-12-02 21:05:32,448 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-12-02 21:05:32,452 - tale_generator.openrouter - WARNING - Attempt 1 failed: Error code: 429 - {'error': {'message': 'Provider returned error', 'code': 429, 'metadata': {'raw': 'google/gemini-2.0-flash-exp:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate your rate limits: https://openrouter.ai/settings/integrations', 'provider_name': 'Google'}}, 'user_id': 'user_31PghrdBjqzIyXSQ53Qi0FdS88c'}. Retrying in 1.0 seconds...
+2025-12-02 21:05:32,873 - tale_generator.openrouter - INFO - Successfully generated story with model openai/gpt-4o-mini
+2025-12-02 21:05:32,874 - tale_generator.populate - INFO - Story generation took 8.83s
+2025-12-02 21:05:32,874 - tale_generator.populate - INFO - Title extraction took 0.00s
+2025-12-02 21:05:32,874 - tale_generator.populate - INFO - DateTime formatting took 0.00s
+2025-12-02 21:05:32,874 - tale_generator.populate - INFO - Hero field preparation took 0.00s
+2025-12-02 21:05:32,874 - tale_generator.populate - INFO - Story object creation took 0.00s
+2025-12-02 21:05:33,034 - httpx - INFO - HTTP Request: POST https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/stories "HTTP/2 201 Created"
+2025-12-02 21:05:33,041 - tale_generator.populate - INFO - Story saved with ID: 696008fc-75aa-4c1e-93bf-0c5539677255, Type: hero in 0.17s
+2025-12-02 21:05:33,041 - tale_generator.populate - INFO - Total story generation process took 9.24s
+2025-12-02 21:05:34,336 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-02 21:05:35,172 - tale_generator.openrouter - INFO - Successfully generated story with model google/gemma-2-27b-it
+2025-12-02 21:05:35,173 - tale_generator.populate - INFO - Story generation took 11.44s
+2025-12-02 21:05:35,173 - tale_generator.populate - INFO - Title extraction took 0.00s
+2025-12-02 21:05:35,173 - tale_generator.populate - INFO - DateTime formatting took 0.00s
+2025-12-02 21:05:35,174 - tale_generator.populate - INFO - Hero field preparation took 0.00s
+2025-12-02 21:05:35,174 - tale_generator.populate - INFO - Story object creation took 0.00s
+2025-12-02 21:05:35,338 - httpx - INFO - HTTP Request: POST https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/stories "HTTP/2 201 Created"
+2025-12-02 21:05:35,341 - tale_generator.populate - INFO - Story saved with ID: b9b765f3-8bf1-41f9-abde-c32e7c983088, Type: child in 0.17s
+2025-12-02 21:05:35,341 - tale_generator.populate - INFO - Total story generation process took 11.61s
+2025-12-02 21:05:35,811 - tale_generator.openrouter - INFO - Successfully generated story with model openai/gpt-4o-mini
+2025-12-02 21:05:35,811 - tale_generator.populate - INFO - Story generation took 12.27s
+2025-12-02 21:05:35,811 - tale_generator.populate - INFO - Title extraction took 0.00s
+2025-12-02 21:05:35,811 - tale_generator.populate - INFO - DateTime formatting took 0.00s
+2025-12-02 21:05:35,811 - tale_generator.populate - INFO - Hero field preparation took 0.00s
+2025-12-02 21:05:35,811 - tale_generator.populate - INFO - Story object creation took 0.00s
+2025-12-02 21:05:35,992 - httpx - INFO - HTTP Request: POST https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/stories "HTTP/2 201 Created"
+2025-12-02 21:05:35,994 - tale_generator.populate - INFO - Story saved with ID: b78f79e4-ea58-4751-97d3-b54565e25c41, Type: child in 0.18s
+2025-12-02 21:05:35,994 - tale_generator.populate - INFO - Total story generation process took 12.45s
+2025-12-02 21:05:38,678 - tale_generator.openrouter - INFO - Successfully generated story with model google/gemini-2.0-flash-exp:free
+2025-12-02 21:05:38,678 - tale_generator.populate - INFO - Story generation took 14.88s
+2025-12-02 21:05:38,679 - tale_generator.populate - INFO - Title extraction took 0.00s
+2025-12-02 21:05:38,679 - tale_generator.populate - INFO - DateTime formatting took 0.00s
+2025-12-02 21:05:38,679 - tale_generator.populate - INFO - Hero field preparation took 0.00s
+2025-12-02 21:05:38,679 - tale_generator.populate - INFO - Story object creation took 0.00s
+2025-12-02 21:05:38,913 - httpx - INFO - HTTP Request: POST https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/stories "HTTP/2 201 Created"
+2025-12-02 21:05:38,914 - tale_generator.populate - INFO - Story saved with ID: 01c8da1b-8f40-49d0-a1cb-93be59dd8d4f, Type: child in 0.24s
+2025-12-02 21:05:38,914 - tale_generator.populate - INFO - Total story generation process took 15.12s
+2025-12-02 21:05:53,225 - tale_generator.openrouter - INFO - Successfully generated story with model meta-llama/llama-3.1-8b-instruct
+2025-12-02 21:05:53,227 - tale_generator.populate - INFO - Story generation took 29.37s
+2025-12-02 21:05:53,227 - tale_generator.populate - INFO - Title extraction took 0.00s
+2025-12-02 21:05:53,227 - tale_generator.populate - INFO - DateTime formatting took 0.00s
+2025-12-02 21:05:53,227 - tale_generator.populate - INFO - Hero field preparation took 0.00s
+2025-12-02 21:05:53,227 - tale_generator.populate - INFO - Story object creation took 0.00s
+2025-12-02 21:05:53,420 - httpx - INFO - HTTP Request: POST https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/stories "HTTP/2 201 Created"
+2025-12-02 21:05:53,423 - tale_generator.populate - INFO - Story saved with ID: 96fd73c4-3241-497b-b938-3276bb787488, Type: child in 0.20s
+2025-12-02 21:05:53,423 - tale_generator.populate - INFO - Total story generation process took 29.57s
+2025-12-02 21:05:54,428 - tale_generator.openrouter - INFO - Successfully generated story with model meta-llama/llama-3.1-8b-instruct
+2025-12-02 21:05:54,428 - tale_generator.populate - INFO - Story generation took 30.48s
+2025-12-02 21:05:54,429 - tale_generator.populate - INFO - Title extraction took 0.00s
+2025-12-02 21:05:54,429 - tale_generator.populate - INFO - DateTime formatting took 0.00s
+2025-12-02 21:05:54,429 - tale_generator.populate - INFO - Hero field preparation took 0.00s
+2025-12-02 21:05:54,429 - tale_generator.populate - INFO - Story object creation took 0.00s
+2025-12-02 21:05:54,583 - httpx - INFO - HTTP Request: POST https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/stories "HTTP/2 201 Created"
+2025-12-02 21:05:54,589 - tale_generator.populate - INFO - Story saved with ID: 2a105299-2d75-4e9d-8146-2c9466b3e276, Type: combined in 0.16s
+2025-12-02 21:05:54,589 - tale_generator.populate - INFO - Total story generation process took 30.89s
+2025-12-02 21:06:20,762 - tale_generator.openrouter - INFO - Successfully generated story with model x-ai/grok-4.1-fast:free
+2025-12-02 21:06:20,762 - tale_generator.populate - INFO - Story generation took 56.75s
+2025-12-02 21:06:20,762 - tale_generator.populate - INFO - Title extraction took 0.00s
+2025-12-02 21:06:20,762 - tale_generator.populate - INFO - DateTime formatting took 0.00s
+2025-12-02 21:06:20,762 - tale_generator.populate - INFO - Hero field preparation took 0.00s
+2025-12-02 21:06:20,762 - tale_generator.populate - INFO - Story object creation took 0.00s
+2025-12-02 21:06:21,108 - httpx - INFO - HTTP Request: POST https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/stories "HTTP/2 201 Created"
+2025-12-02 21:06:21,109 - tale_generator.populate - INFO - Story saved with ID: e891d47d-7c65-4da0-ae70-369567bb562a, Type: combined in 0.35s
+2025-12-02 21:06:21,109 - tale_generator.populate - INFO - Total story generation process took 57.35s
+2025-12-02 21:06:21,109 - tale_generator.populate - INFO - Successfully generated and saved 10 stories in 57.57s!
+2025-12-02 21:06:21,109 - tale_generator.populate - INFO - Total story generation process took 57.57s
+2025-12-02 21:06:21,109 - tale_generator.populate - INFO - Adding ratings to stories...
+2025-12-02 21:06:21,292 - httpx - INFO - HTTP Request: PATCH https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/stories?id=eq.b78f79e4-ea58-4751-97d3-b54565e25c41 "HTTP/2 200 OK"
+2025-12-02 21:06:21,310 - tale_generator.supabase - INFO - Successfully updated rating for story b78f79e4-ea58-4751-97d3-b54565e25c41
+2025-12-02 21:06:21,322 - tale_generator.populate - INFO - Rated story '**Emma and the Kindness Quest**' with 10/10 in 0.21s
+2025-12-02 21:06:21,471 - httpx - INFO - HTTP Request: PATCH https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/stories?id=eq.8e929bf9-43c0-4d3c-86f6-713b503e792d "HTTP/2 200 OK"
+2025-12-02 21:06:21,472 - tale_generator.supabase - INFO - Successfully updated rating for story 8e929bf9-43c0-4d3c-86f6-713b503e792d
+2025-12-02 21:06:21,473 - tale_generator.populate - INFO - Rated story 'Сказка о Ледяной Волшебнице' with 2/10 in 0.15s
+2025-12-02 21:06:21,633 - httpx - INFO - HTTP Request: PATCH https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/stories?id=eq.e891d47d-7c65-4da0-ae70-369567bb562a "HTTP/2 200 OK"
+2025-12-02 21:06:21,658 - tale_generator.supabase - INFO - Successfully updated rating for story e891d47d-7c65-4da0-ae70-369567bb562a
+2025-12-02 21:06:21,659 - tale_generator.populate - INFO - Rated story 'Сказка о Эмме и Ёжике-Хуёжике' with 4/10 in 0.19s
+2025-12-02 21:06:22,193 - httpx - INFO - HTTP Request: PATCH https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/stories?id=eq.01c8da1b-8f40-49d0-a1cb-93be59dd8d4f "HTTP/2 200 OK"
+2025-12-02 21:06:22,194 - tale_generator.supabase - INFO - Successfully updated rating for story 01c8da1b-8f40-49d0-a1cb-93be59dd8d4f
+2025-12-02 21:06:22,195 - tale_generator.populate - INFO - Rated story 'Alright, Liam, snuggle in tight, and let me tell you a story about Liam and the Respect-O-Saurus!' with 6/10 in 0.54s
+2025-12-02 21:06:22,369 - httpx - INFO - HTTP Request: PATCH https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/stories?id=eq.696008fc-75aa-4c1e-93bf-0c5539677255 "HTTP/2 200 OK"
+2025-12-02 21:06:22,372 - tale_generator.supabase - INFO - Successfully updated rating for story 696008fc-75aa-4c1e-93bf-0c5539677255
+2025-12-02 21:06:22,373 - tale_generator.populate - INFO - Rated story '**Ледяная Волшебница и Зимние Чудеса**' with 2/10 in 0.18s
+2025-12-02 21:06:22,567 - httpx - INFO - HTTP Request: PATCH https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/stories?id=eq.96fd73c4-3241-497b-b938-3276bb787488 "HTTP/2 200 OK"
+2025-12-02 21:06:22,568 - tale_generator.supabase - INFO - Successfully updated rating for story 96fd73c4-3241-497b-b938-3276bb787488
+2025-12-02 21:06:22,568 - tale_generator.populate - INFO - Rated story '**Сказка о маленькой Аве и ее друзьях-медведях**' with 10/10 in 0.20s
+2025-12-02 21:06:22,568 - tale_generator.populate - INFO - Rating process completed in 1.46s
+2025-12-02 21:06:22,568 - tale_generator.populate - INFO - Successfully rated 6 stories in 1.46s!
+2025-12-02 21:06:22,568 - tale_generator.populate - INFO - Summary of generated stories:
+2025-12-02 21:06:22,568 - tale_generator.populate - INFO -   1. **Emma and the Kindness Quest** (Type: child, Moral: kindness, Child: Emma, Model: openai/gpt-4o-mini, Language: en)
+2025-12-02 21:06:22,568 - tale_generator.populate - INFO -   2. Сказка о Ледяной Волшебнице (Type: hero, Moral: honesty, Child: Liam, Hero: Ледяная Волшебница, Model: anthropic/claude-3-haiku, Language: ru)
+2025-12-02 21:06:22,568 - tale_generator.populate - INFO -   3. Once upon a time, in a world beyond our own, there lived a little girl named Olivia. She was five years old, with a mop of curly brown hair and a contagious smile. Olivia loved playing in her backyard, where she had a special spot filled with colorful flowers that smelled sweet and made her feel happy. (Type: combined, Moral: bravery, Child: Olivia, Hero: Captain Wonder, Model: meta-llama/llama-3.1-8b-instruct, Language: en)
+2025-12-02 21:06:22,568 - tale_generator.populate - INFO -   4. Ночью, когда луна сияла, как гигантский фонарик, а звезды мигали, словно тысячи маленьких глаз, восемьлетний Ной лежал в своей кровати и мечтал о космосе. Его любимым занятием было смотреть на звездное небо и представлять себе далекие планеты и странных инопланетян. (Type: child, Moral: friendship, Child: Noah, Model: google/gemma-2-27b-it, Language: ru)
+2025-12-02 21:06:22,568 - tale_generator.populate - INFO -   5. Once upon a time, in a galaxy not so far away, there lived a heroic man named Captain Wonder. He was 25 years old, with bright eyes that sparkled like stars and a confident smile that could light up the darkest corners of the universe. Captain Wonder wore a blue cape with a golden star, symbolizing his bravery and kindness. (Type: hero, Moral: perseverance, Child: Ava, Hero: Captain Wonder, Model: mistralai/mixtral-8x22b-instruct, Language: en)
+2025-12-02 21:06:22,568 - tale_generator.populate - INFO -   6. Сказка о Эмме и Ёжике-Хуёжике (Type: combined, Moral: empathy, Child: Emma, Hero: Ёжик-хуёжик, Model: x-ai/grok-4.1-fast:free, Language: ru)
+2025-12-02 21:06:22,568 - tale_generator.populate - INFO -   7. Alright, Liam, snuggle in tight, and let me tell you a story about Liam and the Respect-O-Saurus! (Type: child, Moral: respect, Child: Liam, Model: google/gemini-2.0-flash-exp:free, Language: en)
+2025-12-02 21:06:22,568 - tale_generator.populate - INFO -   8. **Ледяная Волшебница и Зимние Чудеса** (Type: hero, Moral: responsibility, Child: Olivia, Hero: Ледяная Волшебница, Model: openai/gpt-4o-mini, Language: ru)
+2025-12-02 21:06:22,568 - tale_generator.populate - INFO -   9. Here is a 749-word bedtime story featuring the child character Noah and the hero character Captain Wonder, focusing on the moral value of kindness: (Type: combined, Moral: kindness, Child: Noah, Hero: Captain Wonder, Model: anthropic/claude-3-haiku, Language: en)
+2025-12-02 21:06:22,568 - tale_generator.populate - INFO -   10. **Сказка о маленькой Аве и ее друзьях-медведях** (Type: child, Moral: honesty, Child: Ava, Model: meta-llama/llama-3.1-8b-instruct, Language: ru)
+2025-12-02 21:06:22,568 - tale_generator.populate - INFO - Summary display completed in 0.00s
+2025-12-02 21:06:22,568 - tale_generator.populate - INFO - Entire process completed in 60.42s
+2025-12-02 22:03:44,923 - tale_generator.populate - INFO - Initializing clients...
+2025-12-02 22:03:44,986 - tale_generator.supabase_async - INFO - Async Supabase client wrapper initialized
+2025-12-02 22:03:44,986 - tale_generator.populate - INFO - Clients initialized in 0.06s
+2025-12-02 22:03:44,986 - tale_generator.populate - INFO - Starting to save children to database...
+2025-12-02 22:03:45,517 - httpx - INFO - HTTP Request: POST https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/children "HTTP/2 201 Created"
+2025-12-02 22:03:45,521 - tale_generator.populate - INFO - Saved child: Emma with ID: 8bd871cd-4208-4899-befe-fd66aa92dec4 in 0.53s
+2025-12-02 22:03:45,671 - httpx - INFO - HTTP Request: POST https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/children "HTTP/2 201 Created"
+2025-12-02 22:03:45,673 - tale_generator.populate - INFO - Saved child: Liam with ID: e3532371-d7d9-40bb-9423-8898076a6b17 in 0.15s
+2025-12-02 22:03:46,069 - httpx - INFO - HTTP Request: POST https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/children "HTTP/2 201 Created"
+2025-12-02 22:03:46,071 - tale_generator.populate - INFO - Saved child: Olivia with ID: fba51fff-e553-4648-8295-575c14fc501c in 0.40s
+2025-12-02 22:03:46,251 - httpx - INFO - HTTP Request: POST https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/children "HTTP/2 201 Created"
+2025-12-02 22:03:46,253 - tale_generator.populate - INFO - Saved child: Noah with ID: d14230b7-5126-40b7-98ec-475ad8881e2c in 0.18s
+2025-12-02 22:03:46,434 - httpx - INFO - HTTP Request: POST https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/children "HTTP/2 201 Created"
+2025-12-02 22:03:46,435 - tale_generator.populate - INFO - Saved child: Ava with ID: 02ebda52-0f3f-4e49-a527-1df785fad28d in 0.18s
+2025-12-02 22:03:46,435 - tale_generator.populate - INFO - Processed all children in 1.45s
+2025-12-02 22:03:46,435 - tale_generator.populate - INFO - Children saving completed in 1.45s
+2025-12-02 22:03:46,435 - tale_generator.populate - INFO - Generating 10 sample stories...
+2025-12-02 22:03:46,435 - tale_generator.populate - INFO - Created 10 story generation tasks in 0.00s
+2025-12-02 22:03:46,436 - tale_generator.populate - INFO - Generating child story 1/10 for Emma with moral 'kindness' using openai/gpt-4o-mini in en...
+2025-12-02 22:03:46,436 - tale_generator.populate - INFO - Starting child story prompt creation
+2025-12-02 22:03:46,436 - tale_generator.populate - INFO - Converted child data to character in 0.00s
+2025-12-02 22:03:46,436 - tale_generator.populate - INFO - Built prompt in 0.00s
+2025-12-02 22:03:46,436 - tale_generator.populate - INFO - Completed child story prompt creation in 0.00s
+2025-12-02 22:03:46,436 - tale_generator.populate - INFO - Prompt creation took 0.00s
+2025-12-02 22:03:46,556 - tale_generator.populate - INFO - Generating hero story 2/10 for Liam with moral 'honesty' using anthropic/claude-3-haiku in ru...
+2025-12-02 22:03:46,556 - tale_generator.populate - INFO - Starting hero story prompt creation for language ru
+2025-12-02 22:03:46,575 - tale_generator.supabase_async - INFO - Async Supabase client wrapper initialized
+2025-12-02 22:03:46,575 - tale_generator.populate - INFO - Generating combined story 3/10 for Olivia with moral 'bravery' using meta-llama/llama-3.1-8b-instruct in en...
+2025-12-02 22:03:46,575 - tale_generator.populate - INFO - Starting combined story prompt creation for language en
+2025-12-02 22:03:46,599 - tale_generator.supabase_async - INFO - Async Supabase client wrapper initialized
+2025-12-02 22:03:46,600 - tale_generator.populate - INFO - Generating child story 4/10 for Noah with moral 'friendship' using google/gemma-2-27b-it in ru...
+2025-12-02 22:03:46,600 - tale_generator.populate - INFO - Starting child story prompt creation
+2025-12-02 22:03:46,600 - tale_generator.populate - INFO - Converted child data to character in 0.00s
+2025-12-02 22:03:46,600 - tale_generator.populate - INFO - Built prompt in 0.00s
+2025-12-02 22:03:46,600 - tale_generator.populate - INFO - Completed child story prompt creation in 0.00s
+2025-12-02 22:03:46,600 - tale_generator.populate - INFO - Prompt creation took 0.00s
+2025-12-02 22:03:46,601 - tale_generator.populate - INFO - Generating hero story 5/10 for Ava with moral 'perseverance' using mistralai/mixtral-8x22b-instruct in en...
+2025-12-02 22:03:46,601 - tale_generator.populate - INFO - Starting hero story prompt creation for language en
+2025-12-02 22:03:46,626 - tale_generator.supabase_async - INFO - Async Supabase client wrapper initialized
+2025-12-02 22:03:46,626 - tale_generator.populate - INFO - Generating combined story 6/10 for Emma with moral 'empathy' using x-ai/grok-4.1-fast:free in ru...
+2025-12-02 22:03:46,626 - tale_generator.populate - INFO - Starting combined story prompt creation for language ru
+2025-12-02 22:03:46,650 - tale_generator.supabase_async - INFO - Async Supabase client wrapper initialized
+2025-12-02 22:03:46,650 - tale_generator.populate - INFO - Generating child story 7/10 for Liam with moral 'respect' using google/gemini-2.0-flash-exp:free in en...
+2025-12-02 22:03:46,650 - tale_generator.populate - INFO - Starting child story prompt creation
+2025-12-02 22:03:46,650 - tale_generator.populate - INFO - Converted child data to character in 0.00s
+2025-12-02 22:03:46,650 - tale_generator.populate - INFO - Built prompt in 0.00s
+2025-12-02 22:03:46,650 - tale_generator.populate - INFO - Completed child story prompt creation in 0.00s
+2025-12-02 22:03:46,650 - tale_generator.populate - INFO - Prompt creation took 0.00s
+2025-12-02 22:03:46,651 - tale_generator.populate - INFO - Generating hero story 8/10 for Olivia with moral 'responsibility' using openai/gpt-4o-mini in ru...
+2025-12-02 22:03:46,651 - tale_generator.populate - INFO - Starting hero story prompt creation for language ru
+2025-12-02 22:03:46,674 - tale_generator.supabase_async - INFO - Async Supabase client wrapper initialized
+2025-12-02 22:03:46,675 - tale_generator.populate - INFO - Generating combined story 9/10 for Noah with moral 'kindness' using anthropic/claude-3-haiku in en...
+2025-12-02 22:03:46,675 - tale_generator.populate - INFO - Starting combined story prompt creation for language en
+2025-12-02 22:03:46,697 - tale_generator.supabase_async - INFO - Async Supabase client wrapper initialized
+2025-12-02 22:03:46,698 - tale_generator.populate - INFO - Generating child story 10/10 for Ava with moral 'honesty' using meta-llama/llama-3.1-8b-instruct in ru...
+2025-12-02 22:03:46,698 - tale_generator.populate - INFO - Starting child story prompt creation
+2025-12-02 22:03:46,698 - tale_generator.populate - INFO - Converted child data to character in 0.00s
+2025-12-02 22:03:46,698 - tale_generator.populate - INFO - Built prompt in 0.00s
+2025-12-02 22:03:46,698 - tale_generator.populate - INFO - Completed child story prompt creation in 0.00s
+2025-12-02 22:03:46,698 - tale_generator.populate - INFO - Prompt creation took 0.00s
+2025-12-02 22:03:46,791 - httpx - INFO - HTTP Request: GET https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/heroes?select=%2A "HTTP/2 200 OK"
+2025-12-02 22:03:46,792 - tale_generator.populate - INFO - Retrieved 5 heroes in 0.22s
+2025-12-02 22:03:46,792 - tale_generator.populate - INFO - Filtered heroes by language in 0.00s, found 3 heroes
+2025-12-02 22:03:46,792 - tale_generator.populate - INFO - Selected hero Ледяная Волшебница in 0.00s
+2025-12-02 22:03:46,792 - tale_generator.populate - INFO - Converted hero entity in 0.00s
+2025-12-02 22:03:46,792 - tale_generator.populate - INFO - Built prompt in 0.00s
+2025-12-02 22:03:46,793 - tale_generator.populate - INFO - Completed hero story prompt creation in 0.24s
+2025-12-02 22:03:46,793 - tale_generator.populate - INFO - Prompt creation took 0.24s
+2025-12-02 22:03:46,819 - httpx - INFO - HTTP Request: GET https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/heroes?select=%2A "HTTP/2 200 OK"
+2025-12-02 22:03:46,820 - tale_generator.populate - INFO - Retrieved 5 heroes in 0.22s
+2025-12-02 22:03:46,820 - tale_generator.populate - INFO - Filtered heroes by language in 0.00s, found 2 heroes
+2025-12-02 22:03:46,820 - tale_generator.populate - INFO - Selected hero Captain Wonder in 0.00s
+2025-12-02 22:03:46,820 - tale_generator.populate - INFO - Converted child data to character in 0.00s
+2025-12-02 22:03:46,820 - tale_generator.populate - INFO - Converted hero entity in 0.00s
+2025-12-02 22:03:46,820 - tale_generator.populate - INFO - Created relationship description in 0.00s
+2025-12-02 22:03:46,820 - tale_generator.populate - INFO - Created combined character in 0.00s
+2025-12-02 22:03:46,820 - tale_generator.populate - INFO - Built prompt in 0.00s
+2025-12-02 22:03:46,820 - tale_generator.populate - INFO - Completed combined story prompt creation in 0.24s
+2025-12-02 22:03:46,820 - tale_generator.populate - INFO - Prompt creation took 0.25s
+2025-12-02 22:03:46,877 - httpx - INFO - HTTP Request: GET https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/heroes?select=%2A "HTTP/2 200 OK"
+2025-12-02 22:03:46,878 - tale_generator.populate - INFO - Retrieved 5 heroes in 0.25s
+2025-12-02 22:03:46,878 - tale_generator.populate - INFO - Filtered heroes by language in 0.00s, found 2 heroes
+2025-12-02 22:03:46,878 - tale_generator.populate - INFO - Selected hero Captain Wonder in 0.00s
+2025-12-02 22:03:46,878 - tale_generator.populate - INFO - Converted hero entity in 0.00s
+2025-12-02 22:03:46,878 - tale_generator.populate - INFO - Built prompt in 0.00s
+2025-12-02 22:03:46,878 - tale_generator.populate - INFO - Completed hero story prompt creation in 0.28s
+2025-12-02 22:03:46,878 - tale_generator.populate - INFO - Prompt creation took 0.28s
+2025-12-02 22:03:46,892 - httpx - INFO - HTTP Request: GET https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/heroes?select=%2A "HTTP/2 200 OK"
+2025-12-02 22:03:46,892 - tale_generator.populate - INFO - Retrieved 5 heroes in 0.24s
+2025-12-02 22:03:46,892 - tale_generator.populate - INFO - Filtered heroes by language in 0.00s, found 3 heroes
+2025-12-02 22:03:46,892 - tale_generator.populate - INFO - Selected hero Ёжик-хуёжик in 0.00s
+2025-12-02 22:03:46,892 - tale_generator.populate - INFO - Converted child data to character in 0.00s
+2025-12-02 22:03:46,892 - tale_generator.populate - INFO - Converted hero entity in 0.00s
+2025-12-02 22:03:46,892 - tale_generator.populate - INFO - Created relationship description in 0.00s
+2025-12-02 22:03:46,892 - tale_generator.populate - INFO - Created combined character in 0.00s
+2025-12-02 22:03:46,893 - tale_generator.populate - INFO - Built prompt in 0.00s
+2025-12-02 22:03:46,893 - tale_generator.populate - INFO - Completed combined story prompt creation in 0.27s
+2025-12-02 22:03:46,893 - tale_generator.populate - INFO - Prompt creation took 0.27s
+2025-12-02 22:03:46,902 - httpx - INFO - HTTP Request: GET https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/heroes?select=%2A "HTTP/2 200 OK"
+2025-12-02 22:03:46,903 - tale_generator.populate - INFO - Retrieved 5 heroes in 0.23s
+2025-12-02 22:03:46,903 - tale_generator.populate - INFO - Filtered heroes by language in 0.00s, found 3 heroes
+2025-12-02 22:03:46,903 - tale_generator.populate - INFO - Selected hero Ледяная Волшебница in 0.00s
+2025-12-02 22:03:46,903 - tale_generator.populate - INFO - Converted hero entity in 0.00s
+2025-12-02 22:03:46,903 - tale_generator.populate - INFO - Built prompt in 0.00s
+2025-12-02 22:03:46,903 - tale_generator.populate - INFO - Completed hero story prompt creation in 0.25s
+2025-12-02 22:03:46,903 - tale_generator.populate - INFO - Prompt creation took 0.25s
+2025-12-02 22:03:46,923 - httpx - INFO - HTTP Request: GET https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/heroes?select=%2A "HTTP/2 200 OK"
+2025-12-02 22:03:46,923 - tale_generator.populate - INFO - Retrieved 5 heroes in 0.23s
+2025-12-02 22:03:46,924 - tale_generator.populate - INFO - Filtered heroes by language in 0.00s, found 2 heroes
+2025-12-02 22:03:46,924 - tale_generator.populate - INFO - Selected hero Captain Wonder in 0.00s
+2025-12-02 22:03:46,924 - tale_generator.populate - INFO - Converted child data to character in 0.00s
+2025-12-02 22:03:46,924 - tale_generator.populate - INFO - Converted hero entity in 0.00s
+2025-12-02 22:03:46,924 - tale_generator.populate - INFO - Created relationship description in 0.00s
+2025-12-02 22:03:46,924 - tale_generator.populate - INFO - Created combined character in 0.00s
+2025-12-02 22:03:46,924 - tale_generator.populate - INFO - Built prompt in 0.00s
+2025-12-02 22:03:46,924 - tale_generator.populate - INFO - Completed combined story prompt creation in 0.25s
+2025-12-02 22:03:46,924 - tale_generator.populate - INFO - Prompt creation took 0.25s
+2025-12-02 22:03:47,649 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-02 22:03:47,885 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-02 22:03:47,926 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-02 22:03:47,960 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-02 22:03:48,123 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-02 22:03:48,812 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-02 22:03:49,503 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-02 22:03:50,052 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-12-02 22:03:50,057 - openai._base_client - INFO - Retrying request to /chat/completions in 0.468074 seconds
+2025-12-02 22:03:50,249 - tale_generator.openrouter - INFO - Successfully generated story with model meta-llama/llama-3.1-8b-instruct
+2025-12-02 22:03:50,250 - tale_generator.populate - INFO - Story generation took 3.55s
+2025-12-02 22:03:50,250 - tale_generator.populate - INFO - Title extraction took 0.00s
+2025-12-02 22:03:50,250 - tale_generator.populate - INFO - DateTime formatting took 0.00s
+2025-12-02 22:03:50,250 - tale_generator.populate - INFO - Hero field preparation took 0.00s
+2025-12-02 22:03:50,250 - tale_generator.populate - INFO - Story object creation took 0.00s
+2025-12-02 22:03:50,415 - httpx - INFO - HTTP Request: POST https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/stories "HTTP/2 400 Bad Request"
+2025-12-02 22:03:50,416 - tale_generator.populate - ERROR - Error generating story 10: Error saving story: {'message': "Could not find the 'full_response' column of 'stories' in the schema cache", 'code': 'PGRST204', 'hint': None, 'details': None}
+2025-12-02 22:03:50,496 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-02 22:03:50,815 - tale_generator.openrouter - INFO - Successfully generated story with model mistralai/mixtral-8x22b-instruct
+2025-12-02 22:03:50,816 - tale_generator.populate - INFO - Story generation took 3.94s
+2025-12-02 22:03:50,816 - tale_generator.populate - INFO - Title extraction took 0.00s
+2025-12-02 22:03:50,816 - tale_generator.populate - INFO - DateTime formatting took 0.00s
+2025-12-02 22:03:50,816 - tale_generator.populate - INFO - Hero field preparation took 0.00s
+2025-12-02 22:03:50,816 - tale_generator.populate - INFO - Story object creation took 0.00s
+2025-12-02 22:03:50,948 - httpx - INFO - HTTP Request: POST https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/stories "HTTP/2 400 Bad Request"
+2025-12-02 22:03:50,949 - tale_generator.populate - ERROR - Error generating story 5: Error saving story: {'message': "Could not find the 'full_response' column of 'stories' in the schema cache", 'code': 'PGRST204', 'hint': None, 'details': None}
+2025-12-02 22:03:50,963 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-02 22:03:51,595 - tale_generator.openrouter - INFO - Successfully generated story with model anthropic/claude-3-haiku
+2025-12-02 22:03:51,596 - tale_generator.populate - INFO - Story generation took 4.67s
+2025-12-02 22:03:51,596 - tale_generator.populate - INFO - Title extraction took 0.00s
+2025-12-02 22:03:51,596 - tale_generator.populate - INFO - DateTime formatting took 0.00s
+2025-12-02 22:03:51,596 - tale_generator.populate - INFO - Hero field preparation took 0.00s
+2025-12-02 22:03:51,596 - tale_generator.populate - INFO - Story object creation took 0.00s
+2025-12-02 22:03:51,720 - httpx - INFO - HTTP Request: POST https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/stories "HTTP/2 400 Bad Request"
+2025-12-02 22:03:51,722 - tale_generator.populate - ERROR - Error generating story 9: Error saving story: {'message': "Could not find the 'full_response' column of 'stories' in the schema cache", 'code': 'PGRST204', 'hint': None, 'details': None}
+2025-12-02 22:03:52,317 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-02 22:03:54,337 - tale_generator.openrouter - INFO - Successfully generated story with model anthropic/claude-3-haiku
+2025-12-02 22:03:54,337 - tale_generator.populate - INFO - Story generation took 7.54s
+2025-12-02 22:03:54,337 - tale_generator.populate - INFO - Title extraction took 0.00s
+2025-12-02 22:03:54,337 - tale_generator.populate - INFO - DateTime formatting took 0.00s
+2025-12-02 22:03:54,337 - tale_generator.populate - INFO - Hero field preparation took 0.00s
+2025-12-02 22:03:54,338 - tale_generator.populate - INFO - Story object creation took 0.00s
+2025-12-02 22:03:54,487 - httpx - INFO - HTTP Request: POST https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/stories "HTTP/2 400 Bad Request"
+2025-12-02 22:03:54,489 - tale_generator.populate - ERROR - Error generating story 2: Error saving story: {'message': "Could not find the 'full_response' column of 'stories' in the schema cache", 'code': 'PGRST204', 'hint': None, 'details': None}
+2025-12-02 22:03:57,491 - tale_generator.openrouter - INFO - Successfully generated story with model google/gemini-2.0-flash-exp:free
+2025-12-02 22:03:57,491 - tale_generator.populate - INFO - Story generation took 10.84s
+2025-12-02 22:03:57,491 - tale_generator.populate - INFO - Title extraction took 0.00s
+2025-12-02 22:03:57,491 - tale_generator.populate - INFO - DateTime formatting took 0.00s
+2025-12-02 22:03:57,491 - tale_generator.populate - INFO - Hero field preparation took 0.00s
+2025-12-02 22:03:57,492 - tale_generator.populate - INFO - Story object creation took 0.00s
+2025-12-02 22:03:57,635 - httpx - INFO - HTTP Request: POST https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/stories "HTTP/2 400 Bad Request"
+2025-12-02 22:03:57,636 - tale_generator.populate - ERROR - Error generating story 7: Error saving story: {'message': "Could not find the 'full_response' column of 'stories' in the schema cache", 'code': 'PGRST204', 'hint': None, 'details': None}
+2025-12-02 22:03:58,338 - tale_generator.openrouter - INFO - Successfully generated story with model google/gemma-2-27b-it
+2025-12-02 22:03:58,338 - tale_generator.populate - INFO - Story generation took 11.74s
+2025-12-02 22:03:58,338 - tale_generator.populate - INFO - Title extraction took 0.00s
+2025-12-02 22:03:58,338 - tale_generator.populate - INFO - DateTime formatting took 0.00s
+2025-12-02 22:03:58,338 - tale_generator.populate - INFO - Hero field preparation took 0.00s
+2025-12-02 22:03:58,338 - tale_generator.populate - INFO - Story object creation took 0.00s
+2025-12-02 22:03:58,466 - httpx - INFO - HTTP Request: POST https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/stories "HTTP/2 400 Bad Request"
+2025-12-02 22:03:58,468 - tale_generator.populate - ERROR - Error generating story 4: Error saving story: {'message': "Could not find the 'full_response' column of 'stories' in the schema cache", 'code': 'PGRST204', 'hint': None, 'details': None}
+2025-12-02 22:03:58,783 - tale_generator.openrouter - INFO - Successfully generated story with model openai/gpt-4o-mini
+2025-12-02 22:03:58,783 - tale_generator.populate - INFO - Story generation took 12.35s
+2025-12-02 22:03:58,784 - tale_generator.populate - INFO - Title extraction took 0.00s
+2025-12-02 22:03:58,784 - tale_generator.populate - INFO - DateTime formatting took 0.00s
+2025-12-02 22:03:58,784 - tale_generator.populate - INFO - Hero field preparation took 0.00s
+2025-12-02 22:03:58,784 - tale_generator.populate - INFO - Story object creation took 0.00s
+2025-12-02 22:03:58,924 - httpx - INFO - HTTP Request: POST https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/stories "HTTP/2 400 Bad Request"
+2025-12-02 22:03:58,926 - tale_generator.populate - ERROR - Error generating story 1: Error saving story: {'message': "Could not find the 'full_response' column of 'stories' in the schema cache", 'code': 'PGRST204', 'hint': None, 'details': None}
+2025-12-02 22:04:00,385 - tale_generator.openrouter - INFO - Successfully generated story with model openai/gpt-4o-mini
+2025-12-02 22:04:00,385 - tale_generator.populate - INFO - Story generation took 13.48s
+2025-12-02 22:04:00,385 - tale_generator.populate - INFO - Title extraction took 0.00s
+2025-12-02 22:04:00,385 - tale_generator.populate - INFO - DateTime formatting took 0.00s
+2025-12-02 22:04:00,385 - tale_generator.populate - INFO - Hero field preparation took 0.00s
+2025-12-02 22:04:00,385 - tale_generator.populate - INFO - Story object creation took 0.00s
+2025-12-02 22:04:00,527 - httpx - INFO - HTTP Request: POST https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/stories "HTTP/2 400 Bad Request"
+2025-12-02 22:04:00,529 - tale_generator.populate - ERROR - Error generating story 8: Error saving story: {'message': "Could not find the 'full_response' column of 'stories' in the schema cache", 'code': 'PGRST204', 'hint': None, 'details': None}
+2025-12-02 22:04:20,484 - tale_generator.openrouter - INFO - Successfully generated story with model meta-llama/llama-3.1-8b-instruct
+2025-12-02 22:04:20,486 - tale_generator.populate - INFO - Story generation took 33.67s
+2025-12-02 22:04:20,486 - tale_generator.populate - INFO - Title extraction took 0.00s
+2025-12-02 22:04:20,486 - tale_generator.populate - INFO - DateTime formatting took 0.00s
+2025-12-02 22:04:20,486 - tale_generator.populate - INFO - Hero field preparation took 0.00s
+2025-12-02 22:04:20,487 - tale_generator.populate - INFO - Story object creation took 0.00s
+2025-12-02 22:04:20,746 - httpx - INFO - HTTP Request: POST https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/stories "HTTP/2 400 Bad Request"
+2025-12-02 22:04:20,747 - tale_generator.populate - ERROR - Error generating story 3: Error saving story: {'message': "Could not find the 'full_response' column of 'stories' in the schema cache", 'code': 'PGRST204', 'hint': None, 'details': None}
+2025-12-02 22:04:25,202 - tale_generator.openrouter - INFO - Successfully generated story with model x-ai/grok-4.1-fast:free
+2025-12-02 22:04:25,202 - tale_generator.populate - INFO - Story generation took 38.31s
+2025-12-02 22:04:25,202 - tale_generator.populate - INFO - Title extraction took 0.00s
+2025-12-02 22:04:25,202 - tale_generator.populate - INFO - DateTime formatting took 0.00s
+2025-12-02 22:04:25,203 - tale_generator.populate - INFO - Hero field preparation took 0.00s
+2025-12-02 22:04:25,203 - tale_generator.populate - INFO - Story object creation took 0.00s
+2025-12-02 22:04:25,337 - httpx - INFO - HTTP Request: POST https://yefsocnfbcdyuajaanaz.supabase.co/rest/v1/stories "HTTP/2 400 Bad Request"
+2025-12-02 22:04:25,338 - tale_generator.populate - ERROR - Error generating story 6: Error saving story: {'message': "Could not find the 'full_response' column of 'stories' in the schema cache", 'code': 'PGRST204', 'hint': None, 'details': None}
+2025-12-02 22:04:25,338 - tale_generator.populate - INFO - Successfully generated and saved 0 stories in 38.90s!
+2025-12-02 22:04:25,338 - tale_generator.populate - INFO - Total story generation process took 38.90s
+2025-12-02 22:04:25,338 - tale_generator.populate - INFO - Adding ratings to stories...
+2025-12-02 22:04:25,338 - tale_generator.populate - INFO - Rating process completed in 0.00s
+2025-12-02 22:04:25,338 - tale_generator.populate - INFO - Successfully rated 0 stories in 0.00s!
+2025-12-02 22:04:25,338 - tale_generator.populate - INFO - Summary of generated stories:
+2025-12-02 22:04:25,338 - tale_generator.populate - INFO - Summary display completed in 0.00s
+2025-12-02 22:04:25,339 - tale_generator.populate - INFO - Entire process completed in 40.42s

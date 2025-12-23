@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tale Generator Admin Panel</title>
+    <link rel="stylesheet" href="/admin/static/css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-book"></i> Tale Generator Admin Panel</h1>
+            <p>Manage and view generated children's stories</p>
+        </header>
+
+        <main>
+            <section class="story-generation-form">
+                <h2>Generate New Story</h2>
+                <form id="story-generation-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="child-name">Child's Name:</label>
+                            <input type="text" id="child-name" name="child-name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="child-age">Child's Age:</label>
+                            <input type="number" id="child-age" name="child-age" min="1" max="12" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="child-gender">Child's Gender:</label>
+                            <select id="child-gender" name="child-gender" required>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="child-interests">Child's Interests (comma separated):</label>
+                        <input type="text" id="child-interests" name="child-interests" placeholder="dinosaurs, space, princesses">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="story-moral">Story Moral:</label>
+                            <select id="story-moral" name="story-moral">
+                                <option value="">Select a moral (or enter custom below)</option>
+                                <option value="kindness">Kindness</option>
+                                <option value="honesty">Honesty</option>
+                                <option value="bravery">Bravery</option>
+                                <option value="friendship">Friendship</option>
+                                <option value="perseverance">Perseverance</option>
+                                <option value="empathy">Empathy</option>
+                                <option value="respect">Respect</option>
+                                <option value="responsibility">Responsibility</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="custom-moral">Custom Moral:</label>
+                            <input type="text" id="custom-moral" name="custom-moral" placeholder="Enter a custom moral">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="story-language">Language:</label>
+                            <select id="story-language" name="story-language">
+                                <option value="en">English</option>
+                                <option value="ru">Russian</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="story-length">Story Length:</label>
+                            <select id="story-length" name="story-length">
+                                <option value="2">2 minutes</option>
+                                <option value="5">5 minutes</option>
+                                <option value="10">10 minutes</option>
+                                <option value="15">15 minutes</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-magic"></i> Generate Story
+                    </button>
+                </form>
+                
+                <div id="generation-status" class="generation-status hidden">
+                    <div class="loading"></div>
+                    <p>Generating your story...</p>
+                </div>
+            </section>
+
+            <section id="generated-story-section" class="generated-story-section hidden">
+                <h2>Generated Story</h2>
+                <div id="generated-story-content" class="story-content">
+                    <!-- Generated story will be displayed here -->
+                </div>
+                <button id="close-story-btn" class="btn-primary">Close</button>
+            </section>
+
+            <section class="filters">
+                <div class="filter-group">
+                    <label for="child-filter">Filter by Child:</label>
+                    <select id="child-filter">
+                        <option value="">All Children</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="language-filter">Filter by Language:</label>
+                    <select id="language-filter">
+                        <option value="">All Languages</option>
+                        <option value="en">English</option>
+                        <option value="ru">Russian</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="model-filter">Filter by Model:</label>
+                    <select id="model-filter">
+                        <option value="">All Models</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="rating-filter">Filter by Rating:</label>
+                    <select id="rating-filter">
+                        <option value="">All Stories</option>
+                        <option value="rated">With Ratings</option>
+                        <option value="unrated">Without Ratings</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="sort-by">Sort by:</label>
+                    <select id="sort-by">
+                        <option value="created_at_desc">Newest First</option>
+                        <option value="created_at_asc">Oldest First</option>
+                        <option value="title_asc">Title (A-Z)</option>
+                        <option value="title_desc">Title (Z-A)</option>
+                    </select>
+                </div>
+                
+                <button id="refresh-btn" class="btn-primary">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </section>
+
+            <section class="stats">
+                <div class="stat-card">
+                    <h3>Total Stories</h3>
+                    <p id="total-stories">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Children</h3>
+                    <p id="total-children">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Avg Rating</h3>
+                    <p id="avg-rating">-</p>
+                </div>
+            </section>
+
+            <section class="stories-list">
+                <h2>Generated Stories</h2>
+                <div id="stories-container" class="stories-grid">
+                    <!-- Stories will be loaded here dynamically -->
+                    <div class="empty-state">
+                        <i class="fas fa-book-open fa-3x"></i>
+                        <p>No stories found. Generate some stories to see them here.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 Tale Generator. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <!-- Story Detail Modal -->
+    <div id="story-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="story-detail-content">
+                <!-- Story details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="/admin/static/js/admin.js"></script>
+</body>
+</html>

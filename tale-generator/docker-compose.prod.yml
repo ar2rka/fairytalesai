@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  tale-generator:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - tale-network
+
+networks:
+  tale-network:
+    driver: bridge
