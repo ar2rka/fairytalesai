@@ -1,0 +1,370 @@
+{
+  "@@locale": "en",
+  "appTitle": "Tale Generator",
+  "@appTitle": {
+    "description": "The application title"
+  },
+  "appSubtitle": "Create magical stories for your children",
+  "@appSubtitle": {
+    "description": "The application subtitle"
+  },
+  "welcomeBack": "Welcome Back",
+  "@welcomeBack": {
+    "description": "Welcome back message"
+  },
+  "signInToContinue": "Sign in to continue",
+  "@signInToContinue": {
+    "description": "Sign in prompt"
+  },
+  "createAccount": "Create Account",
+  "@createAccount": {
+    "description": "Create account title"
+  },
+  "startCreatingMagicalTales": "Start creating magical tales",
+  "@startCreatingMagicalTales": {
+    "description": "Create account subtitle"
+  },
+  "email": "Email",
+  "@email": {
+    "description": "Email field label"
+  },
+  "pleaseEnterYourEmail": "Please enter your email",
+  "@pleaseEnterYourEmail": {
+    "description": "Email validation error"
+  },
+  "pleaseEnterAValidEmail": "Please enter a valid email",
+  "@pleaseEnterAValidEmail": {
+    "description": "Email format validation error"
+  },
+  "password": "Password",
+  "@password": {
+    "description": "Password field label"
+  },
+  "pleaseEnterYourPassword": "Please enter your password",
+  "@pleaseEnterYourPassword": {
+    "description": "Password validation error"
+  },
+  "passwordMustBeAtLeast6Characters": "Password must be at least 6 characters",
+  "@passwordMustBeAtLeast6Characters": {
+    "description": "Password length validation error"
+  },
+  "signIn": "Sign In",
+  "@signIn": {
+    "description": "Sign in button"
+  },
+  "signUp": "Sign Up",
+  "@signUp": {
+    "description": "Sign up button"
+  },
+  "alreadyHaveAnAccountSignIn": "Already have an account? Sign In",
+  "@alreadyHaveAnAccountSignIn": {
+    "description": "Link to sign in"
+  },
+  "dontHaveAnAccountSignUp": "Don't have an account? Sign Up",
+  "@dontHaveAnAccountSignUp": {
+    "description": "Link to sign up"
+  },
+  "pleaseCheckYourEmailToVerifyYourAccount": "Please check your email to verify your account",
+  "@pleaseCheckYourEmailToVerifyYourAccount": {
+    "description": "Email verification message"
+  },
+  "error": "Error",
+  "@error": {
+    "description": "Error prefix"
+  },
+  "errorOccurred": "Error: {error}",
+  "@errorOccurred": {
+    "description": "Error message with details",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "yourStories": "Your Stories",
+  "@yourStories": {
+    "description": "Home screen title"
+  },
+  "createMagicalTales": "Create magical tales",
+  "@createMagicalTales": {
+    "description": "Home screen subtitle"
+  },
+  "somethingWentWrong": "Something went wrong",
+  "@somethingWentWrong": {
+    "description": "Generic error message"
+  },
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry button"
+  },
+  "noStoriesYet": "No stories yet",
+  "@noStoriesYet": {
+    "description": "Empty stories state title"
+  },
+  "createYourFirstMagicalTale": "Create your first magical tale",
+  "@createYourFirstMagicalTale": {
+    "description": "Empty stories state subtitle"
+  },
+  "generateYourFirstStory": "Generate Your First Story",
+  "@generateYourFirstStory": {
+    "description": "Generate first story button"
+  },
+  "stories": "Stories",
+  "@stories": {
+    "description": "Stories tab label"
+  },
+  "children": "Children",
+  "@children": {
+    "description": "Children tab label"
+  },
+  "profile": "Profile",
+  "@profile": {
+    "description": "Profile tab label"
+  },
+  "childrenTitle": "Children",
+  "@childrenTitle": {
+    "description": "Children screen title"
+  },
+  "noChildrenAddedYet": "No children added yet",
+  "@noChildrenAddedYet": {
+    "description": "Empty children state title"
+  },
+  "addYourFirstChildToCreatePersonalizedStories": "Add your first child to create personalized stories",
+  "@addYourFirstChildToCreatePersonalizedStories": {
+    "description": "Empty children state subtitle"
+  },
+  "addYourFirstChild": "Add Your First Child",
+  "@addYourFirstChild": {
+    "description": "Add first child button"
+  },
+  "age": "Age",
+  "@age": {
+    "description": "Age label"
+  },
+  "deleteChild": "Delete Child",
+  "@deleteChild": {
+    "description": "Delete child dialog title"
+  },
+  "areYouSureYouWantToDelete": "Are you sure you want to delete {name}?",
+  "@areYouSureYouWantToDelete": {
+    "description": "Delete child confirmation message",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button"
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Delete button"
+  },
+  "childDeleted": "Child deleted",
+  "@childDeleted": {
+    "description": "Child deleted success message"
+  },
+  "addChild": "Add Child",
+  "@addChild": {
+    "description": "Add child screen title"
+  },
+  "addAChild": "Add a Child",
+  "@addAChild": {
+    "description": "Add child header title"
+  },
+  "createPersonalizedStories": "Create personalized stories",
+  "@createPersonalizedStories": {
+    "description": "Add child header subtitle"
+  },
+  "name": "Name",
+  "@name": {
+    "description": "Name field label"
+  },
+  "enterChildsName": "Enter child's name",
+  "@enterChildsName": {
+    "description": "Name field hint"
+  },
+  "pleaseEnterAName": "Please enter a name",
+  "@pleaseEnterAName": {
+    "description": "Name validation error"
+  },
+  "enterChildsAge": "Enter child's age",
+  "@enterChildsAge": {
+    "description": "Age field hint"
+  },
+  "pleaseEnterAnAge": "Please enter an age",
+  "@pleaseEnterAnAge": {
+    "description": "Age validation error"
+  },
+  "ageMustBeBetween1And18": "Age must be between 1 and 18",
+  "@ageMustBeBetween1And18": {
+    "description": "Age range validation error"
+  },
+  "gender": "Gender",
+  "@gender": {
+    "description": "Gender field label"
+  },
+  "male": "Male",
+  "@male": {
+    "description": "Male gender option"
+  },
+  "female": "Female",
+  "@female": {
+    "description": "Female gender option"
+  },
+  "other": "Other",
+  "@other": {
+    "description": "Other gender option"
+  },
+  "interests": "Interests",
+  "@interests": {
+    "description": "Interests field label"
+  },
+  "interestsCommaSeparated": "Interests (comma-separated)",
+  "@interestsCommaSeparated": {
+    "description": "Interests field hint"
+  },
+  "interestsExample": "e.g., reading, sports, music",
+  "@interestsExample": {
+    "description": "Interests example"
+  },
+  "save": "Save",
+  "@save": {
+    "description": "Save button"
+  },
+  "childAddedSuccessfully": "Child added successfully",
+  "@childAddedSuccessfully": {
+    "description": "Child added success message"
+  },
+  "generateStory": "Generate Story",
+  "@generateStory": {
+    "description": "Generate story screen title"
+  },
+  "createMagic": "Create Magic",
+  "@createMagic": {
+    "description": "Generate story header title"
+  },
+  "generateAPersonalizedStory": "Generate a personalized story",
+  "@generateAPersonalizedStory": {
+    "description": "Generate story header subtitle"
+  },
+  "storyType": "Story Type",
+  "@storyType": {
+    "description": "Story type field label"
+  },
+  "child": "Child",
+  "@child": {
+    "description": "Child story type"
+  },
+  "hero": "Hero",
+  "@hero": {
+    "description": "Hero story type"
+  },
+  "combined": "Combined",
+  "@combined": {
+    "description": "Combined story type"
+  },
+  "language": "Language",
+  "@language": {
+    "description": "Language field label"
+  },
+  "moral": "Moral",
+  "@moral": {
+    "description": "Moral field label"
+  },
+  "selectChild": "Select Child",
+  "@selectChild": {
+    "description": "Select child field label"
+  },
+  "noChildrenAvailablePleaseAddAChildFirst": "No children available. Please add a child first.",
+  "@noChildrenAvailablePleaseAddAChildFirst": {
+    "description": "No children available message"
+  },
+  "childForStory": "Child for story",
+  "@childForStory": {
+    "description": "Selected child label"
+  },
+  "storyLengthMinutes": "Story Length (minutes)",
+  "@storyLengthMinutes": {
+    "description": "Story length field label"
+  },
+  "enterStoryLengthInMinutesOptional": "Enter story length in minutes (optional)",
+  "@enterStoryLengthInMinutesOptional": {
+    "description": "Story length field hint"
+  },
+  "pleaseEnterAValidNumber": "Please enter a valid number",
+  "@pleaseEnterAValidNumber": {
+    "description": "Number validation error"
+  },
+  "pleaseSelectAChild": "Please select a child",
+  "@pleaseSelectAChild": {
+    "description": "Child selection validation error"
+  },
+  "profileTitle": "Profile",
+  "@profileTitle": {
+    "description": "Profile screen title"
+  },
+  "statistics": "Statistics",
+  "@statistics": {
+    "description": "Statistics section title"
+  },
+  "storiesThisMonth": "Stories this month",
+  "@storiesThisMonth": {
+    "description": "Monthly stories count label"
+  },
+  "profileNotFound": "Profile not found",
+  "@profileNotFound": {
+    "description": "Profile not found message"
+  },
+  "errorLoadingProfile": "Error loading profile",
+  "@errorLoadingProfile": {
+    "description": "Profile loading error"
+  },
+  "logout": "Logout",
+  "@logout": {
+    "description": "Logout button"
+  },
+  "logoutFromAccount": "Logout from account",
+  "@logoutFromAccount": {
+    "description": "Logout dialog title"
+  },
+  "areYouSureYouWantToLogout": "Are you sure you want to logout?",
+  "@areYouSureYouWantToLogout": {
+    "description": "Logout confirmation message"
+  },
+  "languageSettings": "Language",
+  "@languageSettings": {
+    "description": "Language settings label"
+  },
+  "english": "English",
+  "@english": {
+    "description": "English language option"
+  },
+  "russian": "Russian",
+  "@russian": {
+    "description": "Russian language option"
+  },
+  "freeStories": "Free Stories",
+  "@freeStories": {
+    "description": "Free stories tab label"
+  },
+  "browseFreeStories": "Browse free stories",
+  "@browseFreeStories": {
+    "description": "Free stories screen subtitle"
+  },
+  "ageCategory": "Age",
+  "@ageCategory": {
+    "description": "Age category filter label"
+  },
+  "noFreeStoriesFound": "No free stories found",
+  "@noFreeStoriesFound": {
+    "description": "Empty free stories state title"
+  },
+  "tryDifferentFilters": "Try different filters",
+  "@tryDifferentFilters": {
+    "description": "Empty free stories state subtitle"
+  }
+}
+
