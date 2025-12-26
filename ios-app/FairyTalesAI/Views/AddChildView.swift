@@ -5,7 +5,7 @@ struct AddChildView: View {
     @Environment(\.dismiss) var dismiss
     
     @State private var name: String = ""
-    @State private var selectedAgeCategory: AgeCategory = .threeToFive
+    @State private var selectedAgeCategory: AgeCategory = .preschool
     @State private var selectedInterests: Set<String> = []
     @State private var showingAgePicker = false
     
@@ -57,7 +57,7 @@ struct AddChildView: View {
                                 }
                                 .padding()
                                 .background(AppTheme.cardBackground)
-                                .cornerRadius(16)
+                                .cornerRadius(AppTheme.cornerRadius)
                             }
                         }
                         .padding(.horizontal)
@@ -107,7 +107,7 @@ struct AddChildView: View {
                                 selectedInterests.count >= 3 && !name.isEmpty ?
                                 AppTheme.primaryPurple : AppTheme.primaryPurple.opacity(0.5)
                             )
-                            .cornerRadius(16)
+                            .cornerRadius(AppTheme.cornerRadius)
                         }
                         .disabled(selectedInterests.count < 3 || name.isEmpty)
                         .padding(.horizontal)
@@ -179,7 +179,7 @@ struct CustomTextFieldStyle: TextFieldStyle {
         configuration
             .padding()
             .background(AppTheme.cardBackground)
-            .cornerRadius(16)
+            .cornerRadius(AppTheme.cornerRadius)
             .foregroundColor(AppTheme.textPrimary)
     }
 }
@@ -202,7 +202,7 @@ struct InterestChip: View {
             .frame(maxWidth: .infinity)
             .padding(.vertical, 12)
             .background(isSelected ? AppTheme.primaryPurple : AppTheme.cardBackground)
-            .cornerRadius(16)
+            .cornerRadius(AppTheme.cornerRadius)
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(isSelected ? AppTheme.primaryPurple : Color.clear, lineWidth: 2)
@@ -257,4 +257,5 @@ struct AgePickerView: View {
         }
     }
 }
+
 

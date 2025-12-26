@@ -57,7 +57,7 @@ struct SettingsView: View {
                         .padding()
                         .frame(maxWidth: .infinity)
                         .background(AppTheme.cardBackground)
-                        .cornerRadius(20)
+                        .cornerRadius(AppTheme.cornerRadius)
                         .padding(.horizontal)
                         .padding(.top)
                         
@@ -117,7 +117,7 @@ struct SettingsView: View {
                                 .buttonStyle(PlainButtonStyle())
                             }
                             .background(AppTheme.cardBackground)
-                            .cornerRadius(20)
+                            .cornerRadius(AppTheme.cornerRadius)
                             .padding(.horizontal)
                         }
                         
@@ -165,7 +165,7 @@ struct SettingsView: View {
                                 .buttonStyle(PlainButtonStyle())
                             }
                             .background(AppTheme.cardBackground)
-                            .cornerRadius(20)
+                            .cornerRadius(AppTheme.cornerRadius)
                             .padding(.horizontal)
                         }
                         
@@ -231,7 +231,7 @@ struct SettingsView: View {
                                 .buttonStyle(PlainButtonStyle())
                             }
                             .background(AppTheme.cardBackground)
-                            .cornerRadius(20)
+                            .cornerRadius(AppTheme.cornerRadius)
                             .padding(.horizontal)
                         }
                         
@@ -243,7 +243,7 @@ struct SettingsView: View {
                                 .frame(maxWidth: .infinity)
                                 .padding()
                                 .background(AppTheme.cardBackground)
-                                .cornerRadius(16)
+                                .cornerRadius(AppTheme.cornerRadius)
                         }
                         .padding(.horizontal)
                         
@@ -372,4 +372,5 @@ struct TermsView: View {
             .navigationTitle("Terms of Service")
     }
 }
+
 

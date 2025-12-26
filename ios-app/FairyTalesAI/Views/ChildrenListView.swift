@@ -35,7 +35,7 @@ struct ChildrenListView: View {
                             .frame(maxWidth: .infinity)
                             .padding()
                             .background(AppTheme.primaryPurple)
-                            .cornerRadius(16)
+                            .cornerRadius(AppTheme.cornerRadius)
                         }
                         .padding(.horizontal, 40)
                     }
@@ -66,7 +66,7 @@ struct ChildrenListView: View {
                                 .frame(maxWidth: .infinity)
                                 .padding()
                                 .background(AppTheme.primaryPurple)
-                                .cornerRadius(16)
+                                .cornerRadius(AppTheme.cornerRadius)
                             }
                             .padding(.horizontal)
                             .padding(.top, 8)
@@ -75,7 +75,7 @@ struct ChildrenListView: View {
                     }
                 }
             }
-            .navigationTitle("Who are we reading to?")
+            .navigationTitle("Profiles")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -129,7 +129,7 @@ struct ChildRowView: View {
         }
         .padding()
         .background(AppTheme.cardBackground)
-        .cornerRadius(16)
+        .cornerRadius(AppTheme.cornerRadius)
         .padding(.horizontal)
     }
 }
@@ -210,4 +210,5 @@ struct ChildDetailView: View {
         }
     }
 }
+
 

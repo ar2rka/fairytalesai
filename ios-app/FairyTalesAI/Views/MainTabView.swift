@@ -11,33 +11,27 @@ struct MainTabView: View {
                 }
                 .tag(0)
             
-            ChildrenListView()
-                .tabItem {
-                    Label("Children", systemImage: "person.2.fill")
-                }
-                .tag(1)
-            
             GenerateStoryView()
                 .tabItem {
-                    Image(systemName: "sparkles")
-                        .symbolEffect(.pulse)
+                    Label("Create", systemImage: "wand.and.stars")
                 }
-                .tag(2)
+                .tag(1)
             
             LibraryView()
                 .tabItem {
                     Label("Library", systemImage: "book.fill")
                 }
-                .tag(3)
+                .tag(2)
             
-            SettingsView()
+            ChildrenListView()
                 .tabItem {
-                    Label("Settings", systemImage: "gearshape.fill")
+                    Label("Profile", systemImage: "person.fill")
                 }
-                .tag(4)
+                .tag(3)
         }
         .accentColor(AppTheme.primaryPurple)
         .preferredColorScheme(.dark)
     }
 }
+
 

@@ -24,7 +24,7 @@ class StoriesStore: ObservableObject {
             content: generateStoryContent(child: child, theme: theme, plot: plot, length: length),
             childId: childId,
             theme: theme,
-            length: length,
+            duration: length,
             plot: plot
         )
         

@@ -17,30 +17,23 @@ struct Child: Identifiable, Codable {
 }
 
 enum AgeCategory: String, Codable, CaseIterable {
-    case twoToThree = "2-3"
-    case threeToFive = "3-5"
-    case fiveToSeven = "5-7"
+    case toddler = "Toddler"
+    case preschool = "Preschool"
+    case schoolAge = "School Age"
     
     var displayName: String {
         switch self {
-        case .twoToThree:
-            return "2-3 years"
-        case .threeToFive:
-            return "3-5 years"
-        case .fiveToSeven:
-            return "5-7 years"
+        case .toddler:
+            return "Toddler (2-3 years)"
+        case .preschool:
+            return "Preschool (3-5 years)"
+        case .schoolAge:
+            return "School Age (5-8 years)"
         }
     }
     
     var shortName: String {
-        switch self {
-        case .twoToThree:
-            return "Toddler"
-        case .threeToFive:
-            return "Preschooler"
-        case .fiveToSeven:
-            return "Early Reader"
-        }
+        return self.rawValue
     }
 }
 
@@ -64,4 +57,5 @@ struct Interest: Identifiable, Hashable {
         Interest(name: "Science", emoji: "🔬")
     ]
 }
+
 

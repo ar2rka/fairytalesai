@@ -4,6 +4,31 @@ struct HomeView: View {
     @EnvironmentObject var childrenStore: ChildrenStore
     @EnvironmentObject var storiesStore: StoriesStore
     
+    // Hardcoded Free Demo Stories
+    private let freeDemoStories: [Story] = [
+        Story(
+            title: "The Magic Forest Adventure",
+            content: "Once upon a time, in a magical forest filled with talking animals and sparkling trees, a brave little explorer discovered a hidden treasure that brought joy to all the creatures.",
+            theme: "Adventure",
+            duration: 5,
+            favoriteStatus: false
+        ),
+        Story(
+            title: "Princess and the Friendly Dragon",
+            content: "In a faraway kingdom, a kind princess befriended a dragon who loved to paint rainbows. Together, they showed everyone that friendship knows no boundaries.",
+            theme: "Princess",
+            duration: 5,
+            favoriteStatus: false
+        ),
+        Story(
+            title: "The Space Explorer's Journey",
+            content: "A young astronaut traveled through the stars, meeting friendly aliens and discovering planets made of candy. The universe was full of wonder and friendship.",
+            theme: "Space",
+            duration: 5,
+            favoriteStatus: false
+        )
+    ]
+    
     var body: some View {
         NavigationView {
             ZStack {
@@ -11,19 +36,39 @@ struct HomeView: View {
                 
                 ScrollView {
                     VStack(spacing: 24) {
-                        // Header
+                        // Welcome Header
                         VStack(alignment: .leading, spacing: 8) {
-                            Text(greeting)
+                            Text("Welcome")
                                 .font(.system(size: 16, weight: .medium))
                                 .foregroundColor(AppTheme.textSecondary)
                             
-                            Text("Good Evening, Storyteller")
+                            Text("Create Magical Stories")
                                 .font(.system(size: 32, weight: .bold))
                                 .foregroundColor(AppTheme.textPrimary)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal)
                         .padding(.top)
+                        
+                        // Free Demo Stories Section
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("Free Demo Stories")
+                                .font(.system(size: 20, weight: .semibold))
+                                .foregroundColor(AppTheme.textPrimary)
+                                .padding(.horizontal)
+                            
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 16) {
+                                    ForEach(freeDemoStories) { story in
+                                        NavigationLink(destination: StoryReadingView(story: story)) {
+                                            FreeDemoStoryCard(story: story)
+                                        }
+                                        .buttonStyle(PlainButtonStyle())
+                                    }
+                                }
+                                .padding(.horizontal)
+                            }
+                        }
                         
                         // Main Feature Card
                         NavigationLink(destination: GenerateStoryView()) {
@@ -129,72 +174,79 @@ struct HomeView: View {
         }
     }
     
-    private var greeting: String {
-        let hour = Calendar.current.component(.hour, from: Date())
-        if hour < 12 {
-            return "Good Morning"
-        } else if hour < 18 {
-            return "Good Afternoon"
-        } else {
-            return "Good Evening"
+}
+
+struct FreeDemoStoryCard: View {
+    let story: Story
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            RoundedRectangle(cornerRadius: 25)
+                .fill(
+                    LinearGradient(
+                        colors: [AppTheme.primaryPurple.opacity(0.6), AppTheme.accentPurple.opacity(0.6)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .frame(width: 200, height: 120)
+                .overlay(
+                    Image(systemName: "book.fill")
+                        .font(.system(size: 40))
+                        .foregroundColor(.white.opacity(0.8))
+                )
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(story.title)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(AppTheme.textPrimary)
+                    .lineLimit(2)
+                
+                Text("\(story.duration) min • \(story.theme)")
+                    .font(.system(size: 12))
+                    .foregroundColor(AppTheme.textSecondary)
+            }
         }
+        .frame(width: 200)
     }
 }
 
 struct FeatureCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(
-                        LinearGradient(
-                            colors: [Color.purple.opacity(0.3), Color.blue.opacity(0.3)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(height: 200)
-                
-                Image(systemName: "book.fill")
-                    .font(.system(size: 60))
-                    .foregroundColor(.yellow)
+            HStack {
+                Text("New Feature")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(AppTheme.primaryPurple)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 4)
+                    .background(AppTheme.primaryPurple.opacity(0.2))
+                    .cornerRadius(AppTheme.cornerRadius)
             }
             
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Text("New Feature")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundColor(AppTheme.primaryPurple)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 4)
-                        .background(AppTheme.primaryPurple.opacity(0.2))
-                        .cornerRadius(12)
-                }
-                
-                Text("Spark a New Adventure")
-                    .font(.system(size: 24, weight: .bold))
-                    .foregroundColor(AppTheme.textPrimary)
-                
-                Text("Create a custom fairy tale instantly with the power of AI magic.")
-                    .font(.system(size: 14))
-                    .foregroundColor(AppTheme.textSecondary)
-                
-                HStack {
-                    Image(systemName: "sparkles")
-                    Image(systemName: "sparkles")
-                    Text("Create New Tale")
-                        .font(.system(size: 16, weight: .semibold))
-                }
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(AppTheme.primaryPurple)
-                .cornerRadius(16)
+            Text("Spark a New Adventure")
+                .font(.system(size: 24, weight: .bold))
+                .foregroundColor(AppTheme.textPrimary)
+            
+            Text("Create a custom fairy tale instantly with the power of AI magic.")
+                .font(.system(size: 14))
+                .foregroundColor(AppTheme.textSecondary)
+            
+            HStack {
+                Image(systemName: "sparkles")
+                Text("Create New Tale")
+                    .font(.system(size: 16, weight: .semibold))
+                Image(systemName: "sparkles")
             }
+            .foregroundColor(.white)
+            .frame(maxWidth: .infinity)
             .padding()
-            .background(AppTheme.cardBackground)
+            .background(AppTheme.primaryPurple)
+            .cornerRadius(AppTheme.cornerRadius)
         }
-        .cornerRadius(24)
+        .padding()
+        .background(AppTheme.cardBackground)
+        .cornerRadius(AppTheme.cornerRadius)
     }
 }
 
@@ -250,7 +302,7 @@ struct StoryCard: View {
                 .foregroundColor(AppTheme.textPrimary)
                 .lineLimit(2)
             
-            Text("\(story.length) min • \(story.theme)")
+            Text("\(story.duration) min • \(story.theme)")
                 .font(.system(size: 12))
                 .foregroundColor(AppTheme.textSecondary)
         }
@@ -274,8 +326,96 @@ struct ThemeButton: View {
             .frame(maxWidth: .infinity)
             .padding()
             .background(AppTheme.cardBackground)
-            .cornerRadius(16)
+            .cornerRadius(AppTheme.cornerRadius)
         }
     }
 }
+
+struct StoryReadingView: View {
+    let story: Story
+    @EnvironmentObject var premiumManager: PremiumManager
+    @EnvironmentObject var userSettings: UserSettings
+    @Environment(\.dismiss) var dismiss
+    @State private var showingPaywall = false
+    
+    var body: some View {
+        ZStack {
+            AppTheme.darkPurple.ignoresSafeArea()
+            
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    // Story Header
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(story.title)
+                            .font(.system(size: 32, weight: .bold))
+                            .foregroundColor(AppTheme.textPrimary)
+                        
+                        HStack(spacing: 12) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "clock.fill")
+                                    .font(.system(size: 12))
+                                Text("\(story.duration) min")
+                                    .font(.system(size: 14))
+                            }
+                            .foregroundColor(AppTheme.textSecondary)
+                            
+                            Text("•")
+                                .foregroundColor(AppTheme.textSecondary)
+                            
+                            Text(story.theme)
+                                .font(.system(size: 14))
+                                .foregroundColor(AppTheme.primaryPurple)
+                        }
+                    }
+                    
+                    // Listen Button with Premium Lock
+                    Button(action: {
+                        if !userSettings.isPremium {
+                            showingPaywall = true
+                        } else {
+                            // Start audio playback
+                            // In production, this would start the audio narration
+                        }
+                    }) {
+                        HStack {
+                            Image(systemName: userSettings.isPremium ? "play.circle.fill" : "lock.fill")
+                            Text(userSettings.isPremium ? "Listen" : "Listen (Premium)")
+                                .font(.system(size: 16, weight: .semibold))
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(userSettings.isPremium ? AppTheme.primaryPurple : AppTheme.primaryPurple.opacity(0.5))
+                        .cornerRadius(AppTheme.cornerRadius)
+                    }
+                    
+                    // Story Content
+                    Text(story.content)
+                        .font(.system(size: 18))
+                        .foregroundColor(AppTheme.textPrimary)
+                        .lineSpacing(12)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding()
+            }
+        }
+        .navigationTitle("Story")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: { dismiss() }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(AppTheme.textSecondary)
+                }
+            }
+        }
+        .sheet(isPresented: $showingPaywall) {
+            NavigationView {
+                PaywallView()
+                    .environmentObject(userSettings)
+            }
+        }
+    }
+}
+
 

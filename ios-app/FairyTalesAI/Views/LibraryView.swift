@@ -3,6 +3,7 @@ import SwiftUI
 struct LibraryView: View {
     @EnvironmentObject var storiesStore: StoriesStore
     @EnvironmentObject var childrenStore: ChildrenStore
+    @EnvironmentObject var premiumManager: PremiumManager
     @State private var searchText = ""
     @State private var selectedFilter = "All Stories"
     
@@ -56,7 +57,7 @@ struct LibraryView: View {
                         }
                         .padding()
                         .background(AppTheme.cardBackground)
-                        .cornerRadius(16)
+                        .cornerRadius(AppTheme.cornerRadius)
                         .padding(.horizontal)
                         .padding(.top)
                         
@@ -137,7 +138,7 @@ struct FilterButton: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
             .background(isSelected ? AppTheme.primaryPurple : AppTheme.cardBackground)
-            .cornerRadius(20)
+            .cornerRadius(AppTheme.cornerRadius)
         }
     }
 }
@@ -150,7 +151,7 @@ struct StoryLibraryRow: View {
     var body: some View {
         HStack(spacing: 16) {
             // Thumbnail
-            RoundedRectangle(cornerRadius: 12)
+            RoundedRectangle(cornerRadius: AppTheme.cornerRadius)
                 .fill(
                     LinearGradient(
                         colors: [AppTheme.primaryPurple.opacity(0.5), AppTheme.accentPurple.opacity(0.5)],
@@ -186,7 +187,7 @@ struct StoryLibraryRow: View {
                 }
                 
                 HStack(spacing: 12) {
-                    Button(action: {}) {
+                    NavigationLink(destination: StoryDetailView(story: story)) {
                         HStack {
                             Image(systemName: "book.fill")
                             Text("Read")
@@ -195,18 +196,9 @@ struct StoryLibraryRow: View {
                         .foregroundColor(AppTheme.primaryPurple)
                     }
                     
-                    Button(action: {}) {
-                        HStack {
-                            Image(systemName: "sparkles")
-                            Text("Next Chapter")
-                        }
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(AppTheme.primaryPurple)
-                        .cornerRadius(12)
-                    }
+                    Text("\(story.duration) min")
+                        .font(.system(size: 12))
+                        .foregroundColor(AppTheme.textSecondary)
                 }
             }
             
@@ -219,7 +211,7 @@ struct StoryLibraryRow: View {
         }
         .padding()
         .background(AppTheme.cardBackground)
-        .cornerRadius(16)
+        .cornerRadius(AppTheme.cornerRadius)
     }
     
     private func childName(for childId: UUID) -> String {
@@ -242,4 +234,62 @@ struct StoryLibraryRow: View {
         }
     }
 }
+
+struct StoryDetailView: View {
+    let story: Story
+    @EnvironmentObject var premiumManager: PremiumManager
+    @EnvironmentObject var userSettings: UserSettings
+    @Environment(\.dismiss) var dismiss
+    @State private var showingPaywall = false
+    
+    var body: some View {
+        ZStack {
+            AppTheme.darkPurple.ignoresSafeArea()
+            
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    Text(story.title)
+                        .font(.system(size: 28, weight: .bold))
+                        .foregroundColor(AppTheme.textPrimary)
+                    
+                    // Listen Button with Premium Lock
+                    Button(action: {
+                        if !userSettings.isPremium {
+                            showingPaywall = true
+                        } else {
+                            // Start audio playback
+                            // In production, this would start the audio narration
+                        }
+                    }) {
+                        HStack {
+                            Image(systemName: userSettings.isPremium ? "play.circle.fill" : "lock.fill")
+                            Text(userSettings.isPremium ? "Listen" : "Listen (Premium)")
+                                .font(.system(size: 16, weight: .semibold))
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(userSettings.isPremium ? AppTheme.primaryPurple : AppTheme.primaryPurple.opacity(0.5))
+                        .cornerRadius(AppTheme.cornerRadius)
+                    }
+                    
+                    Text(story.content)
+                        .font(.system(size: 16))
+                        .foregroundColor(AppTheme.textPrimary)
+                        .lineSpacing(8)
+                }
+                .padding()
+            }
+        }
+        .navigationTitle("Story")
+        .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $showingPaywall) {
+            NavigationView {
+                PaywallView()
+                    .environmentObject(userSettings)
+            }
+        }
+    }
+}
+
 

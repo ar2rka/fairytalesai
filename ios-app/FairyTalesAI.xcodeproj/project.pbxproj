@@ -13,6 +13,10 @@
 		A1000008 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000007 /* Preview Assets.xcassets */; };
 		D9E2D5DB2EFD60A40082D3B4 /* StoriesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5D12EFD60A40082D3B4 /* StoriesStore.swift */; };
 		D9E2D5DC2EFD60A40082D3B4 /* ChildrenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5D02EFD60A40082D3B4 /* ChildrenStore.swift */; };
+		D9E2D5E72EFD60A40082D3B5 /* PremiumManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5E62EFD60A40082D3B5 /* PremiumManager.swift */; };
+		D9E2D5E92EFD60A40082D3B6 /* UserSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5E82EFD60A40082D3B6 /* UserSettings.swift */; };
+		D9E2D5EA2EFD60A40082D3B7 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5EB2EFD60A40082D3B7 /* OnboardingView.swift */; };
+		D9E2D5EC2EFD60A40082D3B8 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5ED2EFD60A40082D3B8 /* PaywallView.swift */; };
 		D9E2D5DD2EFD60A40082D3B4 /* ChildrenListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5D42EFD60A40082D3B4 /* ChildrenListView.swift */; };
 		D9E2D5DE2EFD60A40082D3B4 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5CE2EFD60A40082D3B4 /* AppTheme.swift */; };
 		D9E2D5DF2EFD60A40082D3B4 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5D62EFD60A40082D3B4 /* HomeView.swift */; };
@@ -37,6 +41,10 @@
 		D9E2D5CE2EFD60A40082D3B4 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 		D9E2D5D02EFD60A40082D3B4 /* ChildrenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChildrenStore.swift; sourceTree = "<group>"; };
 		D9E2D5D12EFD60A40082D3B4 /* StoriesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoriesStore.swift; sourceTree = "<group>"; };
+		D9E2D5E62EFD60A40082D3B5 /* PremiumManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumManager.swift; sourceTree = "<group>"; };
+		D9E2D5E82EFD60A40082D3B6 /* UserSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettings.swift; sourceTree = "<group>"; };
+		D9E2D5EB2EFD60A40082D3B7 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		D9E2D5ED2EFD60A40082D3B8 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
 		D9E2D5D32EFD60A40082D3B4 /* AddChildView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddChildView.swift; sourceTree = "<group>"; };
 		D9E2D5D42EFD60A40082D3B4 /* ChildrenListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChildrenListView.swift; sourceTree = "<group>"; };
 		D9E2D5D52EFD60A40082D3B4 /* GenerateStoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateStoryView.swift; sourceTree = "<group>"; };
@@ -121,6 +129,8 @@
 			children = (
 				D9E2D5D02EFD60A40082D3B4 /* ChildrenStore.swift */,
 				D9E2D5D12EFD60A40082D3B4 /* StoriesStore.swift */,
+				D9E2D5E62EFD60A40082D3B5 /* PremiumManager.swift */,
+				D9E2D5E82EFD60A40082D3B6 /* UserSettings.swift */,
 			);
 			name = ViewModels;
 			path = ViewModels;
@@ -136,6 +146,8 @@
 				D9E2D5D72EFD60A40082D3B4 /* LibraryView.swift */,
 				D9E2D5D82EFD60A40082D3B4 /* MainTabView.swift */,
 				D9E2D5D92EFD60A40082D3B4 /* SettingsView.swift */,
+				D9E2D5EB2EFD60A40082D3B7 /* OnboardingView.swift */,
+				D9E2D5ED2EFD60A40082D3B8 /* PaywallView.swift */,
 			);
 			name = Views;
 			path = Views;
@@ -209,6 +221,10 @@
 				A1000003 /* ContentView.swift in Sources */,
 				D9E2D5DB2EFD60A40082D3B4 /* StoriesStore.swift in Sources */,
 				D9E2D5DC2EFD60A40082D3B4 /* ChildrenStore.swift in Sources */,
+				D9E2D5E72EFD60A40082D3B5 /* PremiumManager.swift in Sources */,
+				D9E2D5E92EFD60A40082D3B6 /* UserSettings.swift in Sources */,
+				D9E2D5EA2EFD60A40082D3B7 /* OnboardingView.swift in Sources */,
+				D9E2D5EC2EFD60A40082D3B8 /* PaywallView.swift in Sources */,
 				D9E2D5DD2EFD60A40082D3B4 /* ChildrenListView.swift in Sources */,
 				D9E2D5DE2EFD60A40082D3B4 /* AppTheme.swift in Sources */,
 				D9E2D5DF2EFD60A40082D3B4 /* HomeView.swift in Sources */,
