@@ -72,6 +72,8 @@ class StoryDB(BaseModel):
     user_id: Optional[str] = None
     # Reference to generation record
     generation_id: str
+    # Reference to parent story for continuation narratives
+    parent_id: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 

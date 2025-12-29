@@ -115,6 +115,8 @@ class StoryDB(BaseModel):
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     generation_id: str
+    # Reference to parent story for continuation narratives
+    parent_id: Optional[str] = None
 
 
 class StoryRatingRequest(BaseModel):

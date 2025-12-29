@@ -548,6 +548,7 @@ class SupabaseClient:
                 'user_id': 'user_id',
                 'status': 'status',
                 'generation_id': 'generation_id',
+                'parent_id': 'parent_id',
             }
             
             for py_key, db_key in key_mapping.items():
@@ -629,7 +630,9 @@ class SupabaseClient:
                     'audio_provider': 'audio_provider',
                     'audio_generation_metadata': 'audio_generation_metadata',
                     'user_id': 'user_id',
-                    'status': 'status'
+                    'status': 'status',
+                    'generation_id': 'generation_id',
+                    'parent_id': 'parent_id'
                 }
                 
                 model_story_data = {}

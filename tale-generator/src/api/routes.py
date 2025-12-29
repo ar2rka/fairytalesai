@@ -228,18 +228,19 @@ def _generate_prompt(
     hero: Optional[Hero],
     moral: str,
     language: Language,
-    story_length: StoryLength
+    story_length: StoryLength,
+    parent_story: Optional[StoryDB] = None
 ) -> str:
     """Generate appropriate prompt based on story type."""
     if story_type == "child":
         logger.info(f"Generating child story for {child.name}")
-        return prompt_service.generate_child_prompt(child, moral, language, story_length)
+        return prompt_service.generate_child_prompt(child, moral, language, story_length, parent_story)
     elif story_type == "hero":
         logger.info(f"Generating hero story for {hero.name}")
-        return prompt_service.generate_hero_prompt(hero, moral, story_length)
+        return prompt_service.generate_hero_prompt(hero, moral, story_length, parent_story)
     else:  # combined
         logger.info(f"Generating combined story for {child.name} and {hero.name}")
-        return prompt_service.generate_combined_prompt(child, hero, moral, language, story_length)
+        return prompt_service.generate_combined_prompt(child, hero, moral, language, story_length, parent_story)
 
 
 async def _create_generation_record(
@@ -597,7 +598,8 @@ async def _save_story(
     hero: Optional[Hero],
     language: Language,
     audio_file_url: Optional[str],
-    user_id: str
+    user_id: str,
+    parent_id: Optional[str] = None
 ) -> Optional[StoryDB]:
     """Save story to database.
     
@@ -618,6 +620,7 @@ async def _save_story(
         hero_id=hero.id if hero else None,
         language=language,
         audio_file_url=audio_file_url,
+        parent_id=parent_id,
         created_at=now,
         updated_at=now
     )
@@ -629,7 +632,7 @@ async def _save_story(
     
     try:
         saved_story = await supabase_client.save_story(story_db_with_user)
-        logger.info(f"Story saved to database with ID: {saved_story.id}, user: {user_id}")
+        logger.info(f"Story saved to database with ID: {saved_story.id}, user: {user_id}, parent_id: {parent_id}")
         return saved_story
     except Exception as e:
         logger.error(f"Failed to save story to database: {str(e)}")
@@ -728,6 +731,17 @@ async def generate_story(
         
         logger.debug(f"Using moral: {moral}")
         
+        # Fetch parent story if parent_id is provided
+        parent_story = None
+        if request.parent_id:
+            parent_story = await supabase_client.get_story(request.parent_id, user.user_id)
+            if not parent_story:
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"Parent story with ID {request.parent_id} not found or access denied"
+                )
+            logger.info(f"Using parent story: {parent_story.title} (ID: {parent_story.id})")
+        
         # Generate prompt
         prompt = _generate_prompt(
             request.story_type,
@@ -735,7 +749,8 @@ async def generate_story(
             hero,
             moral,
             language,
-            story_length
+            story_length,
+            parent_story
         )
         
         # Generate story content
@@ -793,7 +808,8 @@ async def generate_story(
             hero=hero,
             language=language,
             audio_file_url=None,  # Will be updated after audio generation
-            user_id=user.user_id
+            user_id=user.user_id,
+            parent_id=request.parent_id
         )
         
         # Get story ID (fallback to uuid if save failed)
