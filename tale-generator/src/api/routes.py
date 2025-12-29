@@ -166,15 +166,23 @@ async def _fetch_and_convert_child(child_id: str, user_id: str) -> Child:
             detail="You don't have permission to use this child profile"
         )
     
+    # Ensure age_category is present
+    age_category = getattr(child_db, 'age_category', None)
+    if not age_category:
+        logger.error(f"Child {child_id} missing required age_category")
+        raise HTTPException(
+            status_code=500,
+            detail="Child profile is missing age_category"
+        )
+    
     return Child(
         id=child_db.id,
         name=child_db.name,
-        age_category=child_db.age_category,
+        age_category=age_category,
         gender=Gender(child_db.gender),
         interests=child_db.interests,
-        age=child_db.age,  # For backward compatibility
-        created_at=child_db.created_at,
-        updated_at=child_db.updated_at
+        created_at=getattr(child_db, 'created_at', None),
+        updated_at=getattr(child_db, 'updated_at', None)
     )
 
 
@@ -376,7 +384,6 @@ async def _generate_story_content(
             retry_delay=1.0,
             use_langgraph=True,  # Always use LangGraph workflow
             child_name=child.name,
-            child_age=child.age,
             child_gender=child.gender.value,
             child_interests=child.interests or [],
             moral=moral,
@@ -620,7 +627,7 @@ async def _save_story(
         moral=moral,
         child_id=child.id,
         child_name=child.name,
-        child_age=child.age,
+        child_age_category=child.age_category,
         child_gender=child.gender.value,
         child_interests=child.interests,
         hero_id=hero.id if hero else None,
@@ -663,7 +670,7 @@ def _build_response(
     child_info = ChildInfoDTO(
         id=child.id,
         name=child.name,
-        age=child.age,
+        age_category=child.age_category,
         gender=child.gender.value,
         interests=child.interests
     )
@@ -951,7 +958,7 @@ async def create_child(
         return {
             "id": saved_child.id,
             "name": saved_child.name,
-            "age": saved_child.age,
+            "age_category": saved_child.age_category,
             "gender": saved_child.gender,
             "interests": saved_child.interests,
             "created_at": saved_child.created_at.isoformat() if saved_child.created_at else None

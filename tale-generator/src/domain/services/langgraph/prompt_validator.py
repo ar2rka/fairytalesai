@@ -62,7 +62,6 @@ class PromptValidatorService:
         child_name: str,
         child_age_category: str,
         child_interests: List[str],
-        child_age: Optional[int] = None,  # For backward compatibility
         model: str = "openai/gpt-4o-mini"
     ) -> ValidationResult:
         """Validate story prompt for safety and appropriateness.
@@ -72,7 +71,6 @@ class PromptValidatorService:
             child_name: Child's name
             child_age_category: Child's age category ('2-3', '3-5', or '5-7')
             child_interests: List of child's interests
-            child_age: Child's age (for backward compatibility)
             model: LLM model to use for validation
             
         Returns:

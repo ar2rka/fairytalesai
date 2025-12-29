@@ -105,11 +105,14 @@ app = create_app()
 def run():
     """Run the FastAPI application."""
     logger.info("Starting Tale Generator API service")
+    # Get log level from environment or default to info
+    log_level = os.getenv("LOG_LEVEL", "info").lower()
     uvicorn.run(
         app,
         host="0.0.0.0",
         port=8000,
-        log_level="info"
+        log_level=log_level,
+        reload=False  # Set to True for auto-reload on code changes
     )
 
 

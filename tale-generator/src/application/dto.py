@@ -172,7 +172,6 @@ class ChildInfoDTO(BaseModel):
     id: str = Field(..., description="Child ID")
     name: str = Field(..., description="Child name")
     age_category: str = Field(..., description="Child's age category as string interval (e.g., '2-3', '4-5', '6-7')")
-    age: Optional[int] = Field(None, description="Child age (calculated from category, for backward compatibility)")
     gender: str = Field(..., description="Child gender")
     interests: List[str] = Field(..., description="Child interests")
 

@@ -9,7 +9,6 @@ class ChildDB(BaseModel):
     """Database model for child profiles."""
     id: Optional[str] = None
     name: str
-    age: int  # Kept for backward compatibility, but age_category is primary
     age_category: str  # Age category as string interval (e.g., '2-3', '4-5', '6-7', '2-3 года')
     gender: str
     interests: List[str]
@@ -58,7 +57,7 @@ class StoryDB(BaseModel):
     summary: Optional[str] = None
     child_id: Optional[str] = None
     child_name: Optional[str] = None
-    child_age: Optional[int] = None
+    child_age_category: Optional[str] = None
     child_gender: Optional[str] = None
     child_interests: Optional[List[str]] = None
     hero_id: Optional[str] = None

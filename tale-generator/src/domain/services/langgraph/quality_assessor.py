@@ -40,7 +40,6 @@ class QualityAssessorService:
         moral: str,
         language: str,
         expected_word_count: int,
-        child_age: Optional[int] = None,  # For backward compatibility
         model: str = "openai/gpt-4o-mini"
     ) -> QualityAssessment:
         """Assess story quality across multiple criteria.
@@ -52,7 +51,6 @@ class QualityAssessorService:
             moral: Expected moral value
             language: Story language (en/ru)
             expected_word_count: Expected word count
-            child_age: Child's age (for backward compatibility)
             model: LLM model to use for assessment
             
         Returns:

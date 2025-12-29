@@ -136,3 +136,20 @@ def calculate_age_from_category(age_category: str) -> int:
     if match:
         return int(match.group(1))
     return 4  # Default fallback
+
+
+def age_to_category(age: int) -> str:
+    """Convert numeric age to age category.
+    
+    Args:
+        age: Numeric age value
+        
+    Returns:
+        Age category string ('2-3', '3-5', or '5-7')
+    """
+    if age <= 3:
+        return '2-3'
+    elif age <= 5:
+        return '3-5'
+    else:
+        return '5-7'

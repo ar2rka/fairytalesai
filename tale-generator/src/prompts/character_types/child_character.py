@@ -15,7 +15,6 @@ class ChildCharacter(BaseCharacter):
     age_category: str  # Age category as string interval (e.g., '2-3', '4-5', '6-7', '2-3 года')
     gender: str
     interests: List[str]
-    age: Optional[int] = None  # Kept for backward compatibility
     description: Optional[str] = None
     
     def __post_init__(self):
@@ -59,7 +58,6 @@ class ChildCharacter(BaseCharacter):
         return {
             "name": self.name,
             "age_category": self.age_category,
-            "age": self.age,  # For backward compatibility
             "gender": self.gender,
             "interests": self.interests,
             "description": self.description,

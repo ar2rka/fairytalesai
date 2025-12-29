@@ -30,6 +30,7 @@ export const StoryDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [story, setStory] = useState<Story | null>(null);
+  const [parentStory, setParentStory] = useState<Story | null>(null);
   const [rating, setRating] = useState<number>(0);
   const [hoveredStar, setHoveredStar] = useState<number | null>(null);
 
@@ -77,11 +78,40 @@ export const StoryDetailPage: React.FC = () => {
       if (data.rating) {
         setRating(data.rating);
       }
+
+      // Fetch parent story if this is a continuation
+      if (data.parent_id) {
+        fetchParentStory(data.parent_id);
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to fetch story';
       setError(message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchParentStory = async (parentId: string) => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('stories')
+        .select('*')
+        .eq('id', parentId)
+        .eq('user_id', user.id)
+        .single();
+      
+      if (error) {
+        console.error('Failed to fetch parent story:', error);
+        return;
+      }
+      
+      if (data) {
+        setParentStory(data);
+      }
+    } catch (err) {
+      console.error('Error fetching parent story:', err);
     }
   };
 
@@ -259,6 +289,14 @@ export const StoryDetailPage: React.FC = () => {
                       <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${getStatusBadgeColor(story.status)}`}>
                         {getStatusDisplay(story.status)}
                       </span>
+                      {story.parent_id && (
+                        <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-700 flex items-center gap-1">
+                          <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                          </svg>
+                          Continuation
+                        </span>
+                      )}
                       {story.rating && (
                         <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-700 flex items-center gap-1">
                           <StarIconSolid className="h-3 w-3" />
@@ -328,6 +366,41 @@ export const StoryDetailPage: React.FC = () => {
             </div>
           </CardBody>
         </Card>
+
+        {/* Parent Story Info */}
+        {story.parent_id && (
+          <Card className="mb-6">
+            <CardHeader>
+              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <svg className="h-5 w-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+                </svg>
+                Previous Story
+              </h3>
+            </CardHeader>
+            <CardBody>
+              {parentStory ? (
+                <div className="space-y-3">
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-1">{parentStory.title}</h4>
+                    <p className="text-sm text-gray-600 line-clamp-2">{parentStory.content.substring(0, 200)}...</p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate(`/stories/${parentStory.id}`)}
+                  >
+                    View Previous Story
+                  </Button>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-600">
+                  This story is a continuation of another story. Parent story information is loading...
+                </p>
+              )}
+            </CardBody>
+          </Card>
+        )}
 
         {/* Story Content */}
         <Card className="mb-6">
@@ -450,13 +523,27 @@ export const StoryDetailPage: React.FC = () => {
           >
             Back to Stories
           </Button>
+          {story.child_id && (
+            <Button
+              onClick={() => navigate(`/stories/generate?childId=${story.child_id}&parentId=${story.id}`)}
+              variant="primary"
+              className="flex-1"
+              leftIcon={
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              }
+            >
+              Continue This Story
+            </Button>
+          )}
           <Button
             onClick={() => navigate('/stories/generate')}
             variant="primary"
             className="flex-1"
             leftIcon={<SparklesIcon className="h-5 w-5" />}
           >
-            Generate Another Story
+            Generate New Story
           </Button>
         </div>
       </div>

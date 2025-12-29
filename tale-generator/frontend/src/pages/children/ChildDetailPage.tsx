@@ -13,7 +13,7 @@ import {
   BookOpenIcon,
   SparklesIcon 
 } from '@heroicons/react/24/outline';
-import { getAgeDisplay } from '../../utils/ageCategories';
+import { getAgeCategoryDisplay } from '../../utils/ageCategories';
 
 export const ChildDetailPage: React.FC = () => {
   const { user, signOut } = useAuth();
@@ -217,7 +217,7 @@ export const ChildDetailPage: React.FC = () => {
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900">{child.name}</h3>
                     <div className="flex items-center text-sm text-gray-600 space-x-2">
-                      <span>{getAgeDisplay(child.age)}</span>
+                      <span>{getAgeCategoryDisplay(child.age_category)}</span>
                       <span>•</span>
                       <span className="capitalize">{child.gender}</span>
                     </div>

@@ -26,6 +26,7 @@ export interface Story {
   hero_gender: string | null;
   hero_appearance: string | null;
   relationship_description: string | null;
+  parent_id?: string | null;
   created_at: string;
   updated_at: string;
   story_length: number | null;

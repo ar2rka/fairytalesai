@@ -63,10 +63,10 @@ def get_child_story_prompt(child, moral: str, language: Language, story_length: 
     # Convert child to ChildCharacter
     child_char = ChildCharacter(
         name=child.name,
-        age=child.age,
+        age_category=child.age_category,
         gender=child.gender if isinstance(child.gender, str) else child.gender.value,
         interests=child.interests,
-        description=None  # Legacy children don't have description
+        description=None
     )
     
     # Use appropriate builder

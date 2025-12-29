@@ -54,3 +54,21 @@ export function getCategoryLabel(category: AgeCategory): string {
 export function getAgeDisplay(age: number): string {
   return getCategoryLabel(ageToCategory(age));
 }
+
+/**
+ * Gets display label for age category string directly
+ * Use this when you have age_category from the database
+ */
+export function getAgeCategoryDisplay(ageCategory: string | null | undefined): string {
+  if (!ageCategory) {
+    return 'N/A';
+  }
+  // Handle both formats: '2-3' and '2-3 года'
+  const category = ageCategory.split(' ')[0] as AgeCategory;
+  // Validate that it's a valid category
+  if (AGE_CATEGORIES.some(c => c.value === category)) {
+    return getCategoryLabel(category);
+  }
+  // Fallback to the original value if it doesn't match expected format
+  return category;
+}

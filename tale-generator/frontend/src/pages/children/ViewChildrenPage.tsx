@@ -7,7 +7,7 @@ import { Alert } from '../../components/common/Alert';
 import { Card, CardBody } from '../../components/common/Card';
 import type { ChildProfile } from '../../types/models';
 import { UserGroupIcon, PlusIcon, PencilIcon, TrashIcon, EyeIcon } from '@heroicons/react/24/outline';
-import { getAgeDisplay } from '../../utils/ageCategories';
+import { getAgeCategoryDisplay } from '../../utils/ageCategories';
 
 export const ViewChildrenPage: React.FC = () => {
   const { user } = useAuth();
@@ -143,7 +143,7 @@ export const ViewChildrenPage: React.FC = () => {
                     <div className="flex-1">
                       <h3 className="text-lg font-semibold text-neutral-900 mb-1">{child.name}</h3>
                       <div className="flex items-center text-sm text-neutral-600 space-x-2">
-                        <span>{getAgeDisplay(child.age)}</span>
+                        <span>{getAgeCategoryDisplay(child.age_category)}</span>
                         <span>•</span>
                         <span className="capitalize">{child.gender}</span>
                       </div>

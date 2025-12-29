@@ -68,7 +68,6 @@ class PromptService:
                     age_category=child.age_category,
                     gender=child.gender.value if hasattr(child.gender, 'value') else str(child.gender),
                     interests=child.interests,
-                    age=child.age,
                     description=None
                 )
                 
@@ -175,7 +174,6 @@ class PromptService:
                     age_category=child.age_category,
                     gender=child.gender.value if hasattr(child.gender, 'value') else str(child.gender),
                     interests=child.interests,
-                    age=child.age,
                     description=None
                 )
                 

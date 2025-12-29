@@ -271,7 +271,6 @@ class OpenRouterClient:
         use_langgraph: bool = True,
         # Optional parameters for full workflow
         child_name: Optional[str] = None,
-        child_age: Optional[int] = None,
         child_gender: Optional[str] = None,
         child_interests: Optional[List[str]] = None,
         moral: Optional[str] = None,
@@ -291,7 +290,6 @@ class OpenRouterClient:
             retry_delay: Delay between retries in seconds
             use_langgraph: Whether to use full LangGraph workflow with validation and quality assessment (default: True)
             child_name: Optional child name for workflow context (default: "Child")
-            child_age: Optional child age for workflow context (default: 5)
             child_gender: Optional child gender for workflow context (default: "other")
             child_interests: Optional child interests for workflow context (default: ["stories"])
             moral: Optional moral value for the story (default: "kindness")
@@ -329,9 +327,6 @@ class OpenRouterClient:
             if child_name is None or child_name == "":
                 child_name = "Child"
                 logger.warning("child_name was None or empty, using default 'Child'")
-            if child_age is None or child_age == 0:
-                child_age = 5
-                logger.warning("child_age was None or 0, using default 5")
             if child_gender is None or child_gender == "":
                 child_gender = "other"
             if child_interests is None or len(child_interests) == 0:
@@ -343,13 +338,16 @@ class OpenRouterClient:
             if story_length_minutes is None or story_length_minutes == 0:
                 story_length_minutes = 5
             
-            logger.debug(f"Using child_name={child_name}, child_age={child_age} for workflow")
+            # Default age_category if not provided
+            child_age_category = "3-5"  # Default age category
+            
+            logger.debug(f"Using child_name={child_name}, child_age_category={child_age_category} for workflow")
             
             # Create child entity for workflow
             try:
                 child = Child(
                     name=child_name,
-                    age=child_age,
+                    age_category=child_age_category,
                     gender=Gender(child_gender),
                     interests=child_interests
                 )
@@ -357,7 +355,7 @@ class OpenRouterClient:
                 logger.warning(f"Failed to create child entity: {e}, using defaults")
                 child = Child(
                     name="Child",
-                    age=5,
+                    age_category="3-5",
                     gender=Gender.OTHER,
                     interests=["stories"]
                 )
@@ -384,7 +382,6 @@ class OpenRouterClient:
                 expected_word_count=expected_word_count,
                 user_id=user_id,
                 generation_id=generation_id,
-                child_age=child.age,  # For backward compatibility
                 hero_id=None,
                 hero_name=None,
                 hero_description=None

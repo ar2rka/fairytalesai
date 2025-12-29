@@ -6,17 +6,19 @@ import { Button } from '../common/Button';
 import { Alert } from '../common/Alert';
 import { Input } from '../common/Input';
 import { Card, CardBody, CardHeader } from '../common/Card';
-import type { ChildProfile, Hero } from '../../types/models';
-import { getAgeDisplay } from '../../utils/ageCategories';
+import type { ChildProfile, Hero, Story } from '../../types/models';
+import { getAgeCategoryDisplay } from '../../utils/ageCategories';
 
 interface GenerateStoryFormProps {
   childId?: string | null;
+  parentId?: string | null;
   onSuccess?: (storyId: string) => void;
   compact?: boolean;
 }
 
 export const GenerateStoryForm: React.FC<GenerateStoryFormProps> = ({
   childId: initialChildId,
+  parentId: initialParentId,
   onSuccess,
   compact = false,
 }) => {
@@ -37,6 +39,9 @@ export const GenerateStoryForm: React.FC<GenerateStoryFormProps> = ({
   const [filteredHeroes, setFilteredHeroes] = useState<Hero[]>([]);
   const [subscriptionPlan, setSubscriptionPlan] = useState<string>('free');
   const [maxStoryLength, setMaxStoryLength] = useState<number>(30);
+  const [availableStories, setAvailableStories] = useState<Story[]>([]);
+  const [selectedParentId, setSelectedParentId] = useState<string | null>(null);
+  const [isContinuation, setIsContinuation] = useState<boolean>(false);
 
   useEffect(() => {
     if (user) {
@@ -47,14 +52,26 @@ export const GenerateStoryForm: React.FC<GenerateStoryFormProps> = ({
       }
       fetchHeroes();
       fetchSubscription();
+      fetchAvailableStories();
     }
   }, [user, initialChildId]);
+
+  useEffect(() => {
+    // Fetch stories when child is selected for continuation
+    if (selectedChildId && isContinuation) {
+      fetchAvailableStories();
+    }
+  }, [selectedChildId, isContinuation]);
 
   useEffect(() => {
     if (initialChildId) {
       setSelectedChildId(initialChildId);
     }
-  }, [initialChildId]);
+    if (initialParentId) {
+      setSelectedParentId(initialParentId);
+      setIsContinuation(true);
+    }
+  }, [initialChildId, initialParentId]);
 
   useEffect(() => {
     // Filter heroes by selected language
@@ -149,6 +166,34 @@ export const GenerateStoryForm: React.FC<GenerateStoryFormProps> = ({
     }
   };
 
+  const fetchAvailableStories = async () => {
+    if (!user) return;
+
+    try {
+      // Fetch stories for the selected child (or all stories if no child selected)
+      let query = supabase
+        .from('stories')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (selectedChildId) {
+        query = query.eq('child_id', selectedChildId);
+      }
+
+      const { data, error: fetchError } = await query;
+
+      if (fetchError) {
+        throw new Error(fetchError.message);
+      }
+
+      setAvailableStories(data || []);
+    } catch (err) {
+      console.error('Failed to fetch available stories:', err);
+    }
+  };
+
   const handleGenerateStory = async () => {
     if (!selectedChildId) {
       setError('Please select a child first');
@@ -158,6 +203,12 @@ export const GenerateStoryForm: React.FC<GenerateStoryFormProps> = ({
     // Validate hero selection for hero/combined stories
     if ((storyType === 'hero' || storyType === 'combined') && !selectedHeroId) {
       setError('Please select a hero for this story type');
+      return;
+    }
+
+    // Validate parent story selection for continuation
+    if (isContinuation && !selectedParentId) {
+      setError('Please select a parent story for continuation');
       return;
     }
 
@@ -173,6 +224,7 @@ export const GenerateStoryForm: React.FC<GenerateStoryFormProps> = ({
         story_length: number;
         moral?: string;
         hero_id?: string;
+        parent_id?: string;
       }
 
       const requestBody: StoryRequest = {
@@ -182,6 +234,7 @@ export const GenerateStoryForm: React.FC<GenerateStoryFormProps> = ({
         story_length: storyLength,
         ...(moral && { moral }),
         ...((storyType === 'hero' || storyType === 'combined') && selectedHeroId && { hero_id: selectedHeroId }),
+        ...(isContinuation && selectedParentId && { parent_id: selectedParentId }),
       };
       
       const response = await fetch('http://localhost:8000/api/v1/stories/generate', {
@@ -383,7 +436,7 @@ export const GenerateStoryForm: React.FC<GenerateStoryFormProps> = ({
                       }`}>
                         {child.name}
                       </span>
-                      <span className="text-xs text-gray-500">{getAgeDisplay(child.age)}</span>
+                      <span className="text-xs text-gray-500">{getAgeCategoryDisplay(child.age_category)}</span>
                     </button>
                   ))}
                 </div>
@@ -552,6 +605,59 @@ export const GenerateStoryForm: React.FC<GenerateStoryFormProps> = ({
               value={moral}
               onChange={(e) => setMoral(e.target.value)}
             />
+          </div>
+
+          {/* Story Continuation */}
+          <div>
+            <div className="flex items-center mb-3">
+              <input
+                type="checkbox"
+                id="isContinuation"
+                checked={isContinuation}
+                onChange={(e) => {
+                  setIsContinuation(e.target.checked);
+                  if (!e.target.checked) {
+                    setSelectedParentId(null);
+                  }
+                }}
+                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              />
+              <label htmlFor="isContinuation" className="ml-2 block text-sm font-medium text-gray-700">
+                Generate as continuation of another story
+              </label>
+            </div>
+            {isContinuation && (
+              <div className="mt-3">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Select Parent Story
+                </label>
+                {availableStories.length === 0 ? (
+                  <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                    <p className="text-sm text-amber-900">
+                      No stories available for continuation. Please generate a story first.
+                    </p>
+                  </div>
+                ) : (
+                  <select
+                    value={selectedParentId || ''}
+                    onChange={(e) => setSelectedParentId(e.target.value || null)}
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white text-gray-900"
+                  >
+                    <option value="">Select a story to continue...</option>
+                    {availableStories.map((story) => (
+                      <option key={story.id} value={story.id}>
+                        {story.title} ({story.language === 'en' ? 'English' : 'Русский'}, {new Date(story.created_at).toLocaleDateString()})
+                      </option>
+                    ))}
+                  </select>
+                )}
+                {isContinuation && !selectedParentId && (
+                  <p className="mt-2 text-sm text-amber-600">
+                    Please select a parent story to continue from.
+                  </p>
+                )}
+              </div>
+            )}
           </div>
           
           {/* Generate Button */}

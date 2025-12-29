@@ -119,7 +119,6 @@ class SupabaseClient:
             mapped_child_dict = {}
             key_mapping = {
                 'name': 'name',
-                'age': 'age',
                 'age_category': 'age_category',
                 'gender': 'gender',
                 'interests': 'interests',
@@ -183,7 +182,6 @@ class SupabaseClient:
                 # Map snake_case keys back to camelCase keys for the model
                 key_mapping = {
                     'name': 'name',
-                    'age': 'age',
                     'age_category': 'age_category',
                     'gender': 'gender',
                     'interests': 'interests',
@@ -221,7 +219,7 @@ class SupabaseClient:
             children = []
             key_mapping = {
                 'name': 'name',
-                'age': 'age',
+                'age_category': 'age_category',
                 'gender': 'gender',
                 'interests': 'interests',
                 'user_id': 'user_id',
@@ -237,7 +235,7 @@ class SupabaseClient:
                         model_child_data[py_key] = child_data[db_key]
                 
                 # Only append if we have the required fields
-                if all(key in model_child_data for key in ['name', 'age', 'gender']):
+                if all(key in model_child_data for key in ['name', 'age_category', 'gender']):
                     children.append(ChildDB(**model_child_data))
             
             return children
@@ -532,7 +530,7 @@ class SupabaseClient:
             key_mapping = {
                 'child_id': 'child_id',
                 'child_name': 'child_name',
-                'child_age': 'child_age',
+                'child_age_category': 'child_age_category',
                 'child_gender': 'child_gender',
                 'child_interests': 'child_interests',
                 'hero_id': 'hero_id',
@@ -542,6 +540,7 @@ class SupabaseClient:
                 'title': 'title',
                 'content': 'content',
                 'summary': 'summary',
+                'moral': 'moral',
                 'language': 'language',
                 'rating': 'rating',
                 'audio_file_url': 'audio_file_url',
@@ -606,7 +605,7 @@ class SupabaseClient:
                 key_mapping = {
                     'child_id': 'child_id',
                     'child_name': 'child_name',
-                    'child_age': 'child_age',
+                    'child_age_category': 'child_age_category',
                     'child_gender': 'child_gender',
                     'child_interests': 'child_interests',
                     'story_type': 'story_type',
@@ -665,7 +664,7 @@ class SupabaseClient:
             key_mapping = {
                 'child_id': 'child_id',
                 'child_name': 'child_name',
-                'child_age': 'child_age',
+                'child_age_category': 'child_age_category',
                 'child_gender': 'child_gender',
                 'child_interests': 'child_interests',
                 'hero_id': 'hero_id',
@@ -724,7 +723,7 @@ class SupabaseClient:
             key_mapping = {
                 'child_id': 'child_id',
                 'child_name': 'child_name',
-                'child_age': 'child_age',
+                'child_age_category': 'child_age_category',
                 'child_gender': 'child_gender',
                 'child_interests': 'child_interests',
                 'created_at': 'created_at',
@@ -779,7 +778,7 @@ class SupabaseClient:
             key_mapping = {
                 'child_id': 'child_id',
                 'child_name': 'child_name',
-                'child_age': 'child_age',
+                'child_age_category': 'child_age_category',
                 'child_gender': 'child_gender',
                 'child_interests': 'child_interests',
                 'story_type': 'story_type',
@@ -846,7 +845,7 @@ class SupabaseClient:
             key_mapping = {
                 'child_id': 'child_id',
                 'child_name': 'child_name',
-                'child_age': 'child_age',
+                'child_age_category': 'child_age_category',
                 'child_gender': 'child_gender',
                 'child_interests': 'child_interests',
                 'story_type': 'story_type',
@@ -925,7 +924,7 @@ class SupabaseClient:
                 key_mapping = {
                     'child_id': 'child_id',
                     'child_name': 'child_name',
-                    'child_age': 'child_age',
+                    'child_age_category': 'child_age_category',
                     'child_gender': 'child_gender',
                     'child_interests': 'child_interests',
                     'created_at': 'created_at',
@@ -993,7 +992,7 @@ class SupabaseClient:
                 key_mapping = {
                     'child_id': 'child_id',
                     'child_name': 'child_name',
-                    'child_age': 'child_age',
+                    'child_age_category': 'child_age_category',
                     'child_gender': 'child_gender',
                     'child_interests': 'child_interests',
                     'story_type': 'story_type',
@@ -1084,7 +1083,7 @@ class SupabaseClient:
                 key_mapping = {
                     'child_id': 'child_id',
                     'child_name': 'child_name',
-                    'child_age': 'child_age',
+                    'child_age_category': 'child_age_category',
                     'child_gender': 'child_gender',
                     'child_interests': 'child_interests',
                     'story_type': 'story_type',
