@@ -9,7 +9,10 @@ struct ChildrenListView: View {
             ZStack {
                 AppTheme.darkPurple.ignoresSafeArea()
                 
-                if childrenStore.children.isEmpty {
+                if childrenStore.isLoading && childrenStore.children.isEmpty {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.primaryPurple))
+                } else if childrenStore.children.isEmpty {
                     VStack(spacing: 24) {
                         Image(systemName: "person.2.fill")
                             .font(.system(size: 60))
@@ -87,6 +90,17 @@ struct ChildrenListView: View {
             }
             .sheet(isPresented: $showingAddChild) {
                 AddChildView()
+                    .onDisappear {
+                        Task {
+                            await childrenStore.loadChildren()
+                        }
+                    }
+            }
+            .refreshable {
+                await childrenStore.loadChildren()
+            }
+            .task {
+                await childrenStore.loadChildren()
             }
         }
     }
@@ -139,6 +153,7 @@ struct ChildDetailView: View {
     @EnvironmentObject var childrenStore: ChildrenStore
     @Environment(\.dismiss) var dismiss
     @State private var showingEdit = false
+    @State private var showingDeleteAlert = false
     
     var body: some View {
         ZStack {
@@ -198,6 +213,13 @@ struct ChildDetailView: View {
         .navigationTitle("Child Profile")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button("Delete") {
+                    showingDeleteAlert = true
+                }
+                .foregroundColor(.red)
+            }
+            
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button("Edit") {
                     showingEdit = true
@@ -207,6 +229,26 @@ struct ChildDetailView: View {
         }
         .sheet(isPresented: $showingEdit) {
             AddChildView(child: child)
+                .onDisappear {
+                    Task {
+                        await childrenStore.loadChildren()
+                    }
+                }
+        }
+        .alert("Delete Child", isPresented: $showingDeleteAlert) {
+            Button("Cancel", role: .cancel) { }
+            Button("Delete", role: .destructive) {
+                Task {
+                    do {
+                        try await childrenStore.deleteChild(child)
+                        dismiss()
+                    } catch {
+                        print("Error deleting child: \(error)")
+                    }
+                }
+            }
+        } message: {
+            Text("Are you sure you want to delete \(child.name)? This action cannot be undone.")
         }
     }
 }
