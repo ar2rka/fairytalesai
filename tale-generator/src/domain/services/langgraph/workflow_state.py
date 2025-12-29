@@ -113,7 +113,7 @@ class WorkflowState(TypedDict, total=False):
     child_id: str
     child_name: str
     child_age: int  # Kept for backward compatibility
-    child_age_category: str  # Age category: '2-3', '3-5', or '5-7'
+    child_age_category: str  # Age category as string interval (e.g., '2-3', '4-5', '6-7', '2-3 года')
     child_gender: str
     child_interests: List[str]
     
@@ -190,7 +190,7 @@ def create_initial_state(
         original_prompt: The story generation prompt
         child_id: Child UUID
         child_name: Child's name
-        child_age_category: Child's age category ('2-3', '3-5', or '5-7')
+        child_age_category: Child's age category as string interval (e.g., '2-3', '4-5', '6-7', '2-3 года')
         child_gender: Child's gender
         child_interests: List of child's interests
         story_type: Type of story (child/hero/combined)
@@ -211,14 +211,11 @@ def create_initial_state(
     
     # Calculate age from category if not provided
     if child_age is None:
-        if child_age_category == '2-3':
-            child_age = 2
-        elif child_age_category == '3-5':
-            child_age = 4
-        elif child_age_category == '5-7':
-            child_age = 6
-        else:
-            child_age = 4  # Default
+        from src.utils.age_category_utils import calculate_age_from_category
+        try:
+            child_age = calculate_age_from_category(child_age_category)
+        except (ValueError, AttributeError):
+            child_age = 4  # Default fallback
     
     state: WorkflowState = {
         # Input parameters

@@ -894,17 +894,12 @@ async def create_child(
         
         # Create child entity
         # Calculate age from age_category for backward compatibility
-        age = 4  # Default
-        if request.age_category == '2-3':
-            age = 2
-        elif request.age_category == '3-5':
-            age = 4
-        elif request.age_category == '5-7':
-            age = 6
+        from src.utils.age_category_utils import calculate_age_from_category
+        age = calculate_age_from_category(request.age_category)
         
         child_db = ChildDB(
             name=request.name,
-            age_category=request.age_category,
+            age_category=request.age_category,  # Already normalized by DTO validator
             age=age,
             gender=request.gender,
             interests=request.interests,
@@ -1485,12 +1480,16 @@ async def get_free_stories(
         if supabase_client is None:
             raise HTTPException(status_code=500, detail="Supabase not configured")
         
-        # Validate age_category if provided
-        if age_category and age_category not in ['2-3', '3-5', '5-7']:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Invalid age_category: {age_category}. Must be one of: '2-3', '3-5', '5-7'"
-            )
+        # Validate and normalize age_category if provided
+        if age_category:
+            try:
+                from src.utils.age_category_utils import normalize_age_category
+                age_category = normalize_age_category(age_category)
+            except ValueError as e:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Invalid age_category: {str(e)}"
+                )
         
         # Validate language if provided
         if language and language not in ['en', 'ru']:

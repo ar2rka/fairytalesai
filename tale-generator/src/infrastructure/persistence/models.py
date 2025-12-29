@@ -10,7 +10,7 @@ class ChildDB(BaseModel):
     id: Optional[str] = None
     name: str
     age: int  # Kept for backward compatibility, but age_category is primary
-    age_category: str  # Age category: '2-3', '3-5', or '5-7'
+    age_category: str  # Age category as string interval (e.g., '2-3', '4-5', '6-7', '2-3 года')
     gender: str
     interests: List[str]
     created_at: Optional[datetime] = None
@@ -81,7 +81,7 @@ class FreeStoryDB(BaseModel):
     id: Optional[str] = None
     title: str
     content: str
-    age_category: str  # Age category: '2-3', '3-5', or '5-7'
+    age_category: str  # Age category as string interval (e.g., '2-3', '4-5', '6-7', '2-3 года')
     language: str  # Language code: 'en' or 'ru'
     is_active: bool = True  # Whether the story is active and should be displayed
     created_at: Optional[datetime] = None

@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import List, Dict, Any, Optional
 from src.prompts.character_types.base import BaseCharacter
 from src.core.exceptions import ValidationError
+from src.utils.age_category_utils import normalize_age_category
 
 
 @dataclass
@@ -11,7 +12,7 @@ class ChildCharacter(BaseCharacter):
     """Represents a child protagonist in a story."""
     
     name: str
-    age_category: str  # Age category: '2-3', '3-5', or '5-7'
+    age_category: str  # Age category as string interval (e.g., '2-3', '4-5', '6-7', '2-3 года')
     gender: str
     interests: List[str]
     age: Optional[int] = None  # Kept for backward compatibility
@@ -30,9 +31,12 @@ class ChildCharacter(BaseCharacter):
         if not self.name or not self.name.strip():
             raise ValidationError("Child name cannot be empty", field="name")
         
-        if self.age_category not in ['2-3', '3-5', '5-7']:
+        # Normalize age category
+        try:
+            self.age_category = normalize_age_category(self.age_category)
+        except ValueError as e:
             raise ValidationError(
-                "Child age_category must be one of: '2-3', '3-5', '5-7'",
+                f"Invalid age_category: {str(e)}",
                 field="age_category",
                 details={"value": self.age_category}
             )

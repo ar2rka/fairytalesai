@@ -5,6 +5,7 @@ from typing import Optional, List, Dict, Any
 from datetime import datetime
 from src.domain.value_objects import Language, Gender, StoryMoral, Rating, StoryLength
 from src.core.exceptions import ValidationError
+from src.utils.age_category_utils import normalize_age_category, calculate_age_from_category
 
 
 @dataclass
@@ -12,7 +13,7 @@ class Child:
     """Child entity representing a child profile."""
     
     name: str
-    age_category: str  # Age category: '2-3', '3-5', or '5-7'
+    age_category: str  # Age category as string interval (e.g., '2-3', '4-5', '6-7', '2-3 года')
     gender: Gender
     interests: List[str]
     age: Optional[int] = None  # Kept for backward compatibility, calculated from age_category
@@ -25,21 +26,19 @@ class Child:
         if not self.name or not self.name.strip():
             raise ValidationError("Child name cannot be empty", field="name")
         
-        if self.age_category not in ['2-3', '3-5', '5-7']:
+        # Normalize age category
+        try:
+            self.age_category = normalize_age_category(self.age_category)
+        except ValueError as e:
             raise ValidationError(
-                "Child age_category must be one of: '2-3', '3-5', '5-7'",
+                f"Invalid age_category: {str(e)}",
                 field="age_category",
                 details={"value": self.age_category}
             )
         
         # Calculate age from category if not provided
         if self.age is None:
-            if self.age_category == '2-3':
-                self.age = 2
-            elif self.age_category == '3-5':
-                self.age = 4
-            elif self.age_category == '5-7':
-                self.age = 6
+            self.age = calculate_age_from_category(self.age_category)
         
         if not self.interests:
             raise ValidationError("Child must have at least one interest", field="interests")

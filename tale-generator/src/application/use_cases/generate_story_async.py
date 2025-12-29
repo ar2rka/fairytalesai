@@ -235,14 +235,9 @@ class GenerateStoryUseCaseAsync:
         # Try to find exact match
         gender = Gender(request.child.gender.value)
         # For backward compatibility, calculate age from age_category if needed
-        age = 4  # Default
-        if hasattr(request.child, 'age_category'):
-            if request.child.age_category == '2-3':
-                age = 2
-            elif request.child.age_category == '3-5':
-                age = 4
-            elif request.child.age_category == '5-7':
-                age = 6
+        from src.utils.age_category_utils import calculate_age_from_category
+        if hasattr(request.child, 'age_category') and request.child.age_category:
+            age = calculate_age_from_category(request.child.age_category)
         else:
             age = request.child.age if hasattr(request.child, 'age') else 4
         
