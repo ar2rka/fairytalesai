@@ -5,6 +5,7 @@ struct GenerateStoryView: View {
     @EnvironmentObject var storiesStore: StoriesStore
     @EnvironmentObject var premiumManager: PremiumManager
     @EnvironmentObject var userSettings: UserSettings
+    @EnvironmentObject var authService: AuthService
     @Environment(\.colorScheme) var colorScheme
     
     @State private var selectedChildId: UUID? = nil
@@ -22,7 +23,7 @@ struct GenerateStoryView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                AppTheme.darkPurple.ignoresSafeArea()
+                AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
                 
                 ScrollView {
                     VStack(spacing: 32) {
@@ -32,7 +33,17 @@ struct GenerateStoryView: View {
                                 .font(.system(size: 20, weight: .bold))
                                 .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                             
-                            if childrenStore.children.isEmpty {
+                            if childrenStore.isLoading && childrenStore.children.isEmpty {
+                                HStack {
+                                    ProgressView()
+                                        .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.primaryPurple))
+                                    Text("Loading children...")
+                                        .font(.system(size: 14))
+                                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                            } else if childrenStore.children.isEmpty {
                                 NavigationLink(destination: AddChildView()) {
                                     HStack {
                                         Image(systemName: "plus")
@@ -226,6 +237,10 @@ struct GenerateStoryView: View {
             }
             .navigationTitle("Create Story")
             .navigationBarTitleDisplayMode(.inline)
+            .task {
+                // Умная загрузка: использует кеш если он свежий, иначе обновляет
+                await childrenStore.loadChildrenIfNeeded()
+            }
             .sheet(isPresented: $showingStoryResult) {
                 if let story = generatedStory {
                     StoryResultView(story: story)
@@ -429,7 +444,7 @@ struct StoryResultView: View {
                         }
                         
                         Text(story.content)
-                            .font(.system(size: 16))
+                            .font(.system(size: userSettings.storyFontSize))
                             .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                             .lineSpacing(8)
                     }

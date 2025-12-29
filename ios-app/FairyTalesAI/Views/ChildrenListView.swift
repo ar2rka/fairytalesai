@@ -101,7 +101,8 @@ struct ChildrenListView: View {
                 await childrenStore.loadChildren()
             }
             .task {
-                await childrenStore.loadChildren()
+                // Умная загрузка: использует кеш если он свежий
+                await childrenStore.loadChildrenIfNeeded()
             }
         }
     }
