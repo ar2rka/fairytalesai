@@ -1,9 +1,11 @@
 import SwiftUI
 
 struct SettingsView: View {
+    @EnvironmentObject var authService: AuthService
     @AppStorage("pushNotificationsEnabled") private var pushNotificationsEnabled = true
     @AppStorage("soundEffectsEnabled") private var soundEffectsEnabled = true
     @AppStorage("selectedLanguage") private var selectedLanguage = "English"
+    @State private var showLogoutAlert = false
     
     var body: some View {
         NavigationView {
@@ -42,13 +44,17 @@ struct SettingsView: View {
                             }
                             
                             VStack(spacing: 4) {
-                                Text("Sarah Anderson")
+                                Text(authService.userEmail ?? "User")
                                     .font(.system(size: 22, weight: .bold))
                                     .foregroundColor(AppTheme.textPrimary)
+                                    .lineLimit(1)
                                 
-                                Text("sarah.anderson@example.com")
-                                    .font(.system(size: 14))
-                                    .foregroundColor(AppTheme.textSecondary)
+                                if let userEmail = authService.userEmail {
+                                    Text(userEmail)
+                                        .font(.system(size: 14))
+                                        .foregroundColor(AppTheme.textSecondary)
+                                        .lineLimit(1)
+                                }
                             }
                             
                             Image(systemName: "chevron.right")
@@ -236,16 +242,33 @@ struct SettingsView: View {
                         }
                         
                         // Log Out Button
-                        Button(action: {}) {
-                            Text("Log Out")
-                                .font(.system(size: 16, weight: .semibold))
-                                .foregroundColor(.red)
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(AppTheme.cardBackground)
-                                .cornerRadius(AppTheme.cornerRadius)
+                        Button(action: { showLogoutAlert = true }) {
+                            HStack {
+                                if authService.isLoading {
+                                    ProgressView()
+                                        .progressViewStyle(CircularProgressViewStyle(tint: .red))
+                                } else {
+                                    Text("Выйти")
+                                        .font(.system(size: 16, weight: .semibold))
+                                }
+                            }
+                            .foregroundColor(.red)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(AppTheme.cardBackground)
+                            .cornerRadius(AppTheme.cornerRadius)
                         }
+                        .disabled(authService.isLoading)
+                        .opacity(authService.isLoading ? 0.6 : 1.0)
                         .padding(.horizontal)
+                        .alert("Выход", isPresented: $showLogoutAlert) {
+                            Button("Отмена", role: .cancel) { }
+                            Button("Выйти", role: .destructive) {
+                                handleLogout()
+                            }
+                        } message: {
+                            Text("Вы уверены, что хотите выйти из аккаунта?")
+                        }
                         
                         // Version Info
                         Text("Version 1.0.2 (Build 2024)")
@@ -257,6 +280,16 @@ struct SettingsView: View {
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.large)
+        }
+    }
+    
+    private func handleLogout() {
+        Task {
+            do {
+                try await authService.signOut()
+            } catch {
+                // Error is handled by AuthService
+            }
         }
     }
 }
@@ -372,5 +405,4 @@ struct TermsView: View {
             .navigationTitle("Terms of Service")
     }
 }
-
 

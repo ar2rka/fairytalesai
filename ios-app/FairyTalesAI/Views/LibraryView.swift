@@ -4,6 +4,7 @@ struct LibraryView: View {
     @EnvironmentObject var storiesStore: StoriesStore
     @EnvironmentObject var childrenStore: ChildrenStore
     @EnvironmentObject var premiumManager: PremiumManager
+    @EnvironmentObject var authService: AuthService
     @State private var searchText = ""
     @State private var selectedFilter = "All Stories"
     
@@ -31,7 +32,17 @@ struct LibraryView: View {
             ZStack {
                 AppTheme.darkPurple.ignoresSafeArea()
                 
-                if storiesStore.stories.isEmpty {
+                if storiesStore.isLoading {
+                    VStack(spacing: 24) {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.primaryPurple))
+                            .scaleEffect(1.5)
+                        
+                        Text("Loading stories...")
+                            .font(.system(size: 16))
+                            .foregroundColor(AppTheme.textSecondary)
+                    }
+                } else if storiesStore.stories.isEmpty {
                     VStack(spacing: 24) {
                         Image(systemName: "book.fill")
                             .font(.system(size: 60))
@@ -104,6 +115,13 @@ struct LibraryView: View {
                     Button(action: {}) {
                         Image(systemName: "sparkles")
                             .foregroundColor(AppTheme.primaryPurple)
+                    }
+                }
+            }
+            .onAppear {
+                if let userId = authService.currentUser?.id {
+                    Task {
+                        await storiesStore.loadStoriesFromSupabase(userId: userId)
                     }
                 }
             }
@@ -186,8 +204,40 @@ struct StoryLibraryRow: View {
                         .foregroundColor(AppTheme.textSecondary)
                 }
                 
+                HStack(spacing: 8) {
+                    // Language
+                    if let language = story.language {
+                        HStack(spacing: 4) {
+                            Image(systemName: "globe")
+                                .font(.system(size: 10))
+                            Text(language.uppercased())
+                                .font(.system(size: 11, weight: .medium))
+                        }
+                        .foregroundColor(AppTheme.textSecondary)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(AppTheme.cardBackground.opacity(0.5))
+                        .cornerRadius(6)
+                    }
+                    
+                    // Rating
+                    if let rating = story.rating {
+                        HStack(spacing: 4) {
+                            Image(systemName: "star.fill")
+                                .font(.system(size: 10))
+                            Text("\(rating)/10")
+                                .font(.system(size: 11, weight: .medium))
+                        }
+                        .foregroundColor(AppTheme.primaryPurple)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(AppTheme.primaryPurple.opacity(0.2))
+                        .cornerRadius(6)
+                    }
+                }
+                
                 HStack(spacing: 12) {
-                    NavigationLink(destination: StoryDetailView(story: story)) {
+                    NavigationLink(destination: StoryContentView(story: story)) {
                         HStack {
                             Image(systemName: "book.fill")
                             Text("Read")
@@ -235,7 +285,7 @@ struct StoryLibraryRow: View {
     }
 }
 
-struct StoryDetailView: View {
+struct StoryContentView: View {
     let story: Story
     @EnvironmentObject var premiumManager: PremiumManager
     @EnvironmentObject var userSettings: UserSettings
@@ -248,9 +298,40 @@ struct StoryDetailView: View {
             
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
+                    // Title
                     Text(story.title)
                         .font(.system(size: 28, weight: .bold))
                         .foregroundColor(AppTheme.textPrimary)
+                    
+                    // Story metadata
+                    HStack(spacing: 16) {
+                        if let language = story.language {
+                            HStack(spacing: 4) {
+                                Image(systemName: "globe")
+                                    .font(.system(size: 12))
+                                Text(language.uppercased())
+                                    .font(.system(size: 12, weight: .medium))
+                            }
+                            .foregroundColor(AppTheme.textSecondary)
+                        }
+                        
+                        if let rating = story.rating {
+                            HStack(spacing: 4) {
+                                Image(systemName: "star.fill")
+                                    .font(.system(size: 12))
+                                Text("\(rating)/10")
+                                    .font(.system(size: 12, weight: .medium))
+                            }
+                            .foregroundColor(AppTheme.primaryPurple)
+                        }
+                        
+                        Text("\(story.duration) min read")
+                            .font(.system(size: 12))
+                            .foregroundColor(AppTheme.textSecondary)
+                    }
+                    
+                    Divider()
+                        .background(AppTheme.textSecondary.opacity(0.3))
                     
                     // Listen Button with Premium Lock
                     Button(action: {
@@ -273,6 +354,7 @@ struct StoryDetailView: View {
                         .cornerRadius(AppTheme.cornerRadius)
                     }
                     
+                    // Story content
                     Text(story.content)
                         .font(.system(size: 16))
                         .foregroundColor(AppTheme.textPrimary)

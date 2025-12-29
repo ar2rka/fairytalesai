@@ -1,13 +1,32 @@
 import Foundation
 import SwiftUI
 
+@MainActor
 class StoriesStore: ObservableObject {
     @Published var stories: [Story] = []
     @Published var isGenerating: Bool = false
+    @Published var isLoading: Bool = false
+    @Published var errorMessage: String?
     private let storageKey = "saved_stories"
+    private let storiesService = StoriesService.shared
     
     init() {
-        loadStories()
+        // Не загружаем из UserDefaults, теперь загружаем из Supabase
+    }
+    
+    func loadStoriesFromSupabase(userId: UUID) async {
+        isLoading = true
+        errorMessage = nil
+        
+        defer { isLoading = false }
+        
+        do {
+            let fetchedStories = try await storiesService.fetchStories(userId: userId)
+            stories = fetchedStories
+        } catch {
+            errorMessage = error.localizedDescription
+            print("❌ Ошибка загрузки историй: \(error.localizedDescription)")
+        }
     }
     
     func generateStory(childId: UUID?, length: Int, theme: String, plot: String?, children: [Child] = []) async {

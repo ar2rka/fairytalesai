@@ -7,16 +7,22 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5C20FA9A3A924DB8BFF95BB8 /* Services/AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A6F376FB37E4ECCA09E2FC9 /* Services/AuthService.swift */; };
+		61F9D9EBEF1B4978933E2E51 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 61F9D9EAEF1B4978933E2E50 /* Supabase */; };
+		926E6249870741DCB9C75C62 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70E32FB058A04056809C1CBD /* LoginView.swift */; };
+		9A88A6D62F02E992009259D7 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 9A88A6D52F02E992009259D7 /* Auth */; };
+		9A88A6D82F02E992009259D7 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 9A88A6D72F02E992009259D7 /* Functions */; };
+		9A88A6DA2F02E992009259D7 /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 9A88A6D92F02E992009259D7 /* PostgREST */; };
+		9A88A6DC2F02E992009259D7 /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = 9A88A6DB2F02E992009259D7 /* Realtime */; };
+		9A88A6DE2F02E992009259D7 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 9A88A6DD2F02E992009259D7 /* Storage */; };
+		9A88A6E02F02EE2B009259D7 /* Services/StoriesService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A88A6DF2F02EE2B009259D7 /* Services/StoriesService.swift */; };
+		9AAB74292F02E21D005C3BE7 /* Services/SupabaseConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AAB74272F02E21D005C3BE7 /* Services/SupabaseConfig.swift */; };
 		A1000001 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000 /* App.swift */; };
 		A1000003 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000002 /* ContentView.swift */; };
 		A1000005 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000004 /* Assets.xcassets */; };
 		A1000008 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000007 /* Preview Assets.xcassets */; };
 		D9E2D5DB2EFD60A40082D3B4 /* StoriesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5D12EFD60A40082D3B4 /* StoriesStore.swift */; };
 		D9E2D5DC2EFD60A40082D3B4 /* ChildrenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5D02EFD60A40082D3B4 /* ChildrenStore.swift */; };
-		D9E2D5E72EFD60A40082D3B5 /* PremiumManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5E62EFD60A40082D3B5 /* PremiumManager.swift */; };
-		D9E2D5E92EFD60A40082D3B6 /* UserSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5E82EFD60A40082D3B6 /* UserSettings.swift */; };
-		D9E2D5EA2EFD60A40082D3B7 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5EB2EFD60A40082D3B7 /* OnboardingView.swift */; };
-		D9E2D5EC2EFD60A40082D3B8 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5ED2EFD60A40082D3B8 /* PaywallView.swift */; };
 		D9E2D5DD2EFD60A40082D3B4 /* ChildrenListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5D42EFD60A40082D3B4 /* ChildrenListView.swift */; };
 		D9E2D5DE2EFD60A40082D3B4 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5CE2EFD60A40082D3B4 /* AppTheme.swift */; };
 		D9E2D5DF2EFD60A40082D3B4 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5D62EFD60A40082D3B4 /* HomeView.swift */; };
@@ -27,9 +33,17 @@
 		D9E2D5E42EFD60A40082D3B4 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5D92EFD60A40082D3B4 /* SettingsView.swift */; };
 		D9E2D5E52EFD60A40082D3B4 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5D82EFD60A40082D3B4 /* MainTabView.swift */; };
 		D9E2D5E62EFD60A40082D3B4 /* Child.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5CB2EFD60A40082D3B4 /* Child.swift */; };
+		D9E2D5E72EFD60A40082D3B5 /* PremiumManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5E62EFD60A40082D3B5 /* PremiumManager.swift */; };
+		D9E2D5E92EFD60A40082D3B6 /* UserSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5E82EFD60A40082D3B6 /* UserSettings.swift */; };
+		D9E2D5EA2EFD60A40082D3B7 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5EB2EFD60A40082D3B7 /* OnboardingView.swift */; };
+		D9E2D5EC2EFD60A40082D3B8 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5ED2EFD60A40082D3B8 /* PaywallView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		70E32FB058A04056809C1CBD /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		7A6F376FB37E4ECCA09E2FC9 /* Services/AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/AuthService.swift; sourceTree = "<group>"; };
+		9A88A6DF2F02EE2B009259D7 /* Services/StoriesService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/StoriesService.swift; sourceTree = "<group>"; };
+		9AAB74272F02E21D005C3BE7 /* Services/SupabaseConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/SupabaseConfig.swift; sourceTree = "<group>"; };
 		A0FFFFFF /* FairyTalesAI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FairyTalesAI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1000000 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		A1000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -41,10 +55,6 @@
 		D9E2D5CE2EFD60A40082D3B4 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 		D9E2D5D02EFD60A40082D3B4 /* ChildrenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChildrenStore.swift; sourceTree = "<group>"; };
 		D9E2D5D12EFD60A40082D3B4 /* StoriesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoriesStore.swift; sourceTree = "<group>"; };
-		D9E2D5E62EFD60A40082D3B5 /* PremiumManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumManager.swift; sourceTree = "<group>"; };
-		D9E2D5E82EFD60A40082D3B6 /* UserSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettings.swift; sourceTree = "<group>"; };
-		D9E2D5EB2EFD60A40082D3B7 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
-		D9E2D5ED2EFD60A40082D3B8 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
 		D9E2D5D32EFD60A40082D3B4 /* AddChildView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddChildView.swift; sourceTree = "<group>"; };
 		D9E2D5D42EFD60A40082D3B4 /* ChildrenListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChildrenListView.swift; sourceTree = "<group>"; };
 		D9E2D5D52EFD60A40082D3B4 /* GenerateStoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateStoryView.swift; sourceTree = "<group>"; };
@@ -52,6 +62,10 @@
 		D9E2D5D72EFD60A40082D3B4 /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
 		D9E2D5D82EFD60A40082D3B4 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		D9E2D5D92EFD60A40082D3B4 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		D9E2D5E62EFD60A40082D3B5 /* PremiumManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumManager.swift; sourceTree = "<group>"; };
+		D9E2D5E82EFD60A40082D3B6 /* UserSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettings.swift; sourceTree = "<group>"; };
+		D9E2D5EB2EFD60A40082D3B7 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		D9E2D5ED2EFD60A40082D3B8 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,6 +73,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				61F9D9EBEF1B4978933E2E51 /* Supabase in Frameworks */,
+				9A88A6DA2F02E992009259D7 /* PostgREST in Frameworks */,
+				9A88A6D82F02E992009259D7 /* Functions in Frameworks */,
+				9A88A6D62F02E992009259D7 /* Auth in Frameworks */,
+				9A88A6DE2F02E992009259D7 /* Storage in Frameworks */,
+				9A88A6DC2F02E992009259D7 /* Realtime in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -85,6 +105,9 @@
 				D9E2D5CF2EFD60A40082D3B4 /* Theme */,
 				D9E2D5D22EFD60A40082D3B4 /* ViewModels */,
 				D9E2D5DA2EFD60A40082D3B4 /* Views */,
+				9AAB74272F02E21D005C3BE7 /* Services/SupabaseConfig.swift */,
+				7A6F376FB37E4ECCA09E2FC9 /* Services/AuthService.swift */,
+				9A88A6DF2F02EE2B009259D7 /* Services/StoriesService.swift */,
 			);
 			path = FairyTalesAI;
 			sourceTree = "<group>";
@@ -111,7 +134,6 @@
 				D9E2D5CB2EFD60A40082D3B4 /* Child.swift */,
 				D9E2D5CC2EFD60A40082D3B4 /* Story.swift */,
 			);
-			name = Models;
 			path = Models;
 			sourceTree = "<group>";
 		};
@@ -120,7 +142,6 @@
 			children = (
 				D9E2D5CE2EFD60A40082D3B4 /* AppTheme.swift */,
 			);
-			name = Theme;
 			path = Theme;
 			sourceTree = "<group>";
 		};
@@ -132,7 +153,6 @@
 				D9E2D5E62EFD60A40082D3B5 /* PremiumManager.swift */,
 				D9E2D5E82EFD60A40082D3B6 /* UserSettings.swift */,
 			);
-			name = ViewModels;
 			path = ViewModels;
 			sourceTree = "<group>";
 		};
@@ -146,10 +166,10 @@
 				D9E2D5D72EFD60A40082D3B4 /* LibraryView.swift */,
 				D9E2D5D82EFD60A40082D3B4 /* MainTabView.swift */,
 				D9E2D5D92EFD60A40082D3B4 /* SettingsView.swift */,
+				70E32FB058A04056809C1CBD /* LoginView.swift */,
 				D9E2D5EB2EFD60A40082D3B7 /* OnboardingView.swift */,
 				D9E2D5ED2EFD60A40082D3B8 /* PaywallView.swift */,
 			);
-			name = Views;
 			path = Views;
 			sourceTree = "<group>";
 		};
@@ -169,6 +189,14 @@
 			dependencies = (
 			);
 			name = FairyTalesAI;
+			packageProductDependencies = (
+				61F9D9EAEF1B4978933E2E50 /* Supabase */,
+				9A88A6D52F02E992009259D7 /* Auth */,
+				9A88A6D72F02E992009259D7 /* Functions */,
+				9A88A6D92F02E992009259D7 /* PostgREST */,
+				9A88A6DB2F02E992009259D7 /* Realtime */,
+				9A88A6DD2F02E992009259D7 /* Storage */,
+			);
 			productName = FairyTalesAI;
 			productReference = A0FFFFFF /* FairyTalesAI.app */;
 			productType = "com.apple.product-type.application";
@@ -192,6 +220,9 @@
 				Base,
 			);
 			mainGroup = A0FFFFF8;
+			packageReferences = (
+				9A88A6D42F02E992009259D7 /* XCRemoteSwiftPackageReference "supabase-swift" */,
+			);
 			productRefGroup = A100000F /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -223,6 +254,7 @@
 				D9E2D5DC2EFD60A40082D3B4 /* ChildrenStore.swift in Sources */,
 				D9E2D5E72EFD60A40082D3B5 /* PremiumManager.swift in Sources */,
 				D9E2D5E92EFD60A40082D3B6 /* UserSettings.swift in Sources */,
+				926E6249870741DCB9C75C62 /* LoginView.swift in Sources */,
 				D9E2D5EA2EFD60A40082D3B7 /* OnboardingView.swift in Sources */,
 				D9E2D5EC2EFD60A40082D3B8 /* PaywallView.swift in Sources */,
 				D9E2D5DD2EFD60A40082D3B4 /* ChildrenListView.swift in Sources */,
@@ -232,6 +264,9 @@
 				D9E2D5E12EFD60A40082D3B4 /* Story.swift in Sources */,
 				D9E2D5E22EFD60A40082D3B4 /* GenerateStoryView.swift in Sources */,
 				D9E2D5E32EFD60A40082D3B4 /* AddChildView.swift in Sources */,
+				9AAB74292F02E21D005C3BE7 /* Services/SupabaseConfig.swift in Sources */,
+				5C20FA9A3A924DB8BFF95BB8 /* Services/AuthService.swift in Sources */,
+				9A88A6E02F02EE2B009259D7 /* Services/StoriesService.swift in Sources */,
 				D9E2D5E42EFD60A40082D3B4 /* SettingsView.swift in Sources */,
 				D9E2D5E52EFD60A40082D3B4 /* MainTabView.swift in Sources */,
 				D9E2D5E62EFD60A40082D3B4 /* Child.swift in Sources */,
@@ -370,6 +405,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"FairyTalesAI/Preview Content\"";
+				DEVELOPMENT_TEAM = P4J8268M9L;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -399,6 +435,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"FairyTalesAI/Preview Content\"";
+				DEVELOPMENT_TEAM = P4J8268M9L;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -441,6 +478,50 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		9A88A6D42F02E992009259D7 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		61F9D9EAEF1B4978933E2E50 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9A88A6D42F02E992009259D7 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+		9A88A6D52F02E992009259D7 /* Auth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9A88A6D42F02E992009259D7 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Auth;
+		};
+		9A88A6D72F02E992009259D7 /* Functions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9A88A6D42F02E992009259D7 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Functions;
+		};
+		9A88A6D92F02E992009259D7 /* PostgREST */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9A88A6D42F02E992009259D7 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = PostgREST;
+		};
+		9A88A6DB2F02E992009259D7 /* Realtime */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9A88A6D42F02E992009259D7 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Realtime;
+		};
+		9A88A6DD2F02E992009259D7 /* Storage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9A88A6D42F02E992009259D7 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Storage;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A0FFFFF7 /* Project object */;
 }
