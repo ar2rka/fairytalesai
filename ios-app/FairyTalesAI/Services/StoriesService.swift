@@ -49,6 +49,23 @@ class StoriesService: ObservableObject {
         return response.map { $0.toStory() }
     }
     
+    func fetchStories(userId: UUID, limit: Int, offset: Int) async throws -> [Story] {
+        guard let supabase = supabase else {
+            throw StoriesError.supabaseNotConfigured
+        }
+        
+        let response: [SupabaseStory] = try await supabase
+            .from("stories")
+            .select()
+            .eq("user_id", value: userId.uuidString)
+            .order("created_at", ascending: false)
+            .range(from: offset, to: offset + limit - 1)
+            .execute()
+            .value
+        
+        return response.map { $0.toStory() }
+    }
+    
     func fetchStory(id: UUID) async throws -> Story? {
         guard let supabase = supabase else {
             throw StoriesError.supabaseNotConfigured

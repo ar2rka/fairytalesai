@@ -93,6 +93,22 @@ struct LibraryView: View {
                             LazyVStack(spacing: 16) {
                                 ForEach(filteredStories) { story in
                                     StoryLibraryRow(story: story)
+                                        .onAppear {
+                                            // Загружаем следующую страницу когда показываем последние 5 элементов
+                                            // Только если нет фильтров и поиска (работаем с полным списком)
+                                            if selectedFilter == "All Stories" && searchText.isEmpty {
+                                                if let index = filteredStories.firstIndex(where: { $0.id == story.id }),
+                                                   index >= max(0, filteredStories.count - 5),
+                                                   !storiesStore.isLoadingMore,
+                                                   storiesStore.hasMoreStories {
+                                                    Task {
+                                                        if let userId = authService.currentUser?.id {
+                                                            await storiesStore.loadMoreStories(userId: userId)
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
                                 }
                                 
                                 if filteredStories.isEmpty {
@@ -100,6 +116,18 @@ struct LibraryView: View {
                                         .font(.system(size: 16))
                                         .foregroundColor(AppTheme.textSecondary)
                                         .padding()
+                                }
+                                
+                                // Индикатор загрузки для infinite scroll
+                                if storiesStore.isLoadingMore {
+                                    HStack {
+                                        ProgressView()
+                                            .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.primaryPurple))
+                                        Text("Loading more stories...")
+                                            .font(.system(size: 14))
+                                            .foregroundColor(AppTheme.textSecondary)
+                                    }
+                                    .padding()
                                 }
                             }
                             .padding(.horizontal)

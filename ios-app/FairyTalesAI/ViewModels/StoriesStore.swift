@@ -6,9 +6,15 @@ class StoriesStore: ObservableObject {
     @Published var stories: [Story] = []
     @Published var isGenerating: Bool = false
     @Published var isLoading: Bool = false
+    @Published var isLoadingMore: Bool = false
     @Published var errorMessage: String?
+    @Published var hasMoreStories: Bool = true
+    
     private let storageKey = "saved_stories"
     private let storiesService = StoriesService.shared
+    private let pageSize = 10
+    private var currentOffset = 0
+    private var isLoadingPage = false
     
     init() {
         // Не загружаем из UserDefaults, теперь загружаем из Supabase
@@ -17,15 +23,47 @@ class StoriesStore: ObservableObject {
     func loadStoriesFromSupabase(userId: UUID) async {
         isLoading = true
         errorMessage = nil
+        currentOffset = 0
+        hasMoreStories = true
         
         defer { isLoading = false }
         
         do {
-            let fetchedStories = try await storiesService.fetchStories(userId: userId)
+            let fetchedStories = try await storiesService.fetchStories(userId: userId, limit: pageSize, offset: 0)
             stories = fetchedStories
+            currentOffset = fetchedStories.count
+            hasMoreStories = fetchedStories.count >= pageSize
         } catch {
             errorMessage = error.localizedDescription
             print("❌ Ошибка загрузки историй: \(error.localizedDescription)")
+        }
+    }
+    
+    func loadMoreStories(userId: UUID) async {
+        guard !isLoadingPage && hasMoreStories else { return }
+        
+        isLoadingPage = true
+        isLoadingMore = true
+        errorMessage = nil
+        
+        defer {
+            isLoadingPage = false
+            isLoadingMore = false
+        }
+        
+        do {
+            let fetchedStories = try await storiesService.fetchStories(userId: userId, limit: pageSize, offset: currentOffset)
+            
+            if fetchedStories.isEmpty {
+                hasMoreStories = false
+            } else {
+                stories.append(contentsOf: fetchedStories)
+                currentOffset += fetchedStories.count
+                hasMoreStories = fetchedStories.count >= pageSize
+            }
+        } catch {
+            errorMessage = error.localizedDescription
+            print("❌ Ошибка загрузки дополнительных историй: \(error.localizedDescription)")
         }
     }
     
