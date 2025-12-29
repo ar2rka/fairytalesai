@@ -388,7 +388,7 @@ struct StoryContentView: View {
                     
                     // Story content
                     Text(story.content)
-                        .font(.system(size: 16))
+                        .font(.system(size: userSettings.storyFontSize))
                         .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                         .lineSpacing(8)
                 }
@@ -397,6 +397,33 @@ struct StoryContentView: View {
         }
         .navigationTitle("Story")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                HStack(spacing: 16) {
+                    // Decrease font size button
+                    Button(action: {
+                        if userSettings.storyFontSize > 12 {
+                            userSettings.storyFontSize -= 2
+                        }
+                    }) {
+                        Image(systemName: "textformat.size.smaller")
+                            .foregroundColor(userSettings.storyFontSize > 12 ? AppTheme.primaryPurple : AppTheme.textSecondary(for: colorScheme))
+                    }
+                    .disabled(userSettings.storyFontSize <= 12)
+                    
+                    // Increase font size button
+                    Button(action: {
+                        if userSettings.storyFontSize < 24 {
+                            userSettings.storyFontSize += 2
+                        }
+                    }) {
+                        Image(systemName: "textformat.size.larger")
+                            .foregroundColor(userSettings.storyFontSize < 24 ? AppTheme.primaryPurple : AppTheme.textSecondary(for: colorScheme))
+                    }
+                    .disabled(userSettings.storyFontSize >= 24)
+                }
+            }
+        }
         .sheet(isPresented: $showingPaywall) {
             NavigationView {
                 PaywallView()

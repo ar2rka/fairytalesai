@@ -26,6 +26,12 @@ class UserSettings: ObservableObject {
         }
     }
     
+    @Published var storyFontSize: CGFloat {
+        didSet {
+            UserDefaults.standard.set(storyFontSize, forKey: "storyFontSize")
+        }
+    }
+    
     init() {
         self.hasCompletedOnboarding = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
         self.onboardingComplete = UserDefaults.standard.bool(forKey: "onboardingComplete")
@@ -35,6 +41,12 @@ class UserSettings: ObservableObject {
             self.freeGenerationsRemaining = 1
         } else {
             self.freeGenerationsRemaining = UserDefaults.standard.integer(forKey: "freeGenerationsRemaining")
+        }
+        // Initialize story font size (default 16, range 12-24)
+        if UserDefaults.standard.object(forKey: "storyFontSize") == nil {
+            self.storyFontSize = 16.0
+        } else {
+            self.storyFontSize = CGFloat(UserDefaults.standard.double(forKey: "storyFontSize"))
         }
     }
     

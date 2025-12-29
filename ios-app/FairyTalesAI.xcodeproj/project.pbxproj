@@ -44,6 +44,7 @@
 		70E32FB058A04056809C1CBD /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		7A6F376FB37E4ECCA09E2FC9 /* Services/AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/AuthService.swift; sourceTree = "<group>"; };
 		9A88A6DF2F02EE2B009259D7 /* Services/StoriesService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/StoriesService.swift; sourceTree = "<group>"; };
+		9A88A6E12F02FDD8009259D7 /* FairyTalesAIDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FairyTalesAIDebug.entitlements; sourceTree = "<group>"; };
 		9A88A6E22F02EE2B009259D8 /* Services/ChildrenService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/ChildrenService.swift; sourceTree = "<group>"; };
 		9AAB74272F02E21D005C3BE7 /* Services/SupabaseConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/SupabaseConfig.swift; sourceTree = "<group>"; };
 		A0FFFFFF /* FairyTalesAI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FairyTalesAI.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -98,6 +99,7 @@
 		A0FFFFF9 /* FairyTalesAI */ = {
 			isa = PBXGroup;
 			children = (
+				9A88A6E12F02FDD8009259D7 /* FairyTalesAIDebug.entitlements */,
 				A1000000 /* App.swift */,
 				A1000002 /* ContentView.swift */,
 				A1000004 /* Assets.xcassets */,
@@ -407,11 +409,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = FairyTalesAI/FairyTalesAI.entitlements;
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_ENTITLEMENTS = FairyTalesAI/FairyTalesAIDebug.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"FairyTalesAI/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = P4J8268M9L;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
