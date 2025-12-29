@@ -346,7 +346,7 @@ class EnglishPromptGenerator:
         
         prompt = info.get_child_story_template(
             name=child.name,
-            age=child.age,
+            age_category=child.age_category,
             gender=child.gender,
             interests=', '.join(child.interests),
             moral=moral,
@@ -403,7 +403,7 @@ class RussianPromptGenerator:
         
         prompt = info.get_child_story_template(
             name=child.name,
-            age=child.age,
+            age_category=child.age_category,
             gender=gender_ru,
             interests=', '.join(interests_ru),
             moral=moral_ru,
@@ -483,7 +483,7 @@ def get_story_prompt(child, moral, language: Language, story_length: int = 5) ->
     if not isinstance(child, Child):
         child_obj = Child(
             name=child.name,
-            age=child.age,
+            age_category=child.age_category,
             gender=child.gender,
             interests=child.interests
         )

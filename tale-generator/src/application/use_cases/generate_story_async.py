@@ -234,17 +234,12 @@ class GenerateStoryUseCaseAsync:
         """
         # Try to find exact match
         gender = Gender(request.child.gender.value)
-        # For backward compatibility, calculate age from age_category if needed
-        age = 4  # Default
-        if hasattr(request.child, 'age_category'):
-            if request.child.age_category == '2-3':
-                age = 2
-            elif request.child.age_category == '3-5':
-                age = 4
-            elif request.child.age_category == '5-7':
-                age = 6
-        else:
-            age = request.child.age if hasattr(request.child, 'age') else 4
+        # Get age_category from request
+        age_category = request.child.age_category if hasattr(request.child, 'age_category') and request.child.age_category else '3-5'
+        
+        # For backward compatibility with find_exact_match, calculate age from category
+        from src.utils.age_category_utils import calculate_age_from_category
+        age = calculate_age_from_category(age_category)
         
         existing_child = await self.child_repository.find_exact_match(
             name=request.child.name,
@@ -258,7 +253,7 @@ class GenerateStoryUseCaseAsync:
         
         # Create new child
         logger.debug(f"Creating new child: {request.child.name}")
-        age_category = request.child.age_category if hasattr(request.child, 'age_category') else '3-5'
+        age_category = request.child.age_category if hasattr(request.child, 'age_category') and request.child.age_category else '3-5'
         child = Child(
             name=request.child.name,
             age_category=age_category,

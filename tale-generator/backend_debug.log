@@ -1,0 +1,8 @@
+2025-12-29 16:30:23,211 - tale_generator - INFO - Starting Tale Generator API service
+INFO:     Started server process [47744]
+INFO:     Waiting for application startup.
+2025-12-29 16:30:23,221 - tale_generator - INFO - Starting up Tale Generator API
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2025-12-29 16:30:24,681 - tale_generator - DEBUG - Health check endpoint accessed
+INFO:     127.0.0.1:56563 - "GET /health HTTP/1.1" 200 OK

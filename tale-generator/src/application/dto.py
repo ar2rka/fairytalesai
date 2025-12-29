@@ -1,8 +1,9 @@
 """Data Transfer Objects for API layer."""
 
 from typing import Optional, List, Dict, Any
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from src.domain.value_objects import Language, Gender, StoryMoral
+from src.utils.age_category_utils import normalize_age_category
 
 
 # Request DTOs
@@ -10,9 +11,15 @@ from src.domain.value_objects import Language, Gender, StoryMoral
 class ChildProfileDTO(BaseModel):
     """Child profile data transfer object."""
     name: str = Field(..., description="Child's name")
-    age_category: str = Field(..., pattern="^(2-3|3-5|5-7)$", description="Child's age category: '2-3', '3-5', or '5-7'")
+    age_category: str = Field(..., description="Child's age category as string interval (e.g., '2-3 года', '4-5', '6-7 лет')")
     gender: Gender = Field(..., description="Child's gender")
     interests: List[str] = Field(..., min_length=1, description="Child's interests")
+    
+    @field_validator('age_category')
+    @classmethod
+    def validate_age_category(cls, v: str) -> str:
+        """Normalize age category to standard format."""
+        return normalize_age_category(v)
 
 
 class StoryRequestDTO(BaseModel):
@@ -52,9 +59,15 @@ class StoryRatingRequestDTO(BaseModel):
 class ChildRequestDTO(BaseModel):
     """Child creation/update request DTO."""
     name: str = Field(..., description="Child's name")
-    age_category: str = Field(..., pattern="^(2-3|3-5|5-7)$", description="Child's age category: '2-3', '3-5', or '5-7'")
+    age_category: str = Field(..., description="Child's age category as string interval (e.g., '2-3 года', '4-5', '6-7 лет')")
     gender: str = Field(..., description="Child's gender")
     interests: List[str] = Field(..., min_length=1, description="Child's interests")
+    
+    @field_validator('age_category')
+    @classmethod
+    def validate_age_category(cls, v: str) -> str:
+        """Normalize age category to standard format."""
+        return normalize_age_category(v)
 
 
 # Response DTOs
@@ -86,7 +99,7 @@ class ChildResponseDTO(BaseModel):
     """Child profile response DTO."""
     id: str = Field(..., description="Child ID")
     name: str = Field(..., description="Child's name")
-    age_category: str = Field(..., description="Child's age category: '2-3', '3-5', or '5-7'")
+    age_category: str = Field(..., description="Child's age category as string interval (e.g., '2-3', '4-5', '6-7')")
     age: Optional[int] = Field(None, description="Child's age (calculated from category, for backward compatibility)")
     gender: str = Field(..., description="Child's gender")
     interests: List[str] = Field(..., description="Child's interests")
@@ -134,6 +147,7 @@ class GenerateStoryRequestDTO(BaseModel):
     story_length: Optional[int] = Field(default=5, ge=1, le=30, description="Story length in minutes")
     moral: Optional[str] = Field(None, description="Predefined moral value")
     custom_moral: Optional[str] = Field(None, description="Custom moral value")
+    parent_id: Optional[str] = Field(None, description="Parent story ID for continuation narratives")
     generate_audio: Optional[bool] = Field(default=False, description="Generate audio narration")
     voice_provider: Optional[str] = Field(None, description="Voice provider name")
     voice_options: Optional[Dict[str, Any]] = Field(None, description="Voice provider options")
@@ -157,8 +171,7 @@ class ChildInfoDTO(BaseModel):
     """Child information DTO."""
     id: str = Field(..., description="Child ID")
     name: str = Field(..., description="Child name")
-    age_category: str = Field(..., description="Child's age category: '2-3', '3-5', or '5-7'")
-    age: Optional[int] = Field(None, description="Child age (calculated from category, for backward compatibility)")
+    age_category: str = Field(..., description="Child's age category as string interval (e.g., '2-3', '4-5', '6-7')")
     gender: str = Field(..., description="Child gender")
     interests: List[str] = Field(..., description="Child interests")
 
@@ -192,6 +205,6 @@ class FreeStoryResponseDTO(BaseModel):
     id: str = Field(..., description="Story ID")
     title: str = Field(..., description="Story title")
     content: str = Field(..., description="Story content")
-    age_category: str = Field(..., description="Age category: '2-3', '3-5', or '5-7'")
+    age_category: str = Field(..., description="Age category as string interval (e.g., '2-3', '4-5', '6-7')")
     language: str = Field(..., description="Language code: 'en' or 'ru'")
     created_at: str = Field(..., description="Creation timestamp")

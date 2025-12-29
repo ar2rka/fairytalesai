@@ -25,10 +25,6 @@ class CombinedCharacter(BaseCharacter):
         """Get primary character name (child's name)."""
         return self.child.name
     
-    @property
-    def age(self) -> int:
-        """Get primary character age (child's age) - for backward compatibility."""
-        return self.child.age if self.child.age else 4
     
     @property
     def age_category(self) -> str:

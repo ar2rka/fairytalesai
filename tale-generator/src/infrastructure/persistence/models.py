@@ -9,8 +9,7 @@ class ChildDB(BaseModel):
     """Database model for child profiles."""
     id: Optional[str] = None
     name: str
-    age: int  # Kept for backward compatibility, but age_category is primary
-    age_category: str  # Age category: '2-3', '3-5', or '5-7'
+    age_category: str  # Age category as string interval (e.g., '2-3', '4-5', '6-7', '2-3 года')
     gender: str
     interests: List[str]
     created_at: Optional[datetime] = None
@@ -55,9 +54,10 @@ class StoryDB(BaseModel):
     id: Optional[str] = None
     title: str
     content: str
+    summary: Optional[str] = None
     child_id: Optional[str] = None
     child_name: Optional[str] = None
-    child_age: Optional[int] = None
+    child_age_category: Optional[str] = None
     child_gender: Optional[str] = None
     child_interests: Optional[List[str]] = None
     hero_id: Optional[str] = None
@@ -72,6 +72,8 @@ class StoryDB(BaseModel):
     user_id: Optional[str] = None
     # Reference to generation record
     generation_id: str
+    # Reference to parent story for continuation narratives
+    parent_id: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
@@ -81,7 +83,20 @@ class FreeStoryDB(BaseModel):
     id: Optional[str] = None
     title: str
     content: str
-    age_category: str  # Age category: '2-3', '3-5', or '5-7'
+    age_category: str  # Age category as string interval (e.g., '2-3', '4-5', '6-7', '2-3 года')
     language: str  # Language code: 'en' or 'ru'
     is_active: bool = True  # Whether the story is active and should be displayed
     created_at: Optional[datetime] = None
+
+
+class PromptDB(BaseModel):
+    """Database model for prompt templates stored in Supabase."""
+    id: Optional[str] = None
+    priority: int
+    language: str  # 'en' or 'ru'
+    story_type: Optional[str] = None  # 'child', 'hero', 'combined', or None for universal
+    prompt_text: str  # Jinja template text
+    is_active: bool = True
+    description: Optional[str] = None  # Optional description of the prompt part
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None

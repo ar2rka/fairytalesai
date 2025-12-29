@@ -8,6 +8,7 @@ export const GenerateStoryPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const childIdFromParams = searchParams.get('childId');
+  const parentIdFromParams = searchParams.get('parentId');
 
   return (
     <div className="min-h-screen bg-[#F5F5F5]">
@@ -22,7 +23,7 @@ export const GenerateStoryPage: React.FC = () => {
           </Button>
         </div>
 
-        <GenerateStoryForm childId={childIdFromParams} />
+        <GenerateStoryForm childId={childIdFromParams} parentId={parentIdFromParams} />
 
         {/* How It Works */}
         <Card className="mt-6">

@@ -124,7 +124,7 @@ class LangGraphWorkflowService:
         logger.info("🌟 " + "="*78 + " 🌟")
         logger.info("🚀 LANGGRAPH WORKFLOW STARTED")
         logger.info("="*80)
-        logger.info(f"👶 Child: {child.name}, Age: {child.age}, Gender: {child.gender.value}")
+        logger.info(f"👶 Child: {child.name}, Age Category: {child.age_category}, Gender: {child.gender.value}")
         logger.info(f"🎯 Moral: {moral}")
         logger.info(f"🌍 Language: {language.value}")
         logger.info(f"⏱️ Story Length: {story_length.minutes} minutes")
@@ -189,9 +189,9 @@ class LangGraphWorkflowService:
                     logger.warning(f"⚠️ Failed to create generation record in Supabase: {str(e)}")
             
             # Create initial workflow state
-            logger.info(f"Creating initial state with child: name='{child.name}', age={child.age}, interests={child.interests}")
-            if child.name == "Child" and child.age == 5:
-                logger.warning(f"⚠️ Child entity has default values! name='{child.name}', age={child.age} - this might indicate missing data")
+            logger.info(f"Creating initial state with child: name='{child.name}', age_category={child.age_category}, interests={child.interests}")
+            if child.name == "Child" and child.age_category == "3-5":
+                logger.warning(f"⚠️ Child entity has default values! name='{child.name}', age_category={child.age_category} - this might indicate missing data")
             
             initial_state = create_initial_state(
                 original_prompt=prompt,
@@ -207,7 +207,6 @@ class LangGraphWorkflowService:
                 expected_word_count=expected_word_count,
                 user_id=user_id,
                 generation_id=generation_id,
-                child_age=child.age,  # For backward compatibility
                 hero_id=str(hero.id) if hero and hero.id else None,
                 hero_name=hero.name if hero else None,
                 hero_description=hero.description if hero else None

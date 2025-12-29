@@ -2,7 +2,7 @@
 
 import logging
 import os
-from typing import List, Optional, Any
+from typing import List, Optional, Any, Dict
 from supabase import create_client, Client
 from supabase.client import ClientOptions
 from src.models import StoryDB, ChildDB, HeroDB
@@ -119,7 +119,6 @@ class SupabaseClient:
             mapped_child_dict = {}
             key_mapping = {
                 'name': 'name',
-                'age': 'age',
                 'age_category': 'age_category',
                 'gender': 'gender',
                 'interests': 'interests',
@@ -183,7 +182,6 @@ class SupabaseClient:
                 # Map snake_case keys back to camelCase keys for the model
                 key_mapping = {
                     'name': 'name',
-                    'age': 'age',
                     'age_category': 'age_category',
                     'gender': 'gender',
                     'interests': 'interests',
@@ -221,7 +219,7 @@ class SupabaseClient:
             children = []
             key_mapping = {
                 'name': 'name',
-                'age': 'age',
+                'age_category': 'age_category',
                 'gender': 'gender',
                 'interests': 'interests',
                 'user_id': 'user_id',
@@ -237,7 +235,7 @@ class SupabaseClient:
                         model_child_data[py_key] = child_data[db_key]
                 
                 # Only append if we have the required fields
-                if all(key in model_child_data for key in ['name', 'age', 'gender']):
+                if all(key in model_child_data for key in ['name', 'age_category', 'gender']):
                     children.append(ChildDB(**model_child_data))
             
             return children
@@ -532,7 +530,7 @@ class SupabaseClient:
             key_mapping = {
                 'child_id': 'child_id',
                 'child_name': 'child_name',
-                'child_age': 'child_age',
+                'child_age_category': 'child_age_category',
                 'child_gender': 'child_gender',
                 'child_interests': 'child_interests',
                 'hero_id': 'hero_id',
@@ -542,12 +540,14 @@ class SupabaseClient:
                 'title': 'title',
                 'content': 'content',
                 'summary': 'summary',
+                'moral': 'moral',
                 'language': 'language',
                 'rating': 'rating',
                 'audio_file_url': 'audio_file_url',
                 'user_id': 'user_id',
                 'status': 'status',
                 'generation_id': 'generation_id',
+                'parent_id': 'parent_id',
             }
             
             for py_key, db_key in key_mapping.items():
@@ -605,7 +605,7 @@ class SupabaseClient:
                 key_mapping = {
                     'child_id': 'child_id',
                     'child_name': 'child_name',
-                    'child_age': 'child_age',
+                    'child_age_category': 'child_age_category',
                     'child_gender': 'child_gender',
                     'child_interests': 'child_interests',
                     'story_type': 'story_type',
@@ -629,7 +629,9 @@ class SupabaseClient:
                     'audio_provider': 'audio_provider',
                     'audio_generation_metadata': 'audio_generation_metadata',
                     'user_id': 'user_id',
-                    'status': 'status'
+                    'status': 'status',
+                    'generation_id': 'generation_id',
+                    'parent_id': 'parent_id'
                 }
                 
                 model_story_data = {}
@@ -662,7 +664,7 @@ class SupabaseClient:
             key_mapping = {
                 'child_id': 'child_id',
                 'child_name': 'child_name',
-                'child_age': 'child_age',
+                'child_age_category': 'child_age_category',
                 'child_gender': 'child_gender',
                 'child_interests': 'child_interests',
                 'hero_id': 'hero_id',
@@ -721,7 +723,7 @@ class SupabaseClient:
             key_mapping = {
                 'child_id': 'child_id',
                 'child_name': 'child_name',
-                'child_age': 'child_age',
+                'child_age_category': 'child_age_category',
                 'child_gender': 'child_gender',
                 'child_interests': 'child_interests',
                 'created_at': 'created_at',
@@ -776,7 +778,7 @@ class SupabaseClient:
             key_mapping = {
                 'child_id': 'child_id',
                 'child_name': 'child_name',
-                'child_age': 'child_age',
+                'child_age_category': 'child_age_category',
                 'child_gender': 'child_gender',
                 'child_interests': 'child_interests',
                 'story_type': 'story_type',
@@ -843,7 +845,7 @@ class SupabaseClient:
             key_mapping = {
                 'child_id': 'child_id',
                 'child_name': 'child_name',
-                'child_age': 'child_age',
+                'child_age_category': 'child_age_category',
                 'child_gender': 'child_gender',
                 'child_interests': 'child_interests',
                 'story_type': 'story_type',
@@ -922,7 +924,7 @@ class SupabaseClient:
                 key_mapping = {
                     'child_id': 'child_id',
                     'child_name': 'child_name',
-                    'child_age': 'child_age',
+                    'child_age_category': 'child_age_category',
                     'child_gender': 'child_gender',
                     'child_interests': 'child_interests',
                     'created_at': 'created_at',
@@ -990,7 +992,7 @@ class SupabaseClient:
                 key_mapping = {
                     'child_id': 'child_id',
                     'child_name': 'child_name',
-                    'child_age': 'child_age',
+                    'child_age_category': 'child_age_category',
                     'child_gender': 'child_gender',
                     'child_interests': 'child_interests',
                     'story_type': 'story_type',
@@ -1081,7 +1083,7 @@ class SupabaseClient:
                 key_mapping = {
                     'child_id': 'child_id',
                     'child_name': 'child_name',
-                    'child_age': 'child_age',
+                    'child_age_category': 'child_age_category',
                     'child_gender': 'child_gender',
                     'child_interests': 'child_interests',
                     'story_type': 'story_type',
@@ -1727,3 +1729,70 @@ class SupabaseClient:
         except Exception as e:
             logger.error(f"Error retrieving free story: {str(e)}")
             raise Exception(f"Error retrieving free story: {str(e)}")
+    
+    def get_prompts(self, language: str, story_type: Optional[str] = None) -> List[Dict[str, Any]]:
+        """Get prompts from the database.
+        
+        Args:
+            language: Language code ('en' or 'ru')
+            story_type: Story type ('child', 'hero', 'combined') or None for universal
+            
+        Returns:
+            List of prompt dictionaries
+        """
+        try:
+            query = self.client.table("prompts").select("*")
+            query = query.eq("language", language)
+            query = query.eq("is_active", True)
+            
+            if story_type:
+                query = query.or_(f"story_type.eq.{story_type},story_type.is.null")
+            else:
+                query = query.is_("story_type", "null")
+            
+            query = query.order("priority", desc=False)
+            
+            response = query.execute()
+            return response.data if response.data else []
+        except Exception as e:
+            logger.error(f"Error retrieving prompts: {str(e)}")
+            return []
+    
+    def create_prompt(self, prompt_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Create a new prompt in the database.
+        
+        Args:
+            prompt_data: Dictionary with prompt fields (priority, language, story_type, prompt_text, etc.)
+            
+        Returns:
+            Created prompt dictionary or None if failed
+        """
+        try:
+            response = self.client.table("prompts").insert(prompt_data).execute()
+            if response.data:
+                logger.info(f"Created prompt with priority {prompt_data.get('priority')}")
+                return response.data[0]
+            return None
+        except Exception as e:
+            logger.error(f"Error creating prompt: {str(e)}")
+            return None
+    
+    def update_prompt(self, prompt_id: str, prompt_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Update an existing prompt in the database.
+        
+        Args:
+            prompt_id: ID of the prompt to update
+            prompt_data: Dictionary with fields to update
+            
+        Returns:
+            Updated prompt dictionary or None if failed
+        """
+        try:
+            response = self.client.table("prompts").update(prompt_data).eq("id", prompt_id).execute()
+            if response.data:
+                logger.info(f"Updated prompt {prompt_id}")
+                return response.data[0]
+            return None
+        except Exception as e:
+            logger.error(f"Error updating prompt: {str(e)}")
+            return None

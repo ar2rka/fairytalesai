@@ -83,7 +83,13 @@ def _initialize_voice_service():
 openrouter_client = _initialize_openrouter_client()
 supabase_client = _initialize_supabase_client()
 voice_service = _initialize_voice_service()
-prompt_service = PromptService()
+
+# Initialize prompt service with Supabase client if available
+# Note: PromptRepository needs sync client, so we get it from async client
+_sync_supabase_client = None
+if supabase_client and hasattr(supabase_client, '_sync_client'):
+    _sync_supabase_client = supabase_client._sync_client
+prompt_service = PromptService(_sync_supabase_client)
 logger.info("Prompt service initialized successfully")
 
 
@@ -160,15 +166,23 @@ async def _fetch_and_convert_child(child_id: str, user_id: str) -> Child:
             detail="You don't have permission to use this child profile"
         )
     
+    # Ensure age_category is present
+    age_category = getattr(child_db, 'age_category', None)
+    if not age_category:
+        logger.error(f"Child {child_id} missing required age_category")
+        raise HTTPException(
+            status_code=500,
+            detail="Child profile is missing age_category"
+        )
+    
     return Child(
         id=child_db.id,
         name=child_db.name,
-        age_category=child_db.age_category,
+        age_category=age_category,
         gender=Gender(child_db.gender),
         interests=child_db.interests,
-        age=child_db.age,  # For backward compatibility
-        created_at=child_db.created_at,
-        updated_at=child_db.updated_at
+        created_at=getattr(child_db, 'created_at', None),
+        updated_at=getattr(child_db, 'updated_at', None)
     )
 
 
@@ -228,18 +242,19 @@ def _generate_prompt(
     hero: Optional[Hero],
     moral: str,
     language: Language,
-    story_length: StoryLength
+    story_length: StoryLength,
+    parent_story: Optional[StoryDB] = None
 ) -> str:
     """Generate appropriate prompt based on story type."""
     if story_type == "child":
         logger.info(f"Generating child story for {child.name}")
-        return prompt_service.generate_child_prompt(child, moral, language, story_length)
+        return prompt_service.generate_child_prompt(child, moral, language, story_length, parent_story)
     elif story_type == "hero":
         logger.info(f"Generating hero story for {hero.name}")
-        return prompt_service.generate_hero_prompt(hero, moral, story_length)
+        return prompt_service.generate_hero_prompt(hero, moral, story_length, parent_story)
     else:  # combined
         logger.info(f"Generating combined story for {child.name} and {hero.name}")
-        return prompt_service.generate_combined_prompt(child, hero, moral, language, story_length)
+        return prompt_service.generate_combined_prompt(child, hero, moral, language, story_length, parent_story)
 
 
 async def _create_generation_record(
@@ -369,7 +384,6 @@ async def _generate_story_content(
             retry_delay=1.0,
             use_langgraph=True,  # Always use LangGraph workflow
             child_name=child.name,
-            child_age=child.age,
             child_gender=child.gender.value,
             child_interests=child.interests or [],
             moral=moral,
@@ -597,7 +611,8 @@ async def _save_story(
     hero: Optional[Hero],
     language: Language,
     audio_file_url: Optional[str],
-    user_id: str
+    user_id: str,
+    parent_id: Optional[str] = None
 ) -> Optional[StoryDB]:
     """Save story to database.
     
@@ -612,12 +627,13 @@ async def _save_story(
         moral=moral,
         child_id=child.id,
         child_name=child.name,
-        child_age=child.age,
+        child_age_category=child.age_category,
         child_gender=child.gender.value,
         child_interests=child.interests,
         hero_id=hero.id if hero else None,
         language=language,
         audio_file_url=audio_file_url,
+        parent_id=parent_id,
         created_at=now,
         updated_at=now
     )
@@ -629,7 +645,7 @@ async def _save_story(
     
     try:
         saved_story = await supabase_client.save_story(story_db_with_user)
-        logger.info(f"Story saved to database with ID: {saved_story.id}, user: {user_id}")
+        logger.info(f"Story saved to database with ID: {saved_story.id}, user: {user_id}, parent_id: {parent_id}")
         return saved_story
     except Exception as e:
         logger.error(f"Failed to save story to database: {str(e)}")
@@ -654,7 +670,7 @@ def _build_response(
     child_info = ChildInfoDTO(
         id=child.id,
         name=child.name,
-        age=child.age,
+        age_category=child.age_category,
         gender=child.gender.value,
         interests=child.interests
     )
@@ -728,6 +744,17 @@ async def generate_story(
         
         logger.debug(f"Using moral: {moral}")
         
+        # Fetch parent story if parent_id is provided
+        parent_story = None
+        if request.parent_id:
+            parent_story = await supabase_client.get_story(request.parent_id, user.user_id)
+            if not parent_story:
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"Parent story with ID {request.parent_id} not found or access denied"
+                )
+            logger.info(f"Using parent story: {parent_story.title} (ID: {parent_story.id})")
+        
         # Generate prompt
         prompt = _generate_prompt(
             request.story_type,
@@ -735,7 +762,8 @@ async def generate_story(
             hero,
             moral,
             language,
-            story_length
+            story_length,
+            parent_story
         )
         
         # Generate story content
@@ -793,7 +821,8 @@ async def generate_story(
             hero=hero,
             language=language,
             audio_file_url=None,  # Will be updated after audio generation
-            user_id=user.user_id
+            user_id=user.user_id,
+            parent_id=request.parent_id
         )
         
         # Get story ID (fallback to uuid if save failed)
@@ -894,17 +923,12 @@ async def create_child(
         
         # Create child entity
         # Calculate age from age_category for backward compatibility
-        age = 4  # Default
-        if request.age_category == '2-3':
-            age = 2
-        elif request.age_category == '3-5':
-            age = 4
-        elif request.age_category == '5-7':
-            age = 6
+        from src.utils.age_category_utils import calculate_age_from_category
+        age = calculate_age_from_category(request.age_category)
         
         child_db = ChildDB(
             name=request.name,
-            age_category=request.age_category,
+            age_category=request.age_category,  # Already normalized by DTO validator
             age=age,
             gender=request.gender,
             interests=request.interests,
@@ -934,7 +958,7 @@ async def create_child(
         return {
             "id": saved_child.id,
             "name": saved_child.name,
-            "age": saved_child.age,
+            "age_category": saved_child.age_category,
             "gender": saved_child.gender,
             "interests": saved_child.interests,
             "created_at": saved_child.created_at.isoformat() if saved_child.created_at else None
@@ -1485,12 +1509,16 @@ async def get_free_stories(
         if supabase_client is None:
             raise HTTPException(status_code=500, detail="Supabase not configured")
         
-        # Validate age_category if provided
-        if age_category and age_category not in ['2-3', '3-5', '5-7']:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Invalid age_category: {age_category}. Must be one of: '2-3', '3-5', '5-7'"
-            )
+        # Validate and normalize age_category if provided
+        if age_category:
+            try:
+                from src.utils.age_category_utils import normalize_age_category
+                age_category = normalize_age_category(age_category)
+            except ValueError as e:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Invalid age_category: {str(e)}"
+                )
         
         # Validate language if provided
         if language and language not in ['en', 'ru']:

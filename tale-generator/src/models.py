@@ -22,7 +22,7 @@ class Language(StrEnum):
 class ChildProfile(BaseModel):
     """Information about the child for story generation."""
     name: str
-    age: int
+    age_category: str
     gender: Gender
     interests: List[str]
 
@@ -66,7 +66,7 @@ class ChildDB(BaseModel):
     """Database model for child profiles."""
     id: Optional[str] = None
     name: str
-    age: int
+    age_category: str
     gender: str
     interests: List[str]
     user_id: Optional[str] = None
@@ -95,12 +95,13 @@ class StoryDB(BaseModel):
     title: str
     content: str
     summary: Optional[str] = None
+    moral: Optional[str] = None
     # Story type discriminator: child, hero, or combined
     story_type: Optional[str] = "child"
     # Reference to child instead of storing child data directly
     child_id: Optional[str] = None
     child_name: Optional[str] = None
-    child_age: Optional[int] = None
+    child_age_category: Optional[str] = None
     child_gender: Optional[str] = None
     child_interests: Optional[List[str]] = None
     # Reference to hero for hero and combined stories
@@ -115,6 +116,8 @@ class StoryDB(BaseModel):
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     generation_id: str
+    # Reference to parent story for continuation narratives
+    parent_id: Optional[str] = None
 
 
 class StoryRatingRequest(BaseModel):

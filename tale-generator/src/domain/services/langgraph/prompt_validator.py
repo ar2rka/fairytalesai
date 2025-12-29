@@ -62,7 +62,6 @@ class PromptValidatorService:
         child_name: str,
         child_age_category: str,
         child_interests: List[str],
-        child_age: Optional[int] = None,  # For backward compatibility
         model: str = "openai/gpt-4o-mini"
     ) -> ValidationResult:
         """Validate story prompt for safety and appropriateness.
@@ -72,15 +71,22 @@ class PromptValidatorService:
             child_name: Child's name
             child_age_category: Child's age category ('2-3', '3-5', or '5-7')
             child_interests: List of child's interests
-            child_age: Child's age (for backward compatibility)
             model: LLM model to use for validation
             
         Returns:
             ValidationResult with validation outcome
         """
         logger.info(f"Validating prompt for child_name='{child_name}', child_age_category={child_age_category}, child_interests={child_interests}")
-        if child_name == "Child" and child_age_category == "3-5":
-            logger.warning(f"⚠️ Using default values! child_name='{child_name}', child_age_category={child_age_category} - this might indicate missing data")
+        # Normalize age category for comparison
+        from src.utils.age_category_utils import normalize_age_category
+        try:
+            normalized_age_category = normalize_age_category(child_age_category)
+            if child_name == "Child" and normalized_age_category == "3-5":
+                logger.warning(f"⚠️ Using default values! child_name='{child_name}', child_age_category={normalized_age_category} - this might indicate missing data")
+        except (ValueError, AttributeError):
+            # If normalization fails, just log the original value
+            if child_name == "Child":
+                logger.warning(f"⚠️ Using default values! child_name='{child_name}', child_age_category={child_age_category} - this might indicate missing data")
         
         # First, quick keyword-based check for licensed characters
         # Exclude child's name from the prompt for checking to avoid false positives
