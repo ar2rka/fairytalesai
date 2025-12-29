@@ -38,6 +38,15 @@
 		D9E2D5E92EFD60A40082D3B6 /* UserSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5E82EFD60A40082D3B6 /* UserSettings.swift */; };
 		D9E2D5EA2EFD60A40082D3B7 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5EB2EFD60A40082D3B7 /* OnboardingView.swift */; };
 		D9E2D5EC2EFD60A40082D3B8 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5ED2EFD60A40082D3B8 /* PaywallView.swift */; };
+		D9E2D5EE2EFD60A40082D3B9 /* StoryResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5EF2EFD60A40082D3B9 /* StoryResultView.swift */; };
+		D9E2D5F02EFD60A40082D3BA /* GenerateStoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5F12EFD60A40082D3BA /* GenerateStoryViewModel.swift */; };
+		D9E2D5F22EFD60A40082D3BB /* ChildSelectionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5F32EFD60A40082D3BB /* ChildSelectionButton.swift */; };
+		D9E2D5F42EFD60A40082D3BC /* DashedButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5F52EFD60A40082D3BC /* DashedButton.swift */; };
+		D9E2D5F62EFD60A40082D3BD /* SettingsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5F72EFD60A40082D3BD /* SettingsRow.swift */; };
+		D9E2D5F82EFD60A40082D3BE /* ThemeSelectionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5F92EFD60A40082D3BE /* ThemeSelectionButton.swift */; };
+		D9E2D5FA2EFD60A40082D3BF /* LanguageSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5FB2EFD60A40082D3BF /* LanguageSelectionView.swift */; };
+		D9E2D5FC2EFD60A40082D3C0 /* SettingsPlaceholderViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5FD2EFD60A40082D3C0 /* SettingsPlaceholderViews.swift */; };
+		D9E2D5FE2EFD60A40082D3C1 /* ThemeSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5FF2EFD60A40082D3C1 /* ThemeSelectionView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -69,6 +78,15 @@
 		D9E2D5E82EFD60A40082D3B6 /* UserSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettings.swift; sourceTree = "<group>"; };
 		D9E2D5EB2EFD60A40082D3B7 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		D9E2D5ED2EFD60A40082D3B8 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
+		D9E2D5EF2EFD60A40082D3B9 /* StoryResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryResultView.swift; sourceTree = "<group>"; };
+		D9E2D5F12EFD60A40082D3BA /* GenerateStoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateStoryViewModel.swift; sourceTree = "<group>"; };
+		D9E2D5F32EFD60A40082D3BB /* ChildSelectionButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChildSelectionButton.swift; sourceTree = "<group>"; };
+		D9E2D5F52EFD60A40082D3BC /* DashedButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashedButton.swift; sourceTree = "<group>"; };
+		D9E2D5F72EFD60A40082D3BD /* SettingsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRow.swift; sourceTree = "<group>"; };
+		D9E2D5F92EFD60A40082D3BE /* ThemeSelectionButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeSelectionButton.swift; sourceTree = "<group>"; };
+		D9E2D5FB2EFD60A40082D3BF /* LanguageSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageSelectionView.swift; sourceTree = "<group>"; };
+		D9E2D5FD2EFD60A40082D3C0 /* SettingsPlaceholderViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPlaceholderViews.swift; sourceTree = "<group>"; };
+		D9E2D5FF2EFD60A40082D3C1 /* ThemeSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeSelectionView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -157,6 +175,7 @@
 				D9E2D5D12EFD60A40082D3B4 /* StoriesStore.swift */,
 				D9E2D5E62EFD60A40082D3B5 /* PremiumManager.swift */,
 				D9E2D5E82EFD60A40082D3B6 /* UserSettings.swift */,
+				D9E2D5F12EFD60A40082D3BA /* GenerateStoryViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -174,8 +193,32 @@
 				70E32FB058A04056809C1CBD /* LoginView.swift */,
 				D9E2D5EB2EFD60A40082D3B7 /* OnboardingView.swift */,
 				D9E2D5ED2EFD60A40082D3B8 /* PaywallView.swift */,
+				D9E2D5EF2EFD60A40082D3B9 /* StoryResultView.swift */,
+				D9E2D6002EFD60A40082D3C2 /* Components */,
+				D9E2D6012EFD60A40082D3C3 /* Settings */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		D9E2D6002EFD60A40082D3C2 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				D9E2D5F32EFD60A40082D3BB /* ChildSelectionButton.swift */,
+				D9E2D5F52EFD60A40082D3BC /* DashedButton.swift */,
+				D9E2D5F72EFD60A40082D3BD /* SettingsRow.swift */,
+				D9E2D5F92EFD60A40082D3BE /* ThemeSelectionButton.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		D9E2D6012EFD60A40082D3C3 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				D9E2D5FB2EFD60A40082D3BF /* LanguageSelectionView.swift */,
+				D9E2D5FD2EFD60A40082D3C0 /* SettingsPlaceholderViews.swift */,
+				D9E2D5FF2EFD60A40082D3C1 /* ThemeSelectionView.swift */,
+			);
+			path = Settings;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -277,6 +320,15 @@
 				D9E2D5E52EFD60A40082D3B4 /* MainTabView.swift in Sources */,
 				D9E2D5E62EFD60A40082D3B4 /* Child.swift in Sources */,
 				A1000001 /* App.swift in Sources */,
+				D9E2D5EE2EFD60A40082D3B9 /* StoryResultView.swift in Sources */,
+				D9E2D5F02EFD60A40082D3BA /* GenerateStoryViewModel.swift in Sources */,
+				D9E2D5F22EFD60A40082D3BB /* ChildSelectionButton.swift in Sources */,
+				D9E2D5F42EFD60A40082D3BC /* DashedButton.swift in Sources */,
+				D9E2D5F62EFD60A40082D3BD /* SettingsRow.swift in Sources */,
+				D9E2D5F82EFD60A40082D3BE /* ThemeSelectionButton.swift in Sources */,
+				D9E2D5FA2EFD60A40082D3BF /* LanguageSelectionView.swift in Sources */,
+				D9E2D5FC2EFD60A40082D3C0 /* SettingsPlaceholderViews.swift in Sources */,
+				D9E2D5FE2EFD60A40082D3C1 /* ThemeSelectionView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

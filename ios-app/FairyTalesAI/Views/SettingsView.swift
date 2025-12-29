@@ -21,287 +21,15 @@ struct SettingsView: View {
                 
                 ScrollView {
                     VStack(spacing: 24) {
-                        // User Profile Section
-                        VStack(spacing: 16) {
-                            ZStack(alignment: .bottomTrailing) {
-                                Circle()
-                                    .fill(
-                                        LinearGradient(
-                                            colors: [AppTheme.primaryPurple, AppTheme.accentPurple],
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        )
-                                    )
-                                    .frame(width: 80, height: 80)
-                                    .overlay(
-                                        Image(systemName: "person.fill")
-                                            .font(.system(size: 40))
-                                            .foregroundColor(.white)
-                                    )
-                                
-                                Circle()
-                                    .fill(AppTheme.primaryPurple)
-                                    .frame(width: 28, height: 28)
-                                    .overlay(
-                                        Image(systemName: "pencil")
-                                            .font(.system(size: 12))
-                                            .foregroundColor(.white)
-                                    )
-                                    .offset(x: 4, y: 4)
-                            }
-                            
-                            VStack(spacing: 4) {
-                                Text(authService.userEmail ?? "User")
-                                    .font(.system(size: 22, weight: .bold))
-                                    .foregroundColor(AppTheme.textPrimary(for: colorScheme))
-                                    .lineLimit(1)
-                                
-                                if let userEmail = authService.userEmail {
-                                    Text(userEmail)
-                                        .font(.system(size: 14))
-                                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                                        .lineLimit(1)
-                                }
-                            }
-                            
-                            Image(systemName: "chevron.right")
-                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                        }
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(AppTheme.cardBackground(for: colorScheme))
-                        .cornerRadius(AppTheme.cornerRadius)
-                        .padding(.horizontal)
-                        .padding(.top)
+                        userProfileSection
                         
-                        // App Experience Section
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("APP EXPERIENCE")
-                                .font(.system(size: 12, weight: .semibold))
-                                .foregroundColor(AppTheme.primaryPurple)
-                                .padding(.horizontal)
-                            
-                            VStack(spacing: 0) {
-                                SettingsRow(
-                                    icon: "bell.fill",
-                                    iconColor: AppTheme.primaryPurple,
-                                    title: "Push Notifications",
-                                    trailing: {
-                                        Toggle("", isOn: $pushNotificationsEnabled)
-                                            .tint(AppTheme.primaryPurple)
-                                    }
-                                )
-                                
-                                Divider()
-                                    .background(AppTheme.textSecondary(for: colorScheme).opacity(0.3))
-                                    .padding(.leading, 60)
-                                
-                                SettingsRow(
-                                    icon: "music.note",
-                                    iconColor: Color.pink,
-                                    title: "Sound Effects",
-                                    trailing: {
-                                        Toggle("", isOn: $soundEffectsEnabled)
-                                            .tint(AppTheme.primaryPurple)
-                                    }
-                                )
-                                
-                                Divider()
-                                    .background(AppTheme.textSecondary(for: colorScheme).opacity(0.3))
-                                    .padding(.leading, 60)
-                                
-                                NavigationLink(destination: ThemeSelectionView(selectedTheme: Binding(
-                                    get: { ThemeMode(rawValue: themeModeRaw) ?? .system },
-                                    set: { themeModeRaw = $0.rawValue }
-                                ))) {
-                                    SettingsRow(
-                                        icon: "paintbrush.fill",
-                                        iconColor: Color.orange,
-                                        title: "Appearance",
-                                        trailing: {
-                                            HStack {
-                                                Text(themeMode.displayName)
-                                                    .font(.system(size: 14))
-                                                    .foregroundColor(AppTheme.primaryPurple)
-                                                Image(systemName: "chevron.right")
-                                                    .font(.system(size: 12))
-                                                    .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                                            }
-                                        }
-                                    )
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                                
-                                Divider()
-                                    .background(AppTheme.textSecondary(for: colorScheme).opacity(0.3))
-                                    .padding(.leading, 60)
-                                
-                                NavigationLink(destination: LanguageSelectionView()) {
-                                    SettingsRow(
-                                        icon: "globe",
-                                        iconColor: Color.blue,
-                                        title: "Language",
-                                        trailing: {
-                                            HStack {
-                                                Text(selectedLanguage)
-                                                    .font(.system(size: 14))
-                                                    .foregroundColor(AppTheme.primaryPurple)
-                                                Image(systemName: "chevron.right")
-                                                    .font(.system(size: 12))
-                                                    .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                                            }
-                                        }
-                                    )
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                            }
-                            .background(AppTheme.cardBackground(for: colorScheme))
-                            .cornerRadius(AppTheme.cornerRadius)
-                            .padding(.horizontal)
-                        }
+                        appExperienceSection
                         
-                        // Membership Section
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("MEMBERSHIP")
-                                .font(.system(size: 12, weight: .semibold))
-                                .foregroundColor(AppTheme.primaryPurple)
-                                .padding(.horizontal)
-                            
-                            VStack(spacing: 0) {
-                                NavigationLink(destination: MembershipView()) {
-                                    SettingsRow(
-                                        icon: "star.fill",
-                                        iconColor: Color.yellow,
-                                        iconBackground: AppTheme.primaryPurple,
-                                        title: "Storyteller Pro",
-                                        subtitle: "Active Plan",
-                                        subtitleColor: Color.pink,
-                                        trailing: {
-                                            Image(systemName: "chevron.right")
-                                                .font(.system(size: 12))
-                                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                                        }
-                                    )
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                                
-                                Divider()
-                                    .background(AppTheme.textSecondary(for: colorScheme).opacity(0.3))
-                                    .padding(.leading, 60)
-                                
-                                NavigationLink(destination: SubscriptionView()) {
-                                    SettingsRow(
-                                        icon: "creditcard.fill",
-                                        iconColor: AppTheme.primaryPurple,
-                                        title: "Manage Subscription",
-                                        trailing: {
-                                            Image(systemName: "chevron.right")
-                                                .font(.system(size: 12))
-                                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                                        }
-                                    )
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                            }
-                            .background(AppTheme.cardBackground(for: colorScheme))
-                            .cornerRadius(AppTheme.cornerRadius)
-                            .padding(.horizontal)
-                        }
+                        membershipSection
                         
-                        // Support & Legal Section
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("SUPPORT & LEGAL")
-                                .font(.system(size: 12, weight: .semibold))
-                                .foregroundColor(AppTheme.primaryPurple)
-                                .padding(.horizontal)
-                            
-                            VStack(spacing: 0) {
-                                NavigationLink(destination: HelpCenterView()) {
-                                    SettingsRow(
-                                        icon: "questionmark.circle.fill",
-                                        iconColor: Color.green,
-                                        iconBackground: AppTheme.primaryPurple,
-                                        title: "Help Center",
-                                        trailing: {
-                                            Image(systemName: "chevron.right")
-                                                .font(.system(size: 12))
-                                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                                        }
-                                    )
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                                
-                                Divider()
-                                    .background(AppTheme.textSecondary(for: colorScheme).opacity(0.3))
-                                    .padding(.leading, 60)
-                                
-                                NavigationLink(destination: PrivacyPolicyView()) {
-                                    SettingsRow(
-                                        icon: "lock.fill",
-                                        iconColor: Color.gray,
-                                        iconBackground: AppTheme.primaryPurple,
-                                        title: "Privacy Policy",
-                                        trailing: {
-                                            Image(systemName: "chevron.right")
-                                                .font(.system(size: 12))
-                                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                                        }
-                                    )
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                                
-                                Divider()
-                                    .background(AppTheme.textSecondary(for: colorScheme).opacity(0.3))
-                                    .padding(.leading, 60)
-                                
-                                NavigationLink(destination: TermsView()) {
-                                    SettingsRow(
-                                        icon: "doc.text.fill",
-                                        iconColor: Color.gray,
-                                        iconBackground: AppTheme.primaryPurple,
-                                        title: "Terms of Service",
-                                        trailing: {
-                                            Image(systemName: "chevron.right")
-                                                .font(.system(size: 12))
-                                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                                        }
-                                    )
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                            }
-                            .background(AppTheme.cardBackground(for: colorScheme))
-                            .cornerRadius(AppTheme.cornerRadius)
-                            .padding(.horizontal)
-                        }
+                        supportLegalSection
                         
-                        // Log Out Button
-                        Button(action: { showLogoutAlert = true }) {
-                            HStack {
-                                if authService.isLoading {
-                                    ProgressView()
-                                        .progressViewStyle(CircularProgressViewStyle(tint: .red))
-                                } else {
-                                    Text("Выйти")
-                                        .font(.system(size: 16, weight: .semibold))
-                                }
-                            }
-                            .foregroundColor(.red)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(AppTheme.cardBackground(for: colorScheme))
-                            .cornerRadius(AppTheme.cornerRadius)
-                        }
-                        .disabled(authService.isLoading)
-                        .opacity(authService.isLoading ? 0.6 : 1.0)
-                        .padding(.horizontal)
-                        .alert("Выход", isPresented: $showLogoutAlert) {
-                            Button("Отмена", role: .cancel) { }
-                            Button("Выйти", role: .destructive) {
-                                handleLogout()
-                            }
-                        } message: {
-                            Text("Вы уверены, что хотите выйти из аккаунта?")
-                        }
+                        logoutButton
                         
                         // Version Info
                         Text("Version 1.0.2 (Build 2024)")
@@ -316,6 +44,293 @@ struct SettingsView: View {
         }
     }
     
+    private var userProfileSection: some View {
+        VStack(spacing: 16) {
+            ZStack(alignment: .bottomTrailing) {
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [AppTheme.primaryPurple, AppTheme.accentPurple],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 80, height: 80)
+                    .overlay(
+                        Image(systemName: "person.fill")
+                            .font(.system(size: 40))
+                            .foregroundColor(.white)
+                    )
+                
+                Circle()
+                    .fill(AppTheme.primaryPurple)
+                    .frame(width: 28, height: 28)
+                    .overlay(
+                        Image(systemName: "pencil")
+                            .font(.system(size: 12))
+                            .foregroundColor(.white)
+                    )
+                    .offset(x: 4, y: 4)
+            }
+            
+            VStack(spacing: 4) {
+                Text(authService.userEmail ?? "User")
+                    .font(.system(size: 22, weight: .bold))
+                    .foregroundColor(AppTheme.textPrimary(for: colorScheme))
+                    .lineLimit(1)
+                
+                if let userEmail = authService.userEmail {
+                    Text(userEmail)
+                        .font(.system(size: 14))
+                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                        .lineLimit(1)
+                }
+            }
+            
+            Image(systemName: "chevron.right")
+                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+        }
+        .padding()
+        .frame(maxWidth: .infinity)
+        .background(AppTheme.cardBackground(for: colorScheme))
+        .cornerRadius(AppTheme.cornerRadius)
+        .padding(.horizontal)
+        .padding(.top)
+    }
+    
+    private var appExperienceSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("APP EXPERIENCE")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundColor(AppTheme.primaryPurple)
+                .padding(.horizontal)
+            
+            VStack(spacing: 0) {
+                SettingsRow(
+                    icon: "bell.fill",
+                    iconColor: AppTheme.primaryPurple,
+                    title: "Push Notifications",
+                    trailing: {
+                        Toggle("", isOn: $pushNotificationsEnabled)
+                            .tint(AppTheme.primaryPurple)
+                    }
+                )
+                
+                Divider()
+                    .background(AppTheme.textSecondary(for: colorScheme).opacity(0.3))
+                    .padding(.leading, 60)
+                
+                SettingsRow(
+                    icon: "music.note",
+                    iconColor: Color.pink,
+                    title: "Sound Effects",
+                    trailing: {
+                        Toggle("", isOn: $soundEffectsEnabled)
+                            .tint(AppTheme.primaryPurple)
+                    }
+                )
+                
+                Divider()
+                    .background(AppTheme.textSecondary(for: colorScheme).opacity(0.3))
+                    .padding(.leading, 60)
+                
+                NavigationLink(destination: ThemeSelectionView(selectedTheme: Binding(
+                    get: { ThemeMode(rawValue: themeModeRaw) ?? .system },
+                    set: { themeModeRaw = $0.rawValue }
+                ))) {
+                    SettingsRow(
+                        icon: "paintbrush.fill",
+                        iconColor: Color.orange,
+                        title: "Appearance",
+                        trailing: {
+                            HStack {
+                                Text(themeMode.displayName)
+                                    .font(.system(size: 14))
+                                    .foregroundColor(AppTheme.primaryPurple)
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                            }
+                        }
+                    )
+                }
+                .buttonStyle(PlainButtonStyle())
+                
+                Divider()
+                    .background(AppTheme.textSecondary(for: colorScheme).opacity(0.3))
+                    .padding(.leading, 60)
+                
+                NavigationLink(destination: LanguageSelectionView()) {
+                    SettingsRow(
+                        icon: "globe",
+                        iconColor: Color.blue,
+                        title: "Language",
+                        trailing: {
+                            HStack {
+                                Text(selectedLanguage)
+                                    .font(.system(size: 14))
+                                    .foregroundColor(AppTheme.primaryPurple)
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                            }
+                        }
+                    )
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+            .background(AppTheme.cardBackground(for: colorScheme))
+            .cornerRadius(AppTheme.cornerRadius)
+            .padding(.horizontal)
+        }
+    }
+    
+    private var membershipSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("MEMBERSHIP")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundColor(AppTheme.primaryPurple)
+                .padding(.horizontal)
+            
+            VStack(spacing: 0) {
+                NavigationLink(destination: MembershipView()) {
+                    SettingsRow(
+                        icon: "star.fill",
+                        iconColor: Color.yellow,
+                        iconBackground: AppTheme.primaryPurple,
+                        title: "Storyteller Pro",
+                        subtitle: "Active Plan",
+                        subtitleColor: Color.pink,
+                        trailing: {
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 12))
+                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                        }
+                    )
+                }
+                .buttonStyle(PlainButtonStyle())
+                
+                Divider()
+                    .background(AppTheme.textSecondary(for: colorScheme).opacity(0.3))
+                    .padding(.leading, 60)
+                
+                NavigationLink(destination: SubscriptionView()) {
+                    SettingsRow(
+                        icon: "creditcard.fill",
+                        iconColor: AppTheme.primaryPurple,
+                        title: "Manage Subscription",
+                        trailing: {
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 12))
+                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                        }
+                    )
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+            .background(AppTheme.cardBackground(for: colorScheme))
+            .cornerRadius(AppTheme.cornerRadius)
+            .padding(.horizontal)
+        }
+    }
+    
+    private var supportLegalSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("SUPPORT & LEGAL")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundColor(AppTheme.primaryPurple)
+                .padding(.horizontal)
+            
+            VStack(spacing: 0) {
+                NavigationLink(destination: HelpCenterView()) {
+                    SettingsRow(
+                        icon: "questionmark.circle.fill",
+                        iconColor: Color.green,
+                        iconBackground: AppTheme.primaryPurple,
+                        title: "Help Center",
+                        trailing: {
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 12))
+                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                        }
+                    )
+                }
+                .buttonStyle(PlainButtonStyle())
+                
+                Divider()
+                    .background(AppTheme.textSecondary(for: colorScheme).opacity(0.3))
+                    .padding(.leading, 60)
+                
+                NavigationLink(destination: PrivacyPolicyView()) {
+                    SettingsRow(
+                        icon: "lock.fill",
+                        iconColor: Color.gray,
+                        iconBackground: AppTheme.primaryPurple,
+                        title: "Privacy Policy",
+                        trailing: {
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 12))
+                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                        }
+                    )
+                }
+                .buttonStyle(PlainButtonStyle())
+                
+                Divider()
+                    .background(AppTheme.textSecondary(for: colorScheme).opacity(0.3))
+                    .padding(.leading, 60)
+                
+                NavigationLink(destination: TermsView()) {
+                    SettingsRow(
+                        icon: "doc.text.fill",
+                        iconColor: Color.gray,
+                        iconBackground: AppTheme.primaryPurple,
+                        title: "Terms of Service",
+                        trailing: {
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 12))
+                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                        }
+                    )
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+            .background(AppTheme.cardBackground(for: colorScheme))
+            .cornerRadius(AppTheme.cornerRadius)
+            .padding(.horizontal)
+        }
+    }
+    
+    private var logoutButton: some View {
+        Button(action: { showLogoutAlert = true }) {
+            HStack {
+                if authService.isLoading {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: .red))
+                } else {
+                    Text("Выйти")
+                        .font(.system(size: 16, weight: .semibold))
+                }
+            }
+            .foregroundColor(.red)
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(AppTheme.cardBackground(for: colorScheme))
+            .cornerRadius(AppTheme.cornerRadius)
+        }
+        .disabled(authService.isLoading)
+        .opacity(authService.isLoading ? 0.6 : 1.0)
+        .padding(.horizontal)
+        .alert("Выход", isPresented: $showLogoutAlert) {
+            Button("Отмена", role: .cancel) { }
+            Button("Выйти", role: .destructive) {
+                handleLogout()
+            }
+        } message: {
+            Text("Вы уверены, что хотите выйти из аккаунта?")
+        }
+    }
+    
     private func handleLogout() {
         Task {
             do {
@@ -326,159 +341,3 @@ struct SettingsView: View {
         }
     }
 }
-
-struct SettingsRow<Trailing: View>: View {
-    let icon: String
-    var iconColor: Color = AppTheme.primaryPurple
-    var iconBackground: Color? = nil
-    let title: String
-    var subtitle: String? = nil
-    var subtitleColor: Color = AppTheme.textSecondary(for: nil)
-    @ViewBuilder let trailing: () -> Trailing
-    @Environment(\.colorScheme) var colorScheme
-    
-    var body: some View {
-        HStack(spacing: 16) {
-            if let background = iconBackground {
-                ZStack {
-                    Circle()
-                        .fill(background.opacity(0.2))
-                        .frame(width: 40, height: 40)
-                    
-                    Image(systemName: icon)
-                        .foregroundColor(iconColor)
-                        .font(.system(size: 18))
-                }
-            } else {
-                Image(systemName: icon)
-                    .foregroundColor(iconColor)
-                    .font(.system(size: 20))
-                    .frame(width: 40)
-            }
-            
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(.system(size: 16))
-                    .foregroundColor(AppTheme.textPrimary(for: colorScheme))
-                
-                if let subtitle = subtitle {
-                    Text(subtitle)
-                        .font(.system(size: 12))
-                        .foregroundColor(subtitleColor)
-                }
-            }
-            
-            Spacer()
-            
-            trailing()
-        }
-        .padding()
-    }
-}
-
-// Placeholder views for navigation destinations
-struct ThemeSelectionView: View {
-    @Binding var selectedTheme: ThemeMode
-    @Environment(\.dismiss) var dismiss
-    @Environment(\.colorScheme) var colorScheme
-    
-    var body: some View {
-        ZStack {
-            AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
-            
-            List {
-                ForEach(ThemeMode.allCases, id: \.self) { theme in
-                    Button(action: {
-                        selectedTheme = theme
-                        dismiss()
-                    }) {
-                        HStack {
-                            Text(theme.displayName)
-                                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
-                            Spacer()
-                            if selectedTheme == theme {
-                                Image(systemName: "checkmark")
-                                    .foregroundColor(AppTheme.primaryPurple)
-                            }
-                        }
-                    }
-                    .listRowBackground(AppTheme.cardBackground(for: colorScheme))
-                }
-            }
-            .scrollContentBackground(.hidden)
-        }
-        .navigationTitle("Appearance")
-        .navigationBarTitleDisplayMode(.inline)
-    }
-}
-
-struct LanguageSelectionView: View {
-    @AppStorage("selectedLanguage") private var selectedLanguage = "English"
-    @Environment(\.dismiss) var dismiss
-    @Environment(\.colorScheme) var colorScheme
-    
-    var body: some View {
-        ZStack {
-            AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
-            
-            List {
-                ForEach(["English", "Russian", "Spanish", "French"], id: \.self) { language in
-                    Button(action: {
-                        selectedLanguage = language
-                        dismiss()
-                    }) {
-                        HStack {
-                            Text(language)
-                                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
-                            Spacer()
-                            if selectedLanguage == language {
-                                Image(systemName: "checkmark")
-                                    .foregroundColor(AppTheme.primaryPurple)
-                            }
-                        }
-                    }
-                    .listRowBackground(AppTheme.cardBackground(for: colorScheme))
-                }
-            }
-            .scrollContentBackground(.hidden)
-        }
-        .navigationTitle("Language")
-        .navigationBarTitleDisplayMode(.inline)
-    }
-}
-
-struct MembershipView: View {
-    var body: some View {
-        Text("Membership Details")
-            .navigationTitle("Storyteller Pro")
-    }
-}
-
-struct SubscriptionView: View {
-    var body: some View {
-        Text("Manage Subscription")
-            .navigationTitle("Subscription")
-    }
-}
-
-struct HelpCenterView: View {
-    var body: some View {
-        Text("Help Center")
-            .navigationTitle("Help Center")
-    }
-}
-
-struct PrivacyPolicyView: View {
-    var body: some View {
-        Text("Privacy Policy")
-            .navigationTitle("Privacy Policy")
-    }
-}
-
-struct TermsView: View {
-    var body: some View {
-        Text("Terms of Service")
-            .navigationTitle("Terms of Service")
-    }
-}
-
