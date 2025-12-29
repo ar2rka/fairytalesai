@@ -2,7 +2,7 @@
 
 import asyncio
 import logging
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from src.supabase_client import SupabaseClient
 from src.models import StoryDB, ChildDB, HeroDB
 from src.infrastructure.persistence.models import GenerationDB, FreeStoryDB
@@ -246,3 +246,16 @@ class AsyncSupabaseClient:
     async def get_free_story(self, story_id: str) -> Optional[FreeStoryDB]:
         """Get a free story by ID asynchronously."""
         return await asyncio.to_thread(self._sync_client.get_free_story, story_id)
+    
+    # Prompt operations
+    async def get_prompts(self, language: str, story_type: Optional[str] = None) -> List[Dict[str, Any]]:
+        """Get prompts from the database asynchronously."""
+        return await asyncio.to_thread(self._sync_client.get_prompts, language, story_type)
+    
+    async def create_prompt(self, prompt_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Create a new prompt in the database asynchronously."""
+        return await asyncio.to_thread(self._sync_client.create_prompt, prompt_data)
+    
+    async def update_prompt(self, prompt_id: str, prompt_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Update an existing prompt in the database asynchronously."""
+        return await asyncio.to_thread(self._sync_client.update_prompt, prompt_id, prompt_data)

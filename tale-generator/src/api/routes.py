@@ -83,7 +83,13 @@ def _initialize_voice_service():
 openrouter_client = _initialize_openrouter_client()
 supabase_client = _initialize_supabase_client()
 voice_service = _initialize_voice_service()
-prompt_service = PromptService()
+
+# Initialize prompt service with Supabase client if available
+# Note: PromptRepository needs sync client, so we get it from async client
+_sync_supabase_client = None
+if supabase_client and hasattr(supabase_client, '_sync_client'):
+    _sync_supabase_client = supabase_client._sync_client
+prompt_service = PromptService(_sync_supabase_client)
 logger.info("Prompt service initialized successfully")
 
 

@@ -6,12 +6,36 @@ from src.domain.value_objects import Language, StoryLength
 from src.core.logging import get_logger
 from src.utils.age_category_utils import get_age_category_for_prompt
 from src.infrastructure.persistence.models import StoryDB
+from src.prompts.character_types import ChildCharacter, HeroCharacter, CombinedCharacter
+from src.infrastructure.persistence.prompt_repository import PromptRepository
+from src.domain.services.prompt_template_service import PromptTemplateService
 
 logger = get_logger("domain.prompt_service")
 
 
 class PromptService:
     """Service for generating language-specific story prompts."""
+    
+    def __init__(self, supabase_client=None):
+        """Initialize prompt service.
+        
+        Args:
+            supabase_client: Optional Supabase client for loading prompts from database.
+                           If None, will use legacy prompt generation methods.
+        """
+        self._supabase_client = supabase_client
+        self._template_service: Optional[PromptTemplateService] = None
+        
+        if supabase_client:
+            try:
+                repository = PromptRepository(supabase_client)
+                self._template_service = PromptTemplateService(repository)
+                logger.info("PromptTemplateService initialized with Supabase")
+            except Exception as e:
+                logger.warning(f"Failed to initialize PromptTemplateService: {e}. Using legacy methods.")
+                self._template_service = None
+        else:
+            logger.info("No Supabase client provided. Using legacy prompt generation methods.")
     
     def generate_child_prompt(
         self,
@@ -35,6 +59,31 @@ class PromptService:
         """
         logger.debug(f"Generating prompt for child {child.name} in {language.value}")
         
+        # Use template service if available
+        if self._template_service:
+            try:
+                # Convert Child entity to ChildCharacter
+                child_character = ChildCharacter(
+                    name=child.name,
+                    age_category=child.age_category,
+                    gender=child.gender.value if hasattr(child.gender, 'value') else str(child.gender),
+                    interests=child.interests,
+                    age=child.age,
+                    description=None
+                )
+                
+                return self._template_service.render_prompt(
+                    character=child_character,
+                    moral=moral,
+                    language=language,
+                    story_length=story_length.minutes,
+                    story_type="child",
+                    parent_story=parent_story
+                )
+            except Exception as e:
+                logger.warning(f"Template service failed, falling back to legacy: {e}")
+        
+        # Fallback to legacy methods
         if language == Language.RUSSIAN:
             return self._generate_russian_child_prompt(child, moral, story_length, parent_story)
         else:
@@ -60,6 +109,34 @@ class PromptService:
         """
         logger.debug(f"Generating prompt for hero {hero.name} in {hero.language.value}")
         
+        # Use template service if available
+        if self._template_service:
+            try:
+                # Convert Hero entity to HeroCharacter
+                hero_character = HeroCharacter(
+                    name=hero.name,
+                    age=hero.age,
+                    gender=hero.gender.value if hasattr(hero.gender, 'value') else str(hero.gender),
+                    appearance=hero.appearance,
+                    personality_traits=hero.personality_traits,
+                    strengths=hero.strengths,
+                    interests=hero.interests,
+                    language=hero.language,
+                    description=None
+                )
+                
+                return self._template_service.render_prompt(
+                    character=hero_character,
+                    moral=moral,
+                    language=hero.language,
+                    story_length=story_length.minutes,
+                    story_type="hero",
+                    parent_story=parent_story
+                )
+            except Exception as e:
+                logger.warning(f"Template service failed, falling back to legacy: {e}")
+        
+        # Fallback to legacy methods
         if hero.language == Language.RUSSIAN:
             return self._generate_russian_hero_prompt(hero, moral, story_length, parent_story)
         else:
@@ -89,6 +166,55 @@ class PromptService:
         """
         logger.debug(f"Generating combined prompt for {child.name} and {hero.name} in {language.value}")
         
+        # Use template service if available
+        if self._template_service:
+            try:
+                # Convert Child and Hero entities to Character objects
+                child_character = ChildCharacter(
+                    name=child.name,
+                    age_category=child.age_category,
+                    gender=child.gender.value if hasattr(child.gender, 'value') else str(child.gender),
+                    interests=child.interests,
+                    age=child.age,
+                    description=None
+                )
+                
+                hero_character = HeroCharacter(
+                    name=hero.name,
+                    age=hero.age,
+                    gender=hero.gender.value if hasattr(hero.gender, 'value') else str(hero.gender),
+                    appearance=hero.appearance,
+                    personality_traits=hero.personality_traits,
+                    strengths=hero.strengths,
+                    interests=hero.interests,
+                    language=hero.language,
+                    description=None
+                )
+                
+                # Create relationship description
+                if language == Language.RUSSIAN:
+                    relationship = f"{child.name} встречает легендарного героя {hero.name}"
+                else:
+                    relationship = f"{child.name} meets the legendary {hero.name}"
+                
+                combined_character = CombinedCharacter(
+                    child=child_character,
+                    hero=hero_character,
+                    relationship=relationship
+                )
+                
+                return self._template_service.render_prompt(
+                    character=combined_character,
+                    moral=moral,
+                    language=language,
+                    story_length=story_length.minutes,
+                    story_type="combined",
+                    parent_story=parent_story
+                )
+            except Exception as e:
+                logger.warning(f"Template service failed, falling back to legacy: {e}")
+        
+        # Fallback to legacy methods
         if language == Language.RUSSIAN:
             return self._generate_russian_combined_prompt(child, hero, moral, story_length, parent_story)
         else:

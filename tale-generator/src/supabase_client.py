@@ -2,7 +2,7 @@
 
 import logging
 import os
-from typing import List, Optional, Any
+from typing import List, Optional, Any, Dict
 from supabase import create_client, Client
 from supabase.client import ClientOptions
 from src.models import StoryDB, ChildDB, HeroDB
@@ -1730,3 +1730,70 @@ class SupabaseClient:
         except Exception as e:
             logger.error(f"Error retrieving free story: {str(e)}")
             raise Exception(f"Error retrieving free story: {str(e)}")
+    
+    def get_prompts(self, language: str, story_type: Optional[str] = None) -> List[Dict[str, Any]]:
+        """Get prompts from the database.
+        
+        Args:
+            language: Language code ('en' or 'ru')
+            story_type: Story type ('child', 'hero', 'combined') or None for universal
+            
+        Returns:
+            List of prompt dictionaries
+        """
+        try:
+            query = self.client.table("prompts").select("*")
+            query = query.eq("language", language)
+            query = query.eq("is_active", True)
+            
+            if story_type:
+                query = query.or_(f"story_type.eq.{story_type},story_type.is.null")
+            else:
+                query = query.is_("story_type", "null")
+            
+            query = query.order("priority", desc=False)
+            
+            response = query.execute()
+            return response.data if response.data else []
+        except Exception as e:
+            logger.error(f"Error retrieving prompts: {str(e)}")
+            return []
+    
+    def create_prompt(self, prompt_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Create a new prompt in the database.
+        
+        Args:
+            prompt_data: Dictionary with prompt fields (priority, language, story_type, prompt_text, etc.)
+            
+        Returns:
+            Created prompt dictionary or None if failed
+        """
+        try:
+            response = self.client.table("prompts").insert(prompt_data).execute()
+            if response.data:
+                logger.info(f"Created prompt with priority {prompt_data.get('priority')}")
+                return response.data[0]
+            return None
+        except Exception as e:
+            logger.error(f"Error creating prompt: {str(e)}")
+            return None
+    
+    def update_prompt(self, prompt_id: str, prompt_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Update an existing prompt in the database.
+        
+        Args:
+            prompt_id: ID of the prompt to update
+            prompt_data: Dictionary with fields to update
+            
+        Returns:
+            Updated prompt dictionary or None if failed
+        """
+        try:
+            response = self.client.table("prompts").update(prompt_data).eq("id", prompt_id).execute()
+            if response.data:
+                logger.info(f"Updated prompt {prompt_id}")
+                return response.data[0]
+            return None
+        except Exception as e:
+            logger.error(f"Error updating prompt: {str(e)}")
+            return None

@@ -55,6 +55,7 @@ class StoryDB(BaseModel):
     id: Optional[str] = None
     title: str
     content: str
+    summary: Optional[str] = None
     child_id: Optional[str] = None
     child_name: Optional[str] = None
     child_age: Optional[int] = None
@@ -87,3 +88,16 @@ class FreeStoryDB(BaseModel):
     language: str  # Language code: 'en' or 'ru'
     is_active: bool = True  # Whether the story is active and should be displayed
     created_at: Optional[datetime] = None
+
+
+class PromptDB(BaseModel):
+    """Database model for prompt templates stored in Supabase."""
+    id: Optional[str] = None
+    priority: int
+    language: str  # 'en' or 'ru'
+    story_type: Optional[str] = None  # 'child', 'hero', 'combined', or None for universal
+    prompt_text: str  # Jinja template text
+    is_active: bool = True
+    description: Optional[str] = None  # Optional description of the prompt part
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
