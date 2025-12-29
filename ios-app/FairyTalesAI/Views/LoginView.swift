@@ -2,6 +2,7 @@ import SwiftUI
 
 struct LoginView: View {
     @StateObject private var authService = AuthService.shared
+    @Environment(\.colorScheme) var colorScheme
     @State private var email = ""
     @State private var password = ""
     @State private var confirmPassword = ""
@@ -11,7 +12,7 @@ struct LoginView: View {
     
     var body: some View {
         ZStack {
-            AppTheme.darkPurple.ignoresSafeArea()
+            AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
             
             ScrollView {
                 VStack(spacing: 32) {
@@ -29,11 +30,11 @@ struct LoginView: View {
                         
                         Text("Fairy Tales AI")
                             .font(.system(size: 32, weight: .bold))
-                            .foregroundColor(AppTheme.textPrimary)
+                            .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                         
                         Text(isSignUpMode ? "Создайте аккаунт" : "Добро пожаловать")
                             .font(.system(size: 18))
-                            .foregroundColor(AppTheme.textSecondary)
+                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                     }
                     .padding(.top, 40)
                     
@@ -43,7 +44,7 @@ struct LoginView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Email")
                                 .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(AppTheme.textSecondary)
+                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                             
                             TextField("your.email@example.com", text: $email)
                                 .textFieldStyle(LoginTextFieldStyle())
@@ -55,7 +56,7 @@ struct LoginView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Пароль")
                                 .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(AppTheme.textSecondary)
+                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                             
                             HStack {
                                 if showPassword {
@@ -67,7 +68,7 @@ struct LoginView: View {
                                 
                                 Button(action: { showPassword.toggle() }) {
                                     Image(systemName: showPassword ? "eye.slash.fill" : "eye.fill")
-                                        .foregroundColor(AppTheme.textSecondary)
+                                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                                 }
                             }
                             .textFieldStyle(LoginTextFieldStyle())
@@ -78,7 +79,7 @@ struct LoginView: View {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Подтвердите пароль")
                                     .font(.system(size: 14, weight: .medium))
-                                    .foregroundColor(AppTheme.textSecondary)
+                                    .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                                 
                                 HStack {
                                     if showPassword {
@@ -135,7 +136,7 @@ struct LoginView: View {
                         HStack {
                             Text(isSignUpMode ? "Уже есть аккаунт?" : "Нет аккаунта?")
                                 .font(.system(size: 14))
-                                .foregroundColor(AppTheme.textSecondary)
+                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                             
                             Button(action: {
                                 isSignUpMode.toggle()
@@ -152,7 +153,7 @@ struct LoginView: View {
                     }
                     .padding(.horizontal, 24)
                     .padding(.vertical, 32)
-                    .background(AppTheme.cardBackground)
+                    .background(AppTheme.cardBackground(for: colorScheme))
                     .cornerRadius(AppTheme.cornerRadius)
                     .padding(.horizontal, 24)
                 }
@@ -191,21 +192,24 @@ struct LoginView: View {
 }
 
 struct LoginTextFieldStyle: TextFieldStyle {
+    @Environment(\.colorScheme) var colorScheme
+    
     func _body(configuration: TextField<Self._Label>) -> some View {
         configuration
             .padding()
-            .background(AppTheme.darkPurple)
-            .foregroundColor(AppTheme.textPrimary)
+            .background(AppTheme.backgroundColor(for: colorScheme))
+            .foregroundColor(AppTheme.textPrimary(for: colorScheme))
             .cornerRadius(12)
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
-                    .stroke(AppTheme.cardBackground, lineWidth: 1)
+                    .stroke(AppTheme.cardBackground(for: colorScheme), lineWidth: 1)
             )
     }
 }
 
 struct ResetPasswordView: View {
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
     @StateObject private var authService = AuthService.shared
     @State private var email = ""
     @State private var isLoading = false
@@ -214,12 +218,12 @@ struct ResetPasswordView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                AppTheme.darkPurple.ignoresSafeArea()
+                AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
                 
                 VStack(spacing: 24) {
                     Text("Введите email для восстановления пароля")
                         .font(.system(size: 16))
-                        .foregroundColor(AppTheme.textSecondary)
+                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                         .multilineTextAlignment(.center)
                         .padding(.horizontal)
                     

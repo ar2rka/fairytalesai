@@ -5,12 +5,19 @@ struct SettingsView: View {
     @AppStorage("pushNotificationsEnabled") private var pushNotificationsEnabled = true
     @AppStorage("soundEffectsEnabled") private var soundEffectsEnabled = true
     @AppStorage("selectedLanguage") private var selectedLanguage = "English"
+    @AppStorage("themeMode") private var themeModeRaw = ThemeMode.system.rawValue
     @State private var showLogoutAlert = false
+    @Environment(\.colorScheme) var colorScheme
+    
+    private var themeMode: ThemeMode {
+        get { ThemeMode(rawValue: themeModeRaw) ?? .system }
+        set { themeModeRaw = newValue.rawValue }
+    }
     
     var body: some View {
         NavigationView {
             ZStack {
-                AppTheme.darkPurple.ignoresSafeArea()
+                AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
                 
                 ScrollView {
                     VStack(spacing: 24) {
@@ -46,23 +53,23 @@ struct SettingsView: View {
                             VStack(spacing: 4) {
                                 Text(authService.userEmail ?? "User")
                                     .font(.system(size: 22, weight: .bold))
-                                    .foregroundColor(AppTheme.textPrimary)
+                                    .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                                     .lineLimit(1)
                                 
                                 if let userEmail = authService.userEmail {
                                     Text(userEmail)
                                         .font(.system(size: 14))
-                                        .foregroundColor(AppTheme.textSecondary)
+                                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                                         .lineLimit(1)
                                 }
                             }
                             
                             Image(systemName: "chevron.right")
-                                .foregroundColor(AppTheme.textSecondary)
+                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                         }
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(AppTheme.cardBackground)
+                        .background(AppTheme.cardBackground(for: colorScheme))
                         .cornerRadius(AppTheme.cornerRadius)
                         .padding(.horizontal)
                         .padding(.top)
@@ -86,7 +93,7 @@ struct SettingsView: View {
                                 )
                                 
                                 Divider()
-                                    .background(AppTheme.textSecondary.opacity(0.3))
+                                    .background(AppTheme.textSecondary(for: colorScheme).opacity(0.3))
                                     .padding(.leading, 60)
                                 
                                 SettingsRow(
@@ -100,7 +107,33 @@ struct SettingsView: View {
                                 )
                                 
                                 Divider()
-                                    .background(AppTheme.textSecondary.opacity(0.3))
+                                    .background(AppTheme.textSecondary(for: colorScheme).opacity(0.3))
+                                    .padding(.leading, 60)
+                                
+                                NavigationLink(destination: ThemeSelectionView(selectedTheme: Binding(
+                                    get: { ThemeMode(rawValue: themeModeRaw) ?? .system },
+                                    set: { themeModeRaw = $0.rawValue }
+                                ))) {
+                                    SettingsRow(
+                                        icon: "paintbrush.fill",
+                                        iconColor: Color.orange,
+                                        title: "Appearance",
+                                        trailing: {
+                                            HStack {
+                                                Text(themeMode.displayName)
+                                                    .font(.system(size: 14))
+                                                    .foregroundColor(AppTheme.primaryPurple)
+                                                Image(systemName: "chevron.right")
+                                                    .font(.system(size: 12))
+                                                    .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                                            }
+                                        }
+                                    )
+                                }
+                                .buttonStyle(PlainButtonStyle())
+                                
+                                Divider()
+                                    .background(AppTheme.textSecondary(for: colorScheme).opacity(0.3))
                                     .padding(.leading, 60)
                                 
                                 NavigationLink(destination: LanguageSelectionView()) {
@@ -115,14 +148,14 @@ struct SettingsView: View {
                                                     .foregroundColor(AppTheme.primaryPurple)
                                                 Image(systemName: "chevron.right")
                                                     .font(.system(size: 12))
-                                                    .foregroundColor(AppTheme.textSecondary)
+                                                    .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                                             }
                                         }
                                     )
                                 }
                                 .buttonStyle(PlainButtonStyle())
                             }
-                            .background(AppTheme.cardBackground)
+                            .background(AppTheme.cardBackground(for: colorScheme))
                             .cornerRadius(AppTheme.cornerRadius)
                             .padding(.horizontal)
                         }
@@ -146,14 +179,14 @@ struct SettingsView: View {
                                         trailing: {
                                             Image(systemName: "chevron.right")
                                                 .font(.system(size: 12))
-                                                .foregroundColor(AppTheme.textSecondary)
+                                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                                         }
                                     )
                                 }
                                 .buttonStyle(PlainButtonStyle())
                                 
                                 Divider()
-                                    .background(AppTheme.textSecondary.opacity(0.3))
+                                    .background(AppTheme.textSecondary(for: colorScheme).opacity(0.3))
                                     .padding(.leading, 60)
                                 
                                 NavigationLink(destination: SubscriptionView()) {
@@ -164,13 +197,13 @@ struct SettingsView: View {
                                         trailing: {
                                             Image(systemName: "chevron.right")
                                                 .font(.system(size: 12))
-                                                .foregroundColor(AppTheme.textSecondary)
+                                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                                         }
                                     )
                                 }
                                 .buttonStyle(PlainButtonStyle())
                             }
-                            .background(AppTheme.cardBackground)
+                            .background(AppTheme.cardBackground(for: colorScheme))
                             .cornerRadius(AppTheme.cornerRadius)
                             .padding(.horizontal)
                         }
@@ -192,14 +225,14 @@ struct SettingsView: View {
                                         trailing: {
                                             Image(systemName: "chevron.right")
                                                 .font(.system(size: 12))
-                                                .foregroundColor(AppTheme.textSecondary)
+                                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                                         }
                                     )
                                 }
                                 .buttonStyle(PlainButtonStyle())
                                 
                                 Divider()
-                                    .background(AppTheme.textSecondary.opacity(0.3))
+                                    .background(AppTheme.textSecondary(for: colorScheme).opacity(0.3))
                                     .padding(.leading, 60)
                                 
                                 NavigationLink(destination: PrivacyPolicyView()) {
@@ -211,14 +244,14 @@ struct SettingsView: View {
                                         trailing: {
                                             Image(systemName: "chevron.right")
                                                 .font(.system(size: 12))
-                                                .foregroundColor(AppTheme.textSecondary)
+                                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                                         }
                                     )
                                 }
                                 .buttonStyle(PlainButtonStyle())
                                 
                                 Divider()
-                                    .background(AppTheme.textSecondary.opacity(0.3))
+                                    .background(AppTheme.textSecondary(for: colorScheme).opacity(0.3))
                                     .padding(.leading, 60)
                                 
                                 NavigationLink(destination: TermsView()) {
@@ -230,13 +263,13 @@ struct SettingsView: View {
                                         trailing: {
                                             Image(systemName: "chevron.right")
                                                 .font(.system(size: 12))
-                                                .foregroundColor(AppTheme.textSecondary)
+                                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                                         }
                                     )
                                 }
                                 .buttonStyle(PlainButtonStyle())
                             }
-                            .background(AppTheme.cardBackground)
+                            .background(AppTheme.cardBackground(for: colorScheme))
                             .cornerRadius(AppTheme.cornerRadius)
                             .padding(.horizontal)
                         }
@@ -255,7 +288,7 @@ struct SettingsView: View {
                             .foregroundColor(.red)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(AppTheme.cardBackground)
+                            .background(AppTheme.cardBackground(for: colorScheme))
                             .cornerRadius(AppTheme.cornerRadius)
                         }
                         .disabled(authService.isLoading)
@@ -273,7 +306,7 @@ struct SettingsView: View {
                         // Version Info
                         Text("Version 1.0.2 (Build 2024)")
                             .font(.system(size: 12))
-                            .foregroundColor(AppTheme.textSecondary)
+                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                             .padding(.bottom, 100)
                     }
                 }
@@ -300,8 +333,9 @@ struct SettingsRow<Trailing: View>: View {
     var iconBackground: Color? = nil
     let title: String
     var subtitle: String? = nil
-    var subtitleColor: Color = AppTheme.textSecondary
+    var subtitleColor: Color = AppTheme.textSecondary(for: nil)
     @ViewBuilder let trailing: () -> Trailing
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         HStack(spacing: 16) {
@@ -325,7 +359,7 @@ struct SettingsRow<Trailing: View>: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
                     .font(.system(size: 16))
-                    .foregroundColor(AppTheme.textPrimary)
+                    .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                 
                 if let subtitle = subtitle {
                     Text(subtitle)
@@ -343,28 +377,70 @@ struct SettingsRow<Trailing: View>: View {
 }
 
 // Placeholder views for navigation destinations
+struct ThemeSelectionView: View {
+    @Binding var selectedTheme: ThemeMode
+    @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
+    
+    var body: some View {
+        ZStack {
+            AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
+            
+            List {
+                ForEach(ThemeMode.allCases, id: \.self) { theme in
+                    Button(action: {
+                        selectedTheme = theme
+                        dismiss()
+                    }) {
+                        HStack {
+                            Text(theme.displayName)
+                                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
+                            Spacer()
+                            if selectedTheme == theme {
+                                Image(systemName: "checkmark")
+                                    .foregroundColor(AppTheme.primaryPurple)
+                            }
+                        }
+                    }
+                    .listRowBackground(AppTheme.cardBackground(for: colorScheme))
+                }
+            }
+            .scrollContentBackground(.hidden)
+        }
+        .navigationTitle("Appearance")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
 struct LanguageSelectionView: View {
     @AppStorage("selectedLanguage") private var selectedLanguage = "English"
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
-        List {
-            ForEach(["English", "Russian", "Spanish", "French"], id: \.self) { language in
-                Button(action: {
-                    selectedLanguage = language
-                    dismiss()
-                }) {
-                    HStack {
-                        Text(language)
-                            .foregroundColor(AppTheme.textPrimary)
-                        Spacer()
-                        if selectedLanguage == language {
-                            Image(systemName: "checkmark")
-                                .foregroundColor(AppTheme.primaryPurple)
+        ZStack {
+            AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
+            
+            List {
+                ForEach(["English", "Russian", "Spanish", "French"], id: \.self) { language in
+                    Button(action: {
+                        selectedLanguage = language
+                        dismiss()
+                    }) {
+                        HStack {
+                            Text(language)
+                                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
+                            Spacer()
+                            if selectedLanguage == language {
+                                Image(systemName: "checkmark")
+                                    .foregroundColor(AppTheme.primaryPurple)
+                            }
                         }
                     }
+                    .listRowBackground(AppTheme.cardBackground(for: colorScheme))
                 }
             }
+            .scrollContentBackground(.hidden)
         }
         .navigationTitle("Language")
         .navigationBarTitleDisplayMode(.inline)

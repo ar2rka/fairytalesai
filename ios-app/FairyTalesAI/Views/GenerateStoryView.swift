@@ -5,6 +5,7 @@ struct GenerateStoryView: View {
     @EnvironmentObject var storiesStore: StoriesStore
     @EnvironmentObject var premiumManager: PremiumManager
     @EnvironmentObject var userSettings: UserSettings
+    @Environment(\.colorScheme) var colorScheme
     
     @State private var selectedChildId: UUID? = nil
     @State private var selectedDuration: Double = 3
@@ -29,7 +30,7 @@ struct GenerateStoryView: View {
                         VStack(alignment: .leading, spacing: 16) {
                             Text("Who is listening?")
                                 .font(.system(size: 20, weight: .bold))
-                                .foregroundColor(AppTheme.textPrimary)
+                                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                             
                             if childrenStore.children.isEmpty {
                                 NavigationLink(destination: AddChildView()) {
@@ -41,7 +42,7 @@ struct GenerateStoryView: View {
                                     .foregroundColor(AppTheme.primaryPurple)
                                     .padding()
                                     .frame(maxWidth: .infinity)
-                                    .background(AppTheme.cardBackground)
+                                    .background(AppTheme.cardBackground(for: colorScheme))
                                     .cornerRadius(16)
                                 }
                             } else {
@@ -72,7 +73,7 @@ struct GenerateStoryView: View {
                                     .foregroundColor(AppTheme.primaryPurple)
                                 Text("\(userSettings.freeGenerationsRemaining) free story\(userSettings.freeGenerationsRemaining == 1 ? "" : "ies") remaining")
                                     .font(.system(size: 14, weight: .medium))
-                                    .foregroundColor(AppTheme.textSecondary)
+                                    .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                                 Spacer()
                             }
                             .padding(.horizontal)
@@ -83,7 +84,7 @@ struct GenerateStoryView: View {
                             HStack {
                                 Text("Duration")
                                     .font(.system(size: 20, weight: .bold))
-                                    .foregroundColor(AppTheme.textPrimary)
+                                    .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                                 
                                 Spacer()
                                 
@@ -93,7 +94,7 @@ struct GenerateStoryView: View {
                                         .foregroundColor(AppTheme.primaryPurple)
                                     Text("min")
                                         .font(.system(size: 14, weight: .medium))
-                                        .foregroundColor(AppTheme.textSecondary)
+                                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                                 }
                                 
                                 if !userSettings.isPremium && selectedDuration >= 5 {
@@ -132,11 +133,11 @@ struct GenerateStoryView: View {
                                 } minimumValueLabel: {
                                     Text("3")
                                         .font(.system(size: 12))
-                                        .foregroundColor(AppTheme.textSecondary)
+                                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                                 } maximumValueLabel: {
                                     Text(userSettings.isPremium ? "30" : "30 🔒")
                                         .font(.system(size: 12))
-                                        .foregroundColor(AppTheme.textSecondary)
+                                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                                 }
                                 .tint(AppTheme.primaryPurple)
                                 
@@ -144,7 +145,7 @@ struct GenerateStoryView: View {
                                     HStack {
                                         Text("Free: up to 5 min")
                                             .font(.system(size: 12))
-                                            .foregroundColor(AppTheme.textSecondary)
+                                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                                         
                                         Spacer()
                                         
@@ -161,7 +162,7 @@ struct GenerateStoryView: View {
                         VStack(alignment: .leading, spacing: 16) {
                             Text("Choose a Theme")
                                 .font(.system(size: 20, weight: .bold))
-                                .foregroundColor(AppTheme.textPrimary)
+                                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                             
                             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
                                 ForEach(StoryTheme.allThemes) { theme in
@@ -180,21 +181,21 @@ struct GenerateStoryView: View {
                         VStack(alignment: .leading, spacing: 16) {
                             Text("Brief Plot")
                                 .font(.system(size: 20, weight: .bold))
-                                .foregroundColor(AppTheme.textPrimary)
+                                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                             
                             ZStack(alignment: .topLeading) {
                                 if plot.isEmpty {
                                     Text("Describe the story you want to create...")
-                                        .foregroundColor(AppTheme.textSecondary)
+                                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                                         .padding()
                                 }
                                 
                                 TextEditor(text: $plot)
-                                    .foregroundColor(AppTheme.textPrimary)
+                                    .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                                     .scrollContentBackground(.hidden)
                                     .padding(8)
                                     .frame(minHeight: 120)
-                                    .background(AppTheme.cardBackground)
+                                    .background(AppTheme.cardBackground(for: colorScheme))
                                     .cornerRadius(25)
                             }
                         }
@@ -284,21 +285,22 @@ struct ChildSelectionButton: View {
     let child: Child
     let isSelected: Bool
     let action: () -> Void
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         Button(action: action) {
             VStack(spacing: 8) {
                 Text(child.name)
                     .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(isSelected ? .white : AppTheme.textPrimary)
+                    .foregroundColor(isSelected ? .white : AppTheme.textPrimary(for: colorScheme))
                 
                 Text(child.ageCategory.shortName)
                     .font(.system(size: 12))
-                    .foregroundColor(isSelected ? .white.opacity(0.8) : AppTheme.textSecondary)
+                    .foregroundColor(isSelected ? .white.opacity(0.8) : AppTheme.textSecondary(for: colorScheme))
             }
             .padding()
             .frame(width: 100)
-            .background(isSelected ? AppTheme.primaryPurple : AppTheme.cardBackground)
+            .background(isSelected ? AppTheme.primaryPurple : AppTheme.cardBackground(for: colorScheme))
             .cornerRadius(25)
             .overlay(
                 Group {
@@ -323,6 +325,7 @@ struct ThemeSelectionButton: View {
     let theme: StoryTheme
     let isSelected: Bool
     let action: () -> Void
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         Button(action: action) {
@@ -333,16 +336,16 @@ struct ThemeSelectionButton: View {
                 VStack(spacing: 4) {
                     Text(theme.name)
                         .font(.system(size: 16, weight: .bold))
-                        .foregroundColor(isSelected ? .white : AppTheme.textPrimary)
+                        .foregroundColor(isSelected ? .white : AppTheme.textPrimary(for: colorScheme))
                     
                     Text(theme.description)
                         .font(.system(size: 12))
-                        .foregroundColor(isSelected ? .white.opacity(0.8) : AppTheme.textSecondary)
+                        .foregroundColor(isSelected ? .white.opacity(0.8) : AppTheme.textSecondary(for: colorScheme))
                 }
             }
             .frame(maxWidth: .infinity)
             .padding()
-            .background(isSelected ? AppTheme.primaryPurple : AppTheme.cardBackground)
+            .background(isSelected ? AppTheme.primaryPurple : AppTheme.cardBackground(for: colorScheme))
             .cornerRadius(AppTheme.cornerRadius)
             .overlay(
                 Group {
@@ -387,6 +390,7 @@ struct DashedButton: View {
 struct StoryResultView: View {
     let story: Story
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var storiesStore: StoriesStore
     @EnvironmentObject var premiumManager: PremiumManager
     @EnvironmentObject var userSettings: UserSettings
@@ -395,13 +399,13 @@ struct StoryResultView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                AppTheme.darkPurple.ignoresSafeArea()
+                AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
                 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 24) {
                         Text(story.title)
                             .font(.system(size: 28, weight: .bold))
-                            .foregroundColor(AppTheme.textPrimary)
+                            .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                         
                         // Listen Button with Premium Lock
                         Button(action: {
@@ -426,7 +430,7 @@ struct StoryResultView: View {
                         
                         Text(story.content)
                             .font(.system(size: 16))
-                            .foregroundColor(AppTheme.textPrimary)
+                            .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                             .lineSpacing(8)
                     }
                     .padding()

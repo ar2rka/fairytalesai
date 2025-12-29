@@ -54,7 +54,7 @@ class AuthService: ObservableObject {
                 let session = try await supabase.auth.session
                 await MainActor.run {
                     currentUser = session.user
-                    isAuthenticated = session.user != nil
+                    isAuthenticated = !session.user.isAnonymous
                 }
             } catch {
                 // Нет активной сессии - это нормально
@@ -97,7 +97,7 @@ class AuthService: ObservableObject {
             )
             
             currentUser = response.user
-            isAuthenticated = response.user != nil
+            isAuthenticated = !response.user.isAnonymous
         } catch {
             errorMessage = error.localizedDescription
             throw error
@@ -121,7 +121,7 @@ class AuthService: ObservableObject {
             )
             
             currentUser = response.user
-            isAuthenticated = response.user != nil
+            isAuthenticated = !response.user.isAnonymous
         } catch {
             errorMessage = error.localizedDescription
             throw error

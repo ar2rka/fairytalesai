@@ -2,12 +2,13 @@ import SwiftUI
 
 struct ChildrenListView: View {
     @EnvironmentObject var childrenStore: ChildrenStore
+    @Environment(\.colorScheme) var colorScheme
     @State private var showingAddChild = false
     
     var body: some View {
         NavigationView {
             ZStack {
-                AppTheme.darkPurple.ignoresSafeArea()
+                AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
                 
                 if childrenStore.isLoading && childrenStore.children.isEmpty {
                     ProgressView()
@@ -16,15 +17,15 @@ struct ChildrenListView: View {
                     VStack(spacing: 24) {
                         Image(systemName: "person.2.fill")
                             .font(.system(size: 60))
-                            .foregroundColor(AppTheme.textSecondary)
+                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                         
                         Text("No children added yet")
                             .font(.system(size: 20, weight: .semibold))
-                            .foregroundColor(AppTheme.textPrimary)
+                            .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                         
                         Text("Add your first child to start creating personalized stories")
                             .font(.system(size: 14))
-                            .foregroundColor(AppTheme.textSecondary)
+                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                             .multilineTextAlignment(.center)
                             .padding(.horizontal)
                         
@@ -84,7 +85,7 @@ struct ChildrenListView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     NavigationLink(destination: SettingsView()) {
                         Image(systemName: "gearshape.fill")
-                            .foregroundColor(AppTheme.textPrimary)
+                            .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                     }
                 }
             }
@@ -108,6 +109,7 @@ struct ChildrenListView: View {
 
 struct ChildRowView: View {
     let child: Child
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         HStack(spacing: 16) {
@@ -129,20 +131,20 @@ struct ChildRowView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(child.name)
                     .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(AppTheme.textPrimary)
+                    .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                 
                 Text(child.ageCategory.shortName + " (" + child.ageCategory.displayName + ")")
                     .font(.system(size: 14))
-                    .foregroundColor(AppTheme.textSecondary)
+                    .foregroundColor(AppTheme.textSecondary(for: colorScheme))
             }
             
             Spacer()
             
             Image(systemName: "chevron.right")
-                .foregroundColor(AppTheme.textSecondary)
+                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
         }
         .padding()
-        .background(AppTheme.cardBackground)
+        .background(AppTheme.cardBackground(for: colorScheme))
         .cornerRadius(AppTheme.cornerRadius)
         .padding(.horizontal)
     }
@@ -152,12 +154,13 @@ struct ChildDetailView: View {
     let child: Child
     @EnvironmentObject var childrenStore: ChildrenStore
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
     @State private var showingEdit = false
     @State private var showingDeleteAlert = false
     
     var body: some View {
         ZStack {
-            AppTheme.darkPurple.ignoresSafeArea()
+            AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
             
             ScrollView {
                 VStack(spacing: 24) {
@@ -180,11 +183,11 @@ struct ChildDetailView: View {
                         
                         Text(child.name)
                             .font(.system(size: 28, weight: .bold))
-                            .foregroundColor(AppTheme.textPrimary)
+                            .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                         
                         Text(child.ageCategory.shortName + " (" + child.ageCategory.displayName + ")")
                             .font(.system(size: 16))
-                            .foregroundColor(AppTheme.textSecondary)
+                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                     }
                     .padding()
                     
@@ -192,7 +195,7 @@ struct ChildDetailView: View {
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Interests")
                             .font(.system(size: 20, weight: .semibold))
-                            .foregroundColor(AppTheme.textPrimary)
+                            .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                             .padding(.horizontal)
                         
                         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {

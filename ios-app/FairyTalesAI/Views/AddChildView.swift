@@ -3,6 +3,7 @@ import SwiftUI
 struct AddChildView: View {
     @EnvironmentObject var childrenStore: ChildrenStore
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
     
     @State private var name: String = ""
     @State private var selectedGender: String = "boy"
@@ -23,7 +24,7 @@ struct AddChildView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                AppTheme.darkPurple.ignoresSafeArea()
+                AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
                 
                 ScrollView {
                     VStack(spacing: 24) {
@@ -31,7 +32,7 @@ struct AddChildView: View {
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Child's Name")
                                 .font(.system(size: 16, weight: .semibold))
-                                .foregroundColor(AppTheme.textPrimary)
+                                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                             
                             HStack {
                                 TextField("e.g. Oliver", text: $name)
@@ -48,7 +49,7 @@ struct AddChildView: View {
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Gender")
                                 .font(.system(size: 16, weight: .semibold))
-                                .foregroundColor(AppTheme.textPrimary)
+                                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                             
                             HStack(spacing: 12) {
                                 ForEach(genders, id: \.self) { gender in
@@ -57,10 +58,10 @@ struct AddChildView: View {
                                     }) {
                                         Text(gender.capitalized)
                                             .font(.system(size: 14, weight: .medium))
-                                            .foregroundColor(selectedGender == gender ? .white : AppTheme.textPrimary)
+                                            .foregroundColor(selectedGender == gender ? .white : AppTheme.textPrimary(for: colorScheme))
                                             .frame(maxWidth: .infinity)
                                             .padding()
-                                            .background(selectedGender == gender ? AppTheme.primaryPurple : AppTheme.cardBackground)
+                                            .background(selectedGender == gender ? AppTheme.primaryPurple : AppTheme.cardBackground(for: colorScheme))
                                             .cornerRadius(AppTheme.cornerRadius)
                                     }
                                 }
@@ -72,12 +73,12 @@ struct AddChildView: View {
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Age Group")
                                 .font(.system(size: 16, weight: .semibold))
-                                .foregroundColor(AppTheme.textPrimary)
+                                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                             
                             Button(action: { showingAgePicker = true }) {
                                 HStack {
                                     Text(selectedAgeCategory.displayName)
-                                        .foregroundColor(AppTheme.textPrimary)
+                                        .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                                     
                                     Spacer()
                                     
@@ -85,7 +86,7 @@ struct AddChildView: View {
                                         .foregroundColor(AppTheme.primaryPurple)
                                 }
                                 .padding()
-                                .background(AppTheme.cardBackground)
+                                .background(AppTheme.cardBackground(for: colorScheme))
                                 .cornerRadius(AppTheme.cornerRadius)
                             }
                         }
@@ -96,13 +97,13 @@ struct AddChildView: View {
                             HStack {
                                 Text("Interests")
                                     .font(.system(size: 16, weight: .semibold))
-                                    .foregroundColor(AppTheme.textPrimary)
+                                    .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                                 
                                 Spacer()
                                 
                                 Text("Pick at least 3")
                                     .font(.system(size: 12))
-                                    .foregroundColor(AppTheme.textSecondary)
+                                    .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                             }
                             
                             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
@@ -169,7 +170,7 @@ struct AddChildView: View {
                     Button("Cancel") {
                         dismiss()
                     }
-                    .foregroundColor(AppTheme.textPrimary)
+                    .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -243,12 +244,14 @@ struct AddChildView: View {
 }
 
 struct CustomTextFieldStyle: TextFieldStyle {
+    @Environment(\.colorScheme) var colorScheme
+    
     func _body(configuration: TextField<Self._Label>) -> some View {
         configuration
             .padding()
-            .background(AppTheme.cardBackground)
+            .background(AppTheme.cardBackground(for: colorScheme))
             .cornerRadius(AppTheme.cornerRadius)
-            .foregroundColor(AppTheme.textPrimary)
+            .foregroundColor(AppTheme.textPrimary(for: colorScheme))
     }
 }
 
@@ -256,6 +259,7 @@ struct InterestChip: View {
     let interest: Interest
     let isSelected: Bool
     var action: (() -> Void)? = nil
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         Button(action: { action?() }) {
@@ -265,11 +269,11 @@ struct InterestChip: View {
                 
                 Text(interest.name)
                     .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(isSelected ? .white : AppTheme.textPrimary)
+                    .foregroundColor(isSelected ? .white : AppTheme.textPrimary(for: colorScheme))
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 12)
-            .background(isSelected ? AppTheme.primaryPurple : AppTheme.cardBackground)
+            .background(isSelected ? AppTheme.primaryPurple : AppTheme.cardBackground(for: colorScheme))
             .cornerRadius(AppTheme.cornerRadius)
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
@@ -283,11 +287,12 @@ struct InterestChip: View {
 struct AgePickerView: View {
     @Binding var selectedAge: AgeCategory
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         NavigationView {
             ZStack {
-                AppTheme.darkPurple.ignoresSafeArea()
+                AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
                 
                 List {
                     ForEach(AgeCategory.allCases, id: \.self) { age in
@@ -297,7 +302,7 @@ struct AgePickerView: View {
                         }) {
                             HStack {
                                 Text(age.displayName)
-                                    .foregroundColor(AppTheme.textPrimary)
+                                    .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                                 
                                 Spacer()
                                 
@@ -307,7 +312,7 @@ struct AgePickerView: View {
                                 }
                             }
                         }
-                        .listRowBackground(AppTheme.cardBackground)
+                        .listRowBackground(AppTheme.cardBackground(for: colorScheme))
                     }
                 }
                 .scrollContentBackground(.hidden)

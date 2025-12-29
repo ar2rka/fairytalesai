@@ -5,6 +5,7 @@ struct LibraryView: View {
     @EnvironmentObject var childrenStore: ChildrenStore
     @EnvironmentObject var premiumManager: PremiumManager
     @EnvironmentObject var authService: AuthService
+    @Environment(\.colorScheme) var colorScheme
     @State private var searchText = ""
     @State private var selectedFilter = "All Stories"
     
@@ -30,7 +31,7 @@ struct LibraryView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                AppTheme.darkPurple.ignoresSafeArea()
+                AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
                 
                 if storiesStore.isLoading {
                     VStack(spacing: 24) {
@@ -40,34 +41,34 @@ struct LibraryView: View {
                         
                         Text("Loading stories...")
                             .font(.system(size: 16))
-                            .foregroundColor(AppTheme.textSecondary)
+                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                     }
                 } else if storiesStore.stories.isEmpty {
                     VStack(spacing: 24) {
                         Image(systemName: "book.fill")
                             .font(.system(size: 60))
-                            .foregroundColor(AppTheme.textSecondary)
+                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                         
                         Text("No stories yet")
                             .font(.system(size: 20, weight: .semibold))
-                            .foregroundColor(AppTheme.textPrimary)
+                            .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                         
                         Text("Create your first magical story")
                             .font(.system(size: 14))
-                            .foregroundColor(AppTheme.textSecondary)
+                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                     }
                 } else {
                     VStack(spacing: 0) {
                         // Search Bar
                         HStack {
                             Image(systemName: "magnifyingglass")
-                                .foregroundColor(AppTheme.textSecondary)
+                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                             
                             TextField("Search stories, characters...", text: $searchText)
-                                .foregroundColor(AppTheme.textPrimary)
+                                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                         }
                         .padding()
-                        .background(AppTheme.cardBackground)
+                        .background(AppTheme.cardBackground(for: colorScheme))
                         .cornerRadius(AppTheme.cornerRadius)
                         .padding(.horizontal)
                         .padding(.top)
@@ -114,7 +115,7 @@ struct LibraryView: View {
                                 if filteredStories.isEmpty {
                                     Text("No stories found")
                                         .font(.system(size: 16))
-                                        .foregroundColor(AppTheme.textSecondary)
+                                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                                         .padding()
                                 }
                                 
@@ -125,7 +126,7 @@ struct LibraryView: View {
                                             .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.primaryPurple))
                                         Text("Loading more stories...")
                                             .font(.system(size: 14))
-                                            .foregroundColor(AppTheme.textSecondary)
+                                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                                     }
                                     .padding()
                                 }
@@ -169,6 +170,7 @@ struct FilterButton: View {
     let title: String
     let isSelected: Bool
     let action: () -> Void
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         Button(action: action) {
@@ -180,10 +182,10 @@ struct FilterButton: View {
                 Text(title)
                     .font(.system(size: 14, weight: .medium))
             }
-            .foregroundColor(isSelected ? .white : AppTheme.textPrimary)
+            .foregroundColor(isSelected ? .white : AppTheme.textPrimary(for: colorScheme))
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
-            .background(isSelected ? AppTheme.primaryPurple : AppTheme.cardBackground)
+            .background(isSelected ? AppTheme.primaryPurple : AppTheme.cardBackground(for: colorScheme))
             .cornerRadius(AppTheme.cornerRadius)
         }
     }
@@ -192,6 +194,7 @@ struct FilterButton: View {
 struct StoryLibraryRow: View {
     let story: Story
     @EnvironmentObject var childrenStore: ChildrenStore
+    @Environment(\.colorScheme) var colorScheme
     @State private var showingOptions = false
     
     var body: some View {
@@ -215,7 +218,7 @@ struct StoryLibraryRow: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text(story.title)
                     .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(AppTheme.textPrimary)
+                    .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                 
                 HStack {
                     if let childId = story.childId {
@@ -225,11 +228,11 @@ struct StoryLibraryRow: View {
                     }
                     
                     Text("•")
-                        .foregroundColor(AppTheme.textSecondary)
+                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                     
                     Text(timeAgoString(from: story.createdAt))
                         .font(.system(size: 12))
-                        .foregroundColor(AppTheme.textSecondary)
+                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                 }
                 
                 HStack(spacing: 8) {
@@ -241,10 +244,10 @@ struct StoryLibraryRow: View {
                             Text(language.uppercased())
                                 .font(.system(size: 11, weight: .medium))
                         }
-                        .foregroundColor(AppTheme.textSecondary)
+                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
-                        .background(AppTheme.cardBackground.opacity(0.5))
+                        .background(AppTheme.cardBackground(for: colorScheme).opacity(0.5))
                         .cornerRadius(6)
                     }
                     
@@ -276,7 +279,7 @@ struct StoryLibraryRow: View {
                     
                     Text("\(story.duration) min")
                         .font(.system(size: 12))
-                        .foregroundColor(AppTheme.textSecondary)
+                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                 }
             }
             
@@ -284,11 +287,11 @@ struct StoryLibraryRow: View {
             
             Button(action: { showingOptions = true }) {
                 Image(systemName: "ellipsis")
-                    .foregroundColor(AppTheme.textSecondary)
+                    .foregroundColor(AppTheme.textSecondary(for: colorScheme))
             }
         }
         .padding()
-        .background(AppTheme.cardBackground)
+        .background(AppTheme.cardBackground(for: colorScheme))
         .cornerRadius(AppTheme.cornerRadius)
     }
     
@@ -318,18 +321,19 @@ struct StoryContentView: View {
     @EnvironmentObject var premiumManager: PremiumManager
     @EnvironmentObject var userSettings: UserSettings
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
     @State private var showingPaywall = false
     
     var body: some View {
         ZStack {
-            AppTheme.darkPurple.ignoresSafeArea()
+            AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
             
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
                     // Title
                     Text(story.title)
                         .font(.system(size: 28, weight: .bold))
-                        .foregroundColor(AppTheme.textPrimary)
+                        .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                     
                     // Story metadata
                     HStack(spacing: 16) {
@@ -340,7 +344,7 @@ struct StoryContentView: View {
                                 Text(language.uppercased())
                                     .font(.system(size: 12, weight: .medium))
                             }
-                            .foregroundColor(AppTheme.textSecondary)
+                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                         }
                         
                         if let rating = story.rating {
@@ -355,11 +359,11 @@ struct StoryContentView: View {
                         
                         Text("\(story.duration) min read")
                             .font(.system(size: 12))
-                            .foregroundColor(AppTheme.textSecondary)
+                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                     }
                     
                     Divider()
-                        .background(AppTheme.textSecondary.opacity(0.3))
+                        .background(AppTheme.textSecondary(for: colorScheme).opacity(0.3))
                     
                     // Listen Button with Premium Lock
                     Button(action: {
@@ -385,7 +389,7 @@ struct StoryContentView: View {
                     // Story content
                     Text(story.content)
                         .font(.system(size: 16))
-                        .foregroundColor(AppTheme.textPrimary)
+                        .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                         .lineSpacing(8)
                 }
                 .padding()

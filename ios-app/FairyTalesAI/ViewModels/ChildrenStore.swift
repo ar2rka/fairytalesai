@@ -35,7 +35,7 @@ class ChildrenStore: ObservableObject {
         }
     }
     
-    func addChild(_ child: Child) async throws {
+    func addChild(_ child: Child) async throws -> Child {
         guard let userId = authService.currentUser?.id else {
             throw ChildrenError.userNotAuthenticated
         }
@@ -48,6 +48,7 @@ class ChildrenStore: ObservableObject {
         do {
             let createdChild = try await childrenService.createChild(child, userId: userId)
             children.append(createdChild)
+            return createdChild
         } catch {
             errorMessage = error.localizedDescription
             throw error

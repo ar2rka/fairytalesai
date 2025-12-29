@@ -7,6 +7,11 @@ struct FairyTalesAIApp: App {
     @StateObject private var premiumManager = PremiumManager()
     @StateObject private var userSettings = UserSettings()
     @StateObject private var authService = AuthService.shared
+    @AppStorage("themeMode") private var themeModeRaw = ThemeMode.system.rawValue
+    
+    private var themeMode: ThemeMode {
+        ThemeMode(rawValue: themeModeRaw) ?? .system
+    }
     
     var body: some Scene {
         WindowGroup {
@@ -14,7 +19,7 @@ struct FairyTalesAIApp: App {
                 if !authService.isAuthenticated {
                     LoginView()
                         .environmentObject(authService)
-                        .preferredColorScheme(.dark)
+                        .preferredColorScheme(themeMode.colorScheme)
                 } else if userSettings.hasCompletedOnboarding && userSettings.onboardingComplete {
                     MainTabView()
                         .environmentObject(childrenStore)
@@ -22,7 +27,7 @@ struct FairyTalesAIApp: App {
                         .environmentObject(premiumManager)
                         .environmentObject(userSettings)
                         .environmentObject(authService)
-                        .preferredColorScheme(.dark)
+                        .preferredColorScheme(themeMode.colorScheme)
                         .onAppear {
                             premiumManager.syncWithUserSettings(userSettings)
                         }
@@ -30,10 +35,10 @@ struct FairyTalesAIApp: App {
                     OnboardingView()
                         .environmentObject(userSettings)
                         .environmentObject(authService)
-                        .preferredColorScheme(.dark)
+                        .preferredColorScheme(themeMode.colorScheme)
                 }
             }
-            .preferredColorScheme(.dark)
+            .preferredColorScheme(themeMode.colorScheme)
         }
     }
 }
