@@ -5,7 +5,10 @@ struct GenerateStoryView: View {
     @EnvironmentObject var storiesStore: StoriesStore
     @EnvironmentObject var premiumManager: PremiumManager
     @EnvironmentObject var userSettings: UserSettings
+    @EnvironmentObject var authService: AuthService
+    @Environment(\.colorScheme) var colorScheme
     
+<<<<<<< HEAD
     @State private var selectedChildId: UUID? = nil
     @State private var selectedDuration: Double = 3
     @State private var selectedTheme: StoryTheme? = nil
@@ -18,12 +21,16 @@ struct GenerateStoryView: View {
     private var maxAllowedDuration: Double {
         userSettings.isPremium ? 30 : 5
     }
+=======
+    @StateObject private var viewModel = GenerateStoryViewModel()
+>>>>>>> d586088bf77ddd623d794f3e1676750124dbcf7f
     
     var body: some View {
         NavigationView {
             ZStack {
-                AppTheme.darkPurple.ignoresSafeArea()
+                AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
                 
+<<<<<<< HEAD
                 if !childrenStore.hasProfiles {
                     // Empty State
                     VStack(spacing: 24) {
@@ -247,20 +254,45 @@ struct GenerateStoryView: View {
                             .padding(.bottom, 100)
                         }
                         .padding(.top)
+=======
+                ScrollView {
+                    VStack(spacing: 32) {
+                        childrenSelectionSection
+                        
+                        if !userSettings.isPremium {
+                            creditsIndicator
+                        }
+                        
+                        durationSection
+                        
+                        themeSelectionSection
+                        
+                        plotSection
+                        
+                        generateButton
+>>>>>>> d586088bf77ddd623d794f3e1676750124dbcf7f
                     }
                 }
             }
             .navigationTitle("Create Story")
             .navigationBarTitleDisplayMode(.inline)
+<<<<<<< HEAD
             .sheet(isPresented: $showingAddChild) {
                 AddChildView()
             }
             .sheet(isPresented: $showingStoryResult) {
                 if let story = generatedStory {
+=======
+            .task {
+                await childrenStore.loadChildrenIfNeeded()
+            }
+            .sheet(isPresented: $viewModel.showingStoryResult) {
+                if let story = viewModel.generatedStory {
+>>>>>>> d586088bf77ddd623d794f3e1676750124dbcf7f
                     StoryResultView(story: story)
                 }
             }
-            .sheet(isPresented: $showingPaywall) {
+            .sheet(isPresented: $viewModel.showingPaywall) {
                 NavigationView {
                     PaywallView()
                         .environmentObject(userSettings)
@@ -269,6 +301,7 @@ struct GenerateStoryView: View {
         }
     }
     
+<<<<<<< HEAD
     private var canGenerate: Bool {
             selectedChildId != nil && selectedTheme != nil
         }
@@ -345,10 +378,74 @@ struct GenerateStoryView: View {
                         }
                     }
                 )
+=======
+    // MARK: - Subviews
+    
+    private var childrenSelectionSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Who is listening?")
+                .font(.system(size: 20, weight: .bold))
+                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
+            
+            if childrenStore.isLoading && childrenStore.children.isEmpty {
+                loadingView
+            } else if childrenStore.children.isEmpty {
+                addFirstChildButton
+            } else {
+                childrenList
+            }
+        }
+        .padding(.horizontal)
+    }
+    
+    private var loadingView: some View {
+        HStack {
+            ProgressView()
+                .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.primaryPurple))
+            Text("Loading children...")
+                .font(.system(size: 14))
+                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+        }
+        .frame(maxWidth: .infinity)
+        .padding()
+    }
+    
+    private var addFirstChildButton: some View {
+        NavigationLink(destination: AddChildView()) {
+            HStack {
+                Image(systemName: "plus")
+                Text("Add a child first")
+            }
+            .font(.system(size: 14, weight: .medium))
+            .foregroundColor(AppTheme.primaryPurple)
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(AppTheme.cardBackground(for: colorScheme))
+            .cornerRadius(16)
+        }
+    }
+    
+    private var childrenList: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 12) {
+                ForEach(childrenStore.children) { child in
+                    ChildSelectionButton(
+                        child: child,
+                        isSelected: viewModel.selectedChildId == child.id
+                    ) {
+                        viewModel.selectedChildId = viewModel.selectedChildId == child.id ? nil : child.id
+                    }
+                }
+                
+                NavigationLink(destination: AddChildView()) {
+                    DashedButton(text: "NEW")
+                }
+>>>>>>> d586088bf77ddd623d794f3e1676750124dbcf7f
             }
         }
     }
     
+<<<<<<< HEAD
     struct ThemeSelectionButton: View {
         let theme: StoryTheme
         let isSelected: Bool
@@ -410,9 +507,160 @@ struct GenerateStoryView: View {
                 RoundedRectangle(cornerRadius: 25)
                     .stroke(style: StrokeStyle(lineWidth: 2, dash: [5]))
                     .foregroundColor(AppTheme.primaryPurple)
-            )
+=======
+    private var creditsIndicator: some View {
+        HStack {
+            Image(systemName: "sparkles")
+                .foregroundColor(AppTheme.primaryPurple)
+            Text("\(userSettings.freeGenerationsRemaining) free story\(userSettings.freeGenerationsRemaining == 1 ? "" : "ies") remaining")
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+            Spacer()
         }
+        .padding(.horizontal)
     }
+    
+    private var durationSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Text("Duration")
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundColor(AppTheme.textPrimary(for: colorScheme))
+                
+                Spacer()
+                
+                HStack(spacing: 4) {
+                    Text("\(Int(viewModel.selectedDuration))")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(AppTheme.primaryPurple)
+                    Text("min")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                }
+                
+                if !userSettings.isPremium && viewModel.selectedDuration >= 5 {
+                    HStack(spacing: 4) {
+                        Image(systemName: "star.fill")
+                            .font(.system(size: 10))
+                        Text("Premium")
+                            .font(.system(size: 10, weight: .semibold))
+                    }
+                    .foregroundColor(.yellow)
+                }
+            }
+            
+            VStack(spacing: 8) {
+                Slider(
+                    value: Binding(
+                        get: { viewModel.selectedDuration },
+                        set: { viewModel.validateDuration(newValue: $0, isPremium: userSettings.isPremium) }
+                    ),
+                    in: 3...30,
+                    step: 1
+                ) {
+                    Text("Duration")
+                } minimumValueLabel: {
+                    Text("3")
+                        .font(.system(size: 12))
+                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                } maximumValueLabel: {
+                    Text(userSettings.isPremium ? "30" : "30 🔒")
+                        .font(.system(size: 12))
+                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                }
+                .tint(AppTheme.primaryPurple)
+                
+                if !userSettings.isPremium {
+                    HStack {
+                        Text("Free: up to 5 min")
+                            .font(.system(size: 12))
+                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                        
+                        Spacer()
+                        
+                        Text("Premium: up to 30 min")
+                            .font(.system(size: 12))
+                            .foregroundColor(AppTheme.primaryPurple)
+                    }
+                }
+            }
+        }
+        .padding(.horizontal)
+    }
+    
+    private var themeSelectionSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Choose a Theme")
+                .font(.system(size: 20, weight: .bold))
+                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
+            
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                ForEach(StoryTheme.allThemes) { theme in
+                    ThemeSelectionButton(
+                        theme: theme,
+                        isSelected: viewModel.selectedTheme?.id == theme.id
+                    ) {
+                        viewModel.selectedTheme = viewModel.selectedTheme?.id == theme.id ? nil : theme
+                    }
+                }
+            }
+        }
+        .padding(.horizontal)
+    }
+    
+    private var plotSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Brief Plot")
+                .font(.system(size: 20, weight: .bold))
+                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
+            
+            ZStack(alignment: .topLeading) {
+                if viewModel.plot.isEmpty {
+                    Text("Describe the story you want to create...")
+                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                        .padding()
+                }
+                
+                TextEditor(text: $viewModel.plot)
+                    .foregroundColor(AppTheme.textPrimary(for: colorScheme))
+                    .scrollContentBackground(.hidden)
+                    .padding(8)
+                    .frame(minHeight: 120)
+                    .background(AppTheme.cardBackground(for: colorScheme))
+                    .cornerRadius(25)
+            }
+        }
+        .padding(.horizontal)
+    }
+    
+    private var generateButton: some View {
+        Button(action: {
+            viewModel.generateStory(
+                userSettings: userSettings,
+                storiesStore: storiesStore,
+                childrenStore: childrenStore
+            )
+        }) {
+            HStack {
+                Image(systemName: "wand.and.stars")
+                Text("Generate Story")
+                    .font(.system(size: 18, weight: .bold))
+            }
+            .foregroundColor(.white)
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(
+                viewModel.canGenerate && !storiesStore.isGenerating ?
+                AppTheme.primaryPurple : AppTheme.primaryPurple.opacity(0.5)
+>>>>>>> d586088bf77ddd623d794f3e1676750124dbcf7f
+            )
+            .cornerRadius(25)
+        }
+        .disabled(!viewModel.canGenerate || storiesStore.isGenerating)
+        .padding(.horizontal)
+        .padding(.bottom, 100)
+    }
+<<<<<<< HEAD
     
     struct StoryResultView: View {
         let story: Story
@@ -483,3 +731,6 @@ struct GenerateStoryView: View {
     }
     
 
+=======
+}
+>>>>>>> d586088bf77ddd623d794f3e1676750124dbcf7f

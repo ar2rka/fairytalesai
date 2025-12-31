@@ -4,6 +4,7 @@ import UIKit
 struct HomeView: View {
     @EnvironmentObject var childrenStore: ChildrenStore
     @EnvironmentObject var storiesStore: StoriesStore
+    @Environment(\.colorScheme) var colorScheme
     
     // Hardcoded Free Demo Stories
     private let freeDemoStories: [Story] = [
@@ -33,7 +34,7 @@ struct HomeView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                AppTheme.darkPurple.ignoresSafeArea()
+                AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
                 
                 ScrollView {
                     VStack(spacing: 24) {
@@ -41,11 +42,11 @@ struct HomeView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Welcome")
                                 .font(.system(size: 16, weight: .medium))
-                                .foregroundColor(AppTheme.textSecondary)
+                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                             
                             Text("Create Magical Stories")
                                 .font(.system(size: 32, weight: .bold))
-                                .foregroundColor(AppTheme.textPrimary)
+                                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal)
@@ -55,7 +56,7 @@ struct HomeView: View {
                         VStack(alignment: .leading, spacing: 16) {
                             Text("Free Demo Stories")
                                 .font(.system(size: 20, weight: .semibold))
-                                .foregroundColor(AppTheme.textPrimary)
+                                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                                 .padding(.horizontal)
                             
                             ScrollView(.horizontal, showsIndicators: false) {
@@ -89,7 +90,7 @@ struct HomeView: View {
                                 HStack {
                                     Text("Who is listening?")
                                         .font(.system(size: 20, weight: .semibold))
-                                        .foregroundColor(AppTheme.textPrimary)
+                                        .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                                     
                                     Spacer()
                                     
@@ -115,7 +116,7 @@ struct HomeView: View {
                                                     )
                                                 Text("Add")
                                                     .font(.system(size: 12))
-                                                    .foregroundColor(AppTheme.textSecondary)
+                                                    .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                                             }
                                         }
                                     }
@@ -130,7 +131,7 @@ struct HomeView: View {
                                 HStack {
                                     Text("Recent Magic")
                                         .font(.system(size: 20, weight: .semibold))
-                                        .foregroundColor(AppTheme.textPrimary)
+                                        .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                                     
                                     Spacer()
                                     
@@ -154,7 +155,7 @@ struct HomeView: View {
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Popular Themes")
                                 .font(.system(size: 20, weight: .semibold))
-                                .foregroundColor(AppTheme.textPrimary)
+                                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                                 .padding(.horizontal)
                             
                             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
@@ -172,6 +173,17 @@ struct HomeView: View {
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
+<<<<<<< HEAD
+=======
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {}) {
+                        Image(systemName: "bell.fill")
+                            .foregroundColor(AppTheme.textPrimary(for: colorScheme))
+                    }
+                }
+            }
+>>>>>>> d586088bf77ddd623d794f3e1676750124dbcf7f
         }
     }
     
@@ -179,6 +191,7 @@ struct HomeView: View {
 
 struct FreeDemoStoryCard: View {
     let story: Story
+    @Environment(\.colorScheme) var colorScheme
     
     private var themeEmoji: String {
         switch story.theme.lowercased() {
@@ -231,13 +244,13 @@ struct FreeDemoStoryCard: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(story.title)
                     .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(AppTheme.textPrimary)
+                    .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                     .lineLimit(2)
                     .frame(height: 45, alignment: .topLeading)
                 
                 Text("\(story.duration) min • \(story.theme)")
                     .font(.system(size: 12))
-                    .foregroundColor(AppTheme.textSecondary)
+                    .foregroundColor(AppTheme.textSecondary(for: colorScheme))
             }
         }
         .frame(width: 200)
@@ -245,8 +258,11 @@ struct FreeDemoStoryCard: View {
 }
 
 struct FeatureCard: View {
+    @Environment(\.colorScheme) var colorScheme
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
+<<<<<<< HEAD
 
                 
                 Text("Spark a New Adventure")
@@ -259,6 +275,28 @@ struct FeatureCard: View {
                 
                 HStack {
                     Image(systemName: "sparkles")
+=======
+            HStack {
+                Text("New Feature")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(AppTheme.primaryPurple)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 4)
+                    .background(AppTheme.primaryPurple.opacity(0.2))
+                    .cornerRadius(AppTheme.cornerRadius)
+            }
+            
+            Text("Spark a New Adventure")
+                .font(.system(size: 24, weight: .bold))
+                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
+            
+            Text("Create a custom fairy tale instantly with the power of AI magic.")
+                .font(.system(size: 14))
+                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+            
+            HStack {
+                Image(systemName: "sparkles")
+>>>>>>> d586088bf77ddd623d794f3e1676750124dbcf7f
                 Text("Create New Tale")
                     .font(.system(size: 16, weight: .semibold))
                     Image(systemName: "sparkles")
@@ -270,7 +308,7 @@ struct FeatureCard: View {
             .cornerRadius(AppTheme.cornerRadius)
         }
         .padding()
-        .background(AppTheme.cardBackground)
+        .background(AppTheme.cardBackground(for: colorScheme))
         .cornerRadius(AppTheme.cornerRadius)
     }
 }
@@ -316,6 +354,7 @@ struct GetStartedCard: View {
 
 struct ChildProfileCircle: View {
     let child: Child
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         VStack {
@@ -336,13 +375,14 @@ struct ChildProfileCircle: View {
             
             Text(child.name)
                 .font(.system(size: 12))
-                .foregroundColor(AppTheme.textPrimary)
+                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
         }
     }
 }
 
 struct StoryCard: View {
     let story: Story
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -363,12 +403,12 @@ struct StoryCard: View {
             
             Text(story.title)
                 .font(.system(size: 14, weight: .semibold))
-                .foregroundColor(AppTheme.textPrimary)
+                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                 .lineLimit(2)
             
             Text("\(story.duration) min • \(story.theme)")
                 .font(.system(size: 12))
-                .foregroundColor(AppTheme.textSecondary)
+                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
         }
         .frame(width: 150)
     }
@@ -376,6 +416,7 @@ struct StoryCard: View {
 
 struct ThemeButton: View {
     let theme: StoryTheme
+    @Environment(\.colorScheme) var colorScheme
     
     private var themeColor: Color {
         switch theme.name.lowercased() {
@@ -407,6 +448,7 @@ struct ThemeButton: View {
                     .font(.system(size: 28))
                 
                 Text(theme.name)
+<<<<<<< HEAD
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundColor(AppTheme.textPrimary)
                     .lineLimit(1)
@@ -419,6 +461,14 @@ struct ThemeButton: View {
                 RoundedRectangle(cornerRadius: AppTheme.cornerRadius)
                     .stroke(themeColor.opacity(0.3), lineWidth: 1)
             )
+=======
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(AppTheme.textPrimary(for: colorScheme))
+            }
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(AppTheme.cardBackground(for: colorScheme))
+>>>>>>> d586088bf77ddd623d794f3e1676750124dbcf7f
             .cornerRadius(AppTheme.cornerRadius)
         }
     }
@@ -429,12 +479,13 @@ struct StoryReadingView: View {
     @EnvironmentObject var premiumManager: PremiumManager
     @EnvironmentObject var userSettings: UserSettings
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
     @State private var showingPaywall = false
     @State private var showShareSheet = false
     
     var body: some View {
         ZStack {
-            AppTheme.darkPurple.ignoresSafeArea()
+            AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
             
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
@@ -442,7 +493,7 @@ struct StoryReadingView: View {
                     VStack(alignment: .leading, spacing: 12) {
                         Text(story.title)
                             .font(.system(size: 32, weight: .bold))
-                            .foregroundColor(AppTheme.textPrimary)
+                            .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                         
                         HStack(spacing: 12) {
                             HStack(spacing: 4) {
@@ -451,10 +502,10 @@ struct StoryReadingView: View {
                                 Text("\(story.duration) min")
                                     .font(.system(size: 14))
                             }
-                            .foregroundColor(AppTheme.textSecondary)
+                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                             
                             Text("•")
-                                .foregroundColor(AppTheme.textSecondary)
+                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                             
                             Text(story.theme)
                                 .font(.system(size: 14))
@@ -486,7 +537,7 @@ struct StoryReadingView: View {
                     // Story Content
                     Text(story.content)
                         .font(.system(size: 18))
-                        .foregroundColor(AppTheme.textPrimary)
+                        .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                         .lineSpacing(12)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -497,6 +548,7 @@ struct StoryReadingView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
+<<<<<<< HEAD
                 HStack(spacing: 16) {
                     Button(action: { showShareSheet = true }) {
                         Image(systemName: "square.and.arrow.up")
@@ -507,6 +559,11 @@ struct StoryReadingView: View {
                         Image(systemName: "xmark.circle.fill")
                             .foregroundColor(AppTheme.textSecondary)
                     }
+=======
+                Button(action: { dismiss() }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+>>>>>>> d586088bf77ddd623d794f3e1676750124dbcf7f
                 }
             }
         }

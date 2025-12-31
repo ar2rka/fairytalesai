@@ -4,6 +4,8 @@ struct LibraryView: View {
     @EnvironmentObject var storiesStore: StoriesStore
     @EnvironmentObject var childrenStore: ChildrenStore
     @EnvironmentObject var premiumManager: PremiumManager
+    @EnvironmentObject var authService: AuthService
+    @Environment(\.colorScheme) var colorScheme
     @State private var searchText = ""
     @State private var selectedFilter = "All Stories"
     
@@ -29,34 +31,44 @@ struct LibraryView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                AppTheme.darkPurple.ignoresSafeArea()
+                AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
                 
-                if storiesStore.stories.isEmpty {
+                if storiesStore.isLoading {
+                    VStack(spacing: 24) {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.primaryPurple))
+                            .scaleEffect(1.5)
+                        
+                        Text("Loading stories...")
+                            .font(.system(size: 16))
+                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                    }
+                } else if storiesStore.stories.isEmpty {
                     VStack(spacing: 24) {
                         Image(systemName: "book.fill")
                             .font(.system(size: 60))
-                            .foregroundColor(AppTheme.textSecondary)
+                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                         
                         Text("No stories yet")
                             .font(.system(size: 20, weight: .semibold))
-                            .foregroundColor(AppTheme.textPrimary)
+                            .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                         
                         Text("Create your first magical story")
                             .font(.system(size: 14))
-                            .foregroundColor(AppTheme.textSecondary)
+                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                     }
                 } else {
                     VStack(spacing: 0) {
                         // Search Bar
                         HStack {
                             Image(systemName: "magnifyingglass")
-                                .foregroundColor(AppTheme.textSecondary)
+                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                             
                             TextField("Search stories, characters...", text: $searchText)
-                                .foregroundColor(AppTheme.textPrimary)
+                                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                         }
                         .padding()
-                        .background(AppTheme.cardBackground)
+                        .background(AppTheme.cardBackground(for: colorScheme))
                         .cornerRadius(AppTheme.cornerRadius)
                         .padding(.horizontal)
                         .padding(.top)
@@ -82,13 +94,41 @@ struct LibraryView: View {
                             LazyVStack(spacing: 16) {
                                 ForEach(filteredStories) { story in
                                     StoryLibraryRow(story: story)
+                                        .onAppear {
+                                            // Загружаем следующую страницу когда показываем последние 5 элементов
+                                            // Только если нет фильтров и поиска (работаем с полным списком)
+                                            if selectedFilter == "All Stories" && searchText.isEmpty {
+                                                if let index = filteredStories.firstIndex(where: { $0.id == story.id }),
+                                                   index >= max(0, filteredStories.count - 5),
+                                                   !storiesStore.isLoadingMore,
+                                                   storiesStore.hasMoreStories {
+                                                    Task {
+                                                        if let userId = authService.currentUser?.id {
+                                                            await storiesStore.loadMoreStories(userId: userId)
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
                                 }
                                 
                                 if filteredStories.isEmpty {
                                     Text("No stories found")
                                         .font(.system(size: 16))
-                                        .foregroundColor(AppTheme.textSecondary)
+                                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                                         .padding()
+                                }
+                                
+                                // Индикатор загрузки для infinite scroll
+                                if storiesStore.isLoadingMore {
+                                    HStack {
+                                        ProgressView()
+                                            .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.primaryPurple))
+                                        Text("Loading more stories...")
+                                            .font(.system(size: 14))
+                                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                                    }
+                                    .padding()
                                 }
                             }
                             .padding(.horizontal)
@@ -104,6 +144,13 @@ struct LibraryView: View {
                     Button(action: {}) {
                         Image(systemName: "sparkles")
                             .foregroundColor(AppTheme.primaryPurple)
+                    }
+                }
+            }
+            .onAppear {
+                if let userId = authService.currentUser?.id {
+                    Task {
+                        await storiesStore.loadStoriesFromSupabase(userId: userId)
                     }
                 }
             }
@@ -123,6 +170,7 @@ struct FilterButton: View {
     let title: String
     let isSelected: Bool
     let action: () -> Void
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         Button(action: action) {
@@ -134,10 +182,10 @@ struct FilterButton: View {
                 Text(title)
                     .font(.system(size: 14, weight: .medium))
             }
-            .foregroundColor(isSelected ? .white : AppTheme.textPrimary)
+            .foregroundColor(isSelected ? .white : AppTheme.textPrimary(for: colorScheme))
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
-            .background(isSelected ? AppTheme.primaryPurple : AppTheme.cardBackground)
+            .background(isSelected ? AppTheme.primaryPurple : AppTheme.cardBackground(for: colorScheme))
             .cornerRadius(AppTheme.cornerRadius)
         }
     }
@@ -146,6 +194,7 @@ struct FilterButton: View {
 struct StoryLibraryRow: View {
     let story: Story
     @EnvironmentObject var childrenStore: ChildrenStore
+    @Environment(\.colorScheme) var colorScheme
     @State private var showingOptions = false
     
     var body: some View {
@@ -169,7 +218,7 @@ struct StoryLibraryRow: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text(story.title)
                     .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(AppTheme.textPrimary)
+                    .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                 
                 HStack {
                     if let childId = story.childId {
@@ -179,15 +228,47 @@ struct StoryLibraryRow: View {
                     }
                     
                     Text("•")
-                        .foregroundColor(AppTheme.textSecondary)
+                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                     
                     Text(timeAgoString(from: story.createdAt))
                         .font(.system(size: 12))
-                        .foregroundColor(AppTheme.textSecondary)
+                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                }
+                
+                HStack(spacing: 8) {
+                    // Language
+                    if let language = story.language {
+                        HStack(spacing: 4) {
+                            Image(systemName: "globe")
+                                .font(.system(size: 10))
+                            Text(language.uppercased())
+                                .font(.system(size: 11, weight: .medium))
+                        }
+                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(AppTheme.cardBackground(for: colorScheme).opacity(0.5))
+                        .cornerRadius(6)
+                    }
+                    
+                    // Rating
+                    if let rating = story.rating {
+                        HStack(spacing: 4) {
+                            Image(systemName: "star.fill")
+                                .font(.system(size: 10))
+                            Text("\(rating)/10")
+                                .font(.system(size: 11, weight: .medium))
+                        }
+                        .foregroundColor(AppTheme.primaryPurple)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(AppTheme.primaryPurple.opacity(0.2))
+                        .cornerRadius(6)
+                    }
                 }
                 
                 HStack(spacing: 12) {
-                    NavigationLink(destination: StoryDetailView(story: story)) {
+                    NavigationLink(destination: StoryContentView(story: story)) {
                         HStack {
                             Image(systemName: "book.fill")
                             Text("Read")
@@ -198,7 +279,7 @@ struct StoryLibraryRow: View {
                     
                     Text("\(story.duration) min")
                         .font(.system(size: 12))
-                        .foregroundColor(AppTheme.textSecondary)
+                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                 }
             }
             
@@ -206,11 +287,11 @@ struct StoryLibraryRow: View {
             
             Button(action: { showingOptions = true }) {
                 Image(systemName: "ellipsis")
-                    .foregroundColor(AppTheme.textSecondary)
+                    .foregroundColor(AppTheme.textSecondary(for: colorScheme))
             }
         }
         .padding()
-        .background(AppTheme.cardBackground)
+        .background(AppTheme.cardBackground(for: colorScheme))
         .cornerRadius(AppTheme.cornerRadius)
     }
     
@@ -235,22 +316,54 @@ struct StoryLibraryRow: View {
     }
 }
 
-struct StoryDetailView: View {
+struct StoryContentView: View {
     let story: Story
     @EnvironmentObject var premiumManager: PremiumManager
     @EnvironmentObject var userSettings: UserSettings
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
     @State private var showingPaywall = false
     
     var body: some View {
         ZStack {
-            AppTheme.darkPurple.ignoresSafeArea()
+            AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
             
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
+                    // Title
                     Text(story.title)
                         .font(.system(size: 28, weight: .bold))
-                        .foregroundColor(AppTheme.textPrimary)
+                        .foregroundColor(AppTheme.textPrimary(for: colorScheme))
+                    
+                    // Story metadata
+                    HStack(spacing: 16) {
+                        if let language = story.language {
+                            HStack(spacing: 4) {
+                                Image(systemName: "globe")
+                                    .font(.system(size: 12))
+                                Text(language.uppercased())
+                                    .font(.system(size: 12, weight: .medium))
+                            }
+                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                        }
+                        
+                        if let rating = story.rating {
+                            HStack(spacing: 4) {
+                                Image(systemName: "star.fill")
+                                    .font(.system(size: 12))
+                                Text("\(rating)/10")
+                                    .font(.system(size: 12, weight: .medium))
+                            }
+                            .foregroundColor(AppTheme.primaryPurple)
+                        }
+                        
+                        Text("\(story.duration) min read")
+                            .font(.system(size: 12))
+                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                    }
+                    
+                    Divider()
+                        .background(AppTheme.textSecondary(for: colorScheme).opacity(0.3))
                     
                     // Listen Button with Premium Lock
                     Button(action: {
@@ -273,9 +386,10 @@ struct StoryDetailView: View {
                         .cornerRadius(AppTheme.cornerRadius)
                     }
                     
+                    // Story content
                     Text(story.content)
-                        .font(.system(size: 16))
-                        .foregroundColor(AppTheme.textPrimary)
+                        .font(.system(size: userSettings.storyFontSize))
+                        .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                         .lineSpacing(8)
                 }
                 .padding()
@@ -283,6 +397,33 @@ struct StoryDetailView: View {
         }
         .navigationTitle("Story")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                HStack(spacing: 16) {
+                    // Decrease font size button
+                    Button(action: {
+                        if userSettings.storyFontSize > 12 {
+                            userSettings.storyFontSize -= 2
+                        }
+                    }) {
+                        Image(systemName: "textformat.size.smaller")
+                            .foregroundColor(userSettings.storyFontSize > 12 ? AppTheme.primaryPurple : AppTheme.textSecondary(for: colorScheme))
+                    }
+                    .disabled(userSettings.storyFontSize <= 12)
+                    
+                    // Increase font size button
+                    Button(action: {
+                        if userSettings.storyFontSize < 24 {
+                            userSettings.storyFontSize += 2
+                        }
+                    }) {
+                        Image(systemName: "textformat.size.larger")
+                            .foregroundColor(userSettings.storyFontSize < 24 ? AppTheme.primaryPurple : AppTheme.textSecondary(for: colorScheme))
+                    }
+                    .disabled(userSettings.storyFontSize >= 24)
+                }
+            }
+        }
         .sheet(isPresented: $showingPaywall) {
             NavigationView {
                 PaywallView()

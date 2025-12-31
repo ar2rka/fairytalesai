@@ -3,32 +3,47 @@ import Foundation
 struct Child: Identifiable, Codable {
     var id: UUID
     var name: String
+    var gender: String
     var ageCategory: AgeCategory
     var interests: [String]
+    var userId: UUID?
     var createdAt: Date
+    var updatedAt: Date
     
-    init(id: UUID = UUID(), name: String, ageCategory: AgeCategory, interests: [String], createdAt: Date = Date()) {
+    init(
+        id: UUID = UUID(),
+        name: String,
+        gender: String,
+        ageCategory: AgeCategory,
+        interests: [String],
+        userId: UUID? = nil,
+        createdAt: Date = Date(),
+        updatedAt: Date = Date()
+    ) {
         self.id = id
         self.name = name
+        self.gender = gender
         self.ageCategory = ageCategory
         self.interests = interests
+        self.userId = userId
         self.createdAt = createdAt
+        self.updatedAt = updatedAt
     }
 }
 
 enum AgeCategory: String, Codable, CaseIterable {
-    case toddler = "Toddler"
-    case preschool = "Preschool"
-    case schoolAge = "School Age"
+    case twoThree = "2-3"
+    case threeFive = "3-5"
+    case fiveSeven = "5-7"
     
     var displayName: String {
         switch self {
-        case .toddler:
-            return "Toddler (2-3 years)"
-        case .preschool:
-            return "Preschool (3-5 years)"
-        case .schoolAge:
-            return "School Age (5-8 years)"
+        case .twoThree:
+            return "2-3 years"
+        case .threeFive:
+            return "3-5 years"
+        case .fiveSeven:
+            return "5-7 years"
         }
     }
     

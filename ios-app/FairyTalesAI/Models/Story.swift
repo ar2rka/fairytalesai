@@ -10,8 +10,25 @@ struct Story: Identifiable, Codable {
     var plot: String?
     var createdAt: Date
     var favoriteStatus: Bool
+    var language: String?
+    var rating: Int?
     
-    init(id: UUID = UUID(), title: String, content: String, childId: UUID? = nil, theme: String, duration: Int, plot: String? = nil, createdAt: Date = Date(), favoriteStatus: Bool = false) {
+    // Supabase field mappings
+    enum CodingKeys: String, CodingKey {
+        case id
+        case title
+        case content
+        case childId = "child_id"
+        case theme
+        case duration
+        case plot
+        case createdAt = "created_at"
+        case favoriteStatus
+        case language
+        case rating
+    }
+    
+    init(id: UUID = UUID(), title: String, content: String, childId: UUID? = nil, theme: String, duration: Int, plot: String? = nil, createdAt: Date = Date(), favoriteStatus: Bool = false, language: String? = nil, rating: Int? = nil) {
         self.id = id
         self.title = title
         self.content = content
@@ -21,6 +38,8 @@ struct Story: Identifiable, Codable {
         self.plot = plot
         self.createdAt = createdAt
         self.favoriteStatus = favoriteStatus
+        self.language = language
+        self.rating = rating
     }
     
     // Legacy support for 'length' property
