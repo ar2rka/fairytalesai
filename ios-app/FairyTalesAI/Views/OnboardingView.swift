@@ -95,26 +95,27 @@ struct OnboardingView: View {
                             // Start free trial
                             userSettings.startFreeTrial()
                         }) {
-                            HStack {
-                                Text("Start Your 7-Day Free Trial")
-                                    .font(.system(size: min(geometry.size.width * 0.045, 18), weight: .semibold))
-                            }
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, geometry.size.height * 0.022)
-                            .background(
-                                LinearGradient(
-                                    colors: [
-                                        AppTheme.primaryPurple,
-                                        AppTheme.accentPurple
-                                    ],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
+                            Text("Start Your 7-Day Free Trial")
+                                .font(.system(size: min(geometry.size.width * 0.045, 18), weight: .semibold))
+                                .foregroundColor(.white)
+                                .multilineTextAlignment(.center)
+                                .lineLimit(nil)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, geometry.size.height * 0.022)
+                                .background(
+                                    LinearGradient(
+                                        colors: [
+                                            AppTheme.primaryPurple,
+                                            AppTheme.accentPurple
+                                        ],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
                                 )
-                            )
-                            .cornerRadius(AppTheme.cornerRadius)
-                            .scaleEffect(isPulsing ? 1.02 : 1.0)
-                            .shadow(color: AppTheme.primaryPurple.opacity(0.5), radius: isPulsing ? 20 : 10)
+                                .cornerRadius(AppTheme.cornerRadius)
+                                .scaleEffect(isPulsing ? 1.02 : 1.0)
+                                .shadow(color: AppTheme.primaryPurple.opacity(0.5), radius: isPulsing ? 20 : 10)
                         }
                         .padding(.horizontal, geometry.size.width * 0.08)
                         .onAppear {
@@ -131,6 +132,9 @@ struct OnboardingView: View {
                             Text("Restore Purchases")
                                 .font(.system(size: min(geometry.size.width * 0.035, 14), weight: .medium))
                                 .foregroundColor(.white.opacity(0.7))
+                                .multilineTextAlignment(.center)
+                                .lineLimit(nil)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
                         .padding(.top, geometry.size.height * 0.008)
                         
@@ -141,6 +145,9 @@ struct OnboardingView: View {
                             Text("Continue with Limited Version")
                                 .font(.system(size: min(geometry.size.width * 0.03, 12)))
                                 .foregroundColor(.white.opacity(0.7))
+                                .multilineTextAlignment(.center)
+                                .lineLimit(nil)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
                         .padding(.top, geometry.size.height * 0.01)
                         .padding(.bottom, geometry.size.height * 0.025)

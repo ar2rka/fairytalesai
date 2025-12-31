@@ -23,11 +23,13 @@ struct MainTabView: View {
                 }
                 .tag(2)
             
-            ChildrenListView()
-                .tabItem {
-                    Label("Profile", systemImage: "person.fill")
-                }
-                .tag(3)
+            NavigationView {
+                SettingsView()
+            }
+            .tabItem {
+                Label("Profile", systemImage: "person.fill")
+            }
+            .tag(3)
         }
         .accentColor(AppTheme.primaryPurple)
         .preferredColorScheme(.dark)

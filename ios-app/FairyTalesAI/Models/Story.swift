@@ -38,11 +38,13 @@ struct StoryTheme: Identifiable, Hashable {
     
     static let allThemes: [StoryTheme] = [
         StoryTheme(name: "Space", description: "Galaxies & Aliens", emoji: "🚀"),
-        StoryTheme(name: "Adventure", description: "Knights & Castles", emoji: "🏰"),
+        StoryTheme(name: "Pirates", description: "Treasure & Adventure", emoji: "🏴‍☠️"),
+        StoryTheme(name: "Dinosaurs", description: "Prehistoric Adventures", emoji: "🦖"),
+        StoryTheme(name: "Mermaids", description: "Ocean Magic", emoji: "🧜‍♀️"),
         StoryTheme(name: "Animals", description: "Forest Friends", emoji: "🦁"),
         StoryTheme(name: "Mystery", description: "Clues & Secrets", emoji: "🔍"),
-        StoryTheme(name: "Princess", description: "Royal Adventures", emoji: "👑"),
-        StoryTheme(name: "Learning", description: "Educational Fun", emoji: "💡")
+        StoryTheme(name: "Magic School", description: "Wizardry & Spells", emoji: "🏰"),
+        StoryTheme(name: "Robots", description: "Tech Adventures", emoji: "🤖")
     ]
 }
 

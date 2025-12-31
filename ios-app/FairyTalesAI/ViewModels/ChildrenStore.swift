@@ -5,6 +5,10 @@ class ChildrenStore: ObservableObject {
     @Published var children: [Child] = []
     private let storageKey = "saved_children"
     
+    var hasProfiles: Bool {
+        !children.isEmpty
+    }
+    
     init() {
         loadChildren()
     }
@@ -39,6 +43,7 @@ class ChildrenStore: ObservableObject {
         }
     }
 }
+
 
 
 

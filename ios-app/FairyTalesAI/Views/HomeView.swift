@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct HomeView: View {
     @EnvironmentObject var childrenStore: ChildrenStore
@@ -9,14 +10,14 @@ struct HomeView: View {
         Story(
             title: "The Magic Forest Adventure",
             content: "Once upon a time, in a magical forest filled with talking animals and sparkling trees, a brave little explorer discovered a hidden treasure that brought joy to all the creatures.",
-            theme: "Adventure",
+            theme: "Fairies",
             duration: 5,
             favoriteStatus: false
         ),
         Story(
-            title: "Princess and the Friendly Dragon",
-            content: "In a faraway kingdom, a kind princess befriended a dragon who loved to paint rainbows. Together, they showed everyone that friendship knows no boundaries.",
-            theme: "Princess",
+            title: "The Pirate's Treasure",
+            content: "In a faraway kingdom, a brave pirate captain sailed the seven seas, discovering hidden islands and making friends with sea creatures. Together, they found the greatest treasure of all: friendship.",
+            theme: "Pirates",
             duration: 5,
             favoriteStatus: false
         ),
@@ -58,7 +59,7 @@ struct HomeView: View {
                                 .padding(.horizontal)
                             
                             ScrollView(.horizontal, showsIndicators: false) {
-                                HStack(spacing: 16) {
+                                HStack(alignment: .top, spacing: 16) {
                                     ForEach(freeDemoStories) { story in
                                         NavigationLink(destination: StoryReadingView(story: story)) {
                                             FreeDemoStoryCard(story: story)
@@ -71,11 +72,16 @@ struct HomeView: View {
                         }
                         
                         // Main Feature Card
+                        if childrenStore.hasProfiles {
                         NavigationLink(destination: GenerateStoryView()) {
                             FeatureCard()
                         }
                         .buttonStyle(PlainButtonStyle())
                         .padding(.horizontal)
+                        } else {
+                            GetStartedCard()
+                                .padding(.horizontal)
+                        }
                         
                         // Who is listening section
                         if !childrenStore.children.isEmpty {
@@ -87,7 +93,7 @@ struct HomeView: View {
                                     
                                     Spacer()
                                     
-                                    NavigationLink("Manage", destination: ChildrenListView())
+                                    NavigationLink("Manage", destination: SettingsView())
                                         .foregroundColor(AppTheme.primaryPurple)
                                 }
                                 .padding(.horizontal)
@@ -152,7 +158,7 @@ struct HomeView: View {
                                 .padding(.horizontal)
                             
                             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                                ForEach(StoryTheme.allThemes.prefix(4)) { theme in
+                                ForEach(StoryTheme.allThemes) { theme in
                                     ThemeButton(theme: theme)
                                 }
                             }
@@ -160,17 +166,12 @@ struct HomeView: View {
                         }
                     }
                     .padding(.bottom, 100)
+                    
+                    // Bottom spacing for TabBar
+                    Spacer(minLength: 50)
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {}) {
-                        Image(systemName: "bell.fill")
-                            .foregroundColor(AppTheme.textPrimary)
-                    }
-                }
-            }
         }
     }
     
@@ -179,28 +180,60 @@ struct HomeView: View {
 struct FreeDemoStoryCard: View {
     let story: Story
     
+    private var themeEmoji: String {
+        switch story.theme.lowercased() {
+        case "space": return "🚀"
+        case "pirates": return "🏴‍☠️"
+        case "animals": return "🦁"
+        case "fairies": return "🧚"
+        case "forest", "adventure": return "🌲"
+        case "dragon": return "🐉"
+        default: return "📖"
+        }
+    }
+    
+    private var themeGradient: [Color] {
+        switch story.theme.lowercased() {
+        case "space":
+            return [Color(red: 0.1, green: 0.2, blue: 0.4), Color(red: 0.2, green: 0.1, blue: 0.3)]
+        case "pirates":
+            return [Color(red: 0.3, green: 0.2, blue: 0.1), Color(red: 0.4, green: 0.3, blue: 0.15)]
+        case "animals":
+            return [Color(red: 0.2, green: 0.4, blue: 0.2), Color(red: 0.15, green: 0.35, blue: 0.15)]
+        case "fairies":
+            return [Color(red: 0.4, green: 0.2, blue: 0.4), Color(red: 0.5, green: 0.3, blue: 0.5)]
+        case "forest", "adventure":
+            return [Color(red: 0.1, green: 0.3, blue: 0.2), Color(red: 0.15, green: 0.4, blue: 0.25)]
+        case "dragon":
+            return [Color(red: 0.4, green: 0.1, blue: 0.1), Color(red: 0.5, green: 0.15, blue: 0.15)]
+        default:
+            return [AppTheme.primaryPurple.opacity(0.6), AppTheme.accentPurple.opacity(0.6)]
+        }
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            RoundedRectangle(cornerRadius: 25)
-                .fill(
-                    LinearGradient(
-                        colors: [AppTheme.primaryPurple.opacity(0.6), AppTheme.accentPurple.opacity(0.6)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
+            ZStack {
+                RoundedRectangle(cornerRadius: 25)
+                    .fill(
+                        LinearGradient(
+                            colors: themeGradient,
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
                     )
-                )
-                .frame(width: 200, height: 120)
-                .overlay(
-                    Image(systemName: "book.fill")
-                        .font(.system(size: 40))
-                        .foregroundColor(.white.opacity(0.8))
-                )
+                    .frame(width: 200, height: 120)
+                
+                Text(themeEmoji)
+                    .font(.system(size: 60))
+            }
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(story.title)
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(AppTheme.textPrimary)
                     .lineLimit(2)
+                    .frame(height: 45, alignment: .topLeading)
                 
                 Text("\(story.duration) min • \(story.theme)")
                     .font(.system(size: 12))
@@ -214,29 +247,21 @@ struct FreeDemoStoryCard: View {
 struct FeatureCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Text("New Feature")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundColor(AppTheme.primaryPurple)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 4)
-                    .background(AppTheme.primaryPurple.opacity(0.2))
-                    .cornerRadius(AppTheme.cornerRadius)
-            }
-            
-            Text("Spark a New Adventure")
-                .font(.system(size: 24, weight: .bold))
-                .foregroundColor(AppTheme.textPrimary)
-            
-            Text("Create a custom fairy tale instantly with the power of AI magic.")
-                .font(.system(size: 14))
-                .foregroundColor(AppTheme.textSecondary)
-            
-            HStack {
-                Image(systemName: "sparkles")
+
+                
+                Text("Spark a New Adventure")
+                    .font(.system(size: 24, weight: .bold))
+                    .foregroundColor(AppTheme.textPrimary)
+                
+                Text("Create a custom fairy tale instantly with the power of AI magic.")
+                    .font(.system(size: 14))
+                    .foregroundColor(AppTheme.textSecondary)
+                
+                HStack {
+                    Image(systemName: "sparkles")
                 Text("Create New Tale")
                     .font(.system(size: 16, weight: .semibold))
-                Image(systemName: "sparkles")
+                    Image(systemName: "sparkles")
             }
             .foregroundColor(.white)
             .frame(maxWidth: .infinity)
@@ -247,6 +272,45 @@ struct FeatureCard: View {
         .padding()
         .background(AppTheme.cardBackground)
         .cornerRadius(AppTheme.cornerRadius)
+    }
+}
+
+struct GetStartedCard: View {
+    @EnvironmentObject var childrenStore: ChildrenStore
+    @State private var showingAddChild = false
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Every story needs a hero. Add your child to start the magic!")
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundColor(AppTheme.textPrimary)
+                .multilineTextAlignment(.leading)
+            
+            Button(action: { showingAddChild = true }) {
+                HStack {
+                    Image(systemName: "person.fill.badge.plus")
+                    Text("Add Child Profile")
+                        .font(.system(size: 16, weight: .semibold))
+                }
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(
+                    LinearGradient(
+                        colors: [AppTheme.primaryPurple, AppTheme.accentPurple],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .cornerRadius(AppTheme.cornerRadius)
+            }
+            }
+            .padding()
+            .background(AppTheme.cardBackground)
+        .cornerRadius(AppTheme.cornerRadius)
+        .sheet(isPresented: $showingAddChild) {
+            AddChildView()
+        }
     }
 }
 
@@ -313,19 +377,48 @@ struct StoryCard: View {
 struct ThemeButton: View {
     let theme: StoryTheme
     
+    private var themeColor: Color {
+        switch theme.name.lowercased() {
+        case "space":
+            return Color(red: 0.1, green: 0.2, blue: 0.4)
+        case "pirates":
+            return Color(red: 0.3, green: 0.2, blue: 0.1)
+        case "dinosaurs":
+            return Color(red: 0.4, green: 0.3, blue: 0.1)
+        case "mermaids":
+            return Color(red: 0.1, green: 0.3, blue: 0.4)
+        case "animals":
+            return Color(red: 0.2, green: 0.4, blue: 0.2)
+        case "mystery":
+            return Color(red: 0.3, green: 0.2, blue: 0.3)
+        case "magic school":
+            return Color(red: 0.4, green: 0.2, blue: 0.4)
+        case "robots":
+            return Color(red: 0.3, green: 0.3, blue: 0.3)
+        default:
+            return AppTheme.primaryPurple
+        }
+    }
+    
     var body: some View {
         Button(action: {}) {
-            VStack(spacing: 8) {
+            VStack(spacing: 6) {
                 Text(theme.emoji)
-                    .font(.system(size: 32))
+                    .font(.system(size: 28))
                 
                 Text(theme.name)
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.system(size: 13, weight: .semibold))
                     .foregroundColor(AppTheme.textPrimary)
+                    .lineLimit(1)
             }
             .frame(maxWidth: .infinity)
-            .padding()
-            .background(AppTheme.cardBackground)
+            .padding(.vertical, 12)
+            .padding(.horizontal, 8)
+            .background(themeColor.opacity(0.15))
+            .overlay(
+                RoundedRectangle(cornerRadius: AppTheme.cornerRadius)
+                    .stroke(themeColor.opacity(0.3), lineWidth: 1)
+            )
             .cornerRadius(AppTheme.cornerRadius)
         }
     }
@@ -337,6 +430,7 @@ struct StoryReadingView: View {
     @EnvironmentObject var userSettings: UserSettings
     @Environment(\.dismiss) var dismiss
     @State private var showingPaywall = false
+    @State private var showShareSheet = false
     
     var body: some View {
         ZStack {
@@ -396,16 +490,23 @@ struct StoryReadingView: View {
                         .lineSpacing(12)
                         .fixedSize(horizontal: false, vertical: true)
                 }
-                .padding()
+            .padding()
             }
         }
         .navigationTitle("Story")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: { dismiss() }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(AppTheme.textSecondary)
+                HStack(spacing: 16) {
+                    Button(action: { showShareSheet = true }) {
+                        Image(systemName: "square.and.arrow.up")
+                            .foregroundColor(AppTheme.textPrimary)
+                    }
+                    
+                    Button(action: { dismiss() }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundColor(AppTheme.textSecondary)
+                    }
                 }
             }
         }
@@ -415,7 +516,145 @@ struct StoryReadingView: View {
                     .environmentObject(userSettings)
             }
         }
+        .sheet(isPresented: $showShareSheet) {
+            ShareSheet(activityItems: [
+                "\(story.title)\n\n\(story.content)"
+            ])
+        }
     }
 }
 
+struct ProfileSwitcherButton: View {
+    @EnvironmentObject var childrenStore: ChildrenStore
+    @State private var showingChildPicker = false
+    
+    var body: some View {
+        if let firstChild = childrenStore.children.first {
+            Button(action: { showingChildPicker = true }) {
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [AppTheme.primaryPurple, AppTheme.accentPurple],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 36, height: 36)
+                    .overlay(
+                        Text(firstChild.name.prefix(1).uppercased())
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(.white)
+                    )
+            }
+            .sheet(isPresented: $showingChildPicker) {
+                ChildPickerView()
+                    .environmentObject(childrenStore)
+            }
+        } else {
+            NavigationLink(destination: SettingsView()) {
+                Circle()
+                    .fill(AppTheme.cardBackground)
+                    .frame(width: 36, height: 36)
+                    .overlay(
+                        Image(systemName: "person.fill")
+                            .font(.system(size: 16))
+                            .foregroundColor(AppTheme.textPrimary)
+                    )
+            }
+        }
+    }
+}
+
+struct ChildPickerView: View {
+    @EnvironmentObject var childrenStore: ChildrenStore
+    @Environment(\.dismiss) var dismiss
+    
+    var body: some View {
+        NavigationView {
+            ZStack {
+                AppTheme.darkPurple.ignoresSafeArea()
+                
+                if childrenStore.children.isEmpty {
+                    VStack(spacing: 16) {
+                        Image(systemName: "person.2.fill")
+                            .font(.system(size: 50))
+                            .foregroundColor(AppTheme.textSecondary)
+                        
+                        Text("No children added yet")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(AppTheme.textPrimary)
+                        
+                        Text("Add a child profile in Settings")
+                            .font(.system(size: 14))
+                            .foregroundColor(AppTheme.textSecondary)
+                    }
+                } else {
+                    List {
+                        ForEach(childrenStore.children) { child in
+                            HStack(spacing: 16) {
+                                Circle()
+                                    .fill(
+                                        LinearGradient(
+                                            colors: [AppTheme.primaryPurple, AppTheme.accentPurple],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
+                                    )
+                                    .frame(width: 50, height: 50)
+                                    .overlay(
+                                        Text(child.name.prefix(1).uppercased())
+                                            .font(.system(size: 20, weight: .bold))
+                                            .foregroundColor(.white)
+                                    )
+                                
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(child.name)
+                                        .font(.system(size: 18, weight: .semibold))
+                                        .foregroundColor(AppTheme.textPrimary)
+                                    
+                                    Text(child.ageCategory.displayName)
+                                        .font(.system(size: 14))
+                                        .foregroundColor(AppTheme.textSecondary)
+                                }
+                                
+                                Spacer()
+                            }
+                            .padding(.vertical, 8)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                dismiss()
+                            }
+                        }
+                    }
+                    .scrollContentBackground(.hidden)
+                }
+            }
+            .navigationTitle("Select Child")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                    .foregroundColor(AppTheme.primaryPurple)
+                }
+            }
+        }
+    }
+}
+
+struct ShareSheet: UIViewControllerRepresentable {
+    let activityItems: [Any]
+    let applicationActivities: [UIActivity]? = nil
+    
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        let controller = UIActivityViewController(
+            activityItems: activityItems,
+            applicationActivities: applicationActivities
+        )
+        return controller
+    }
+    
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+}
 
