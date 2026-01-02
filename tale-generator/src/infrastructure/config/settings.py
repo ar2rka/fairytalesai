@@ -44,6 +44,10 @@ class AIServiceSettings(BaseSettings):
         default="openai/gpt-4o-mini",
         description="Default AI model to use"
     )
+    fallback_model: Optional[str] = Field(
+        default=None,
+        description="Fallback AI model to use when primary model fails (None = use default fallback chain)"
+    )
     max_tokens: int = Field(
         default=DEFAULT_MAX_TOKENS,
         description="Maximum tokens for generation"
@@ -169,7 +173,7 @@ class LangGraphWorkflowSettings(BaseSettings):
     # Model configuration
     validation_model: str = Field(
         default="openai/gpt-4o-mini",
-        description="Model for prompt validation"
+        description="Model for prompt validation (can be set via LANGGRAPH_VALIDATION_MODEL env var)"
     )
     assessment_model: str = Field(
         default="openai/gpt-4o-mini",
@@ -177,7 +181,7 @@ class LangGraphWorkflowSettings(BaseSettings):
     )
     generation_model: Optional[str] = Field(
         default=None,
-        description="Model for story generation (None = use default from AIServiceSettings)"
+        description="Primary model for story generation (can be set via LANGGRAPH_GENERATION_MODEL env var, None = use default from AIServiceSettings)"
     )
     
     # Temperature settings for different attempts

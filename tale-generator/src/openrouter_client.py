@@ -41,8 +41,8 @@ class OpenRouterModel(StrEnum):
     GPT_OSS_120B = "openai/gpt-oss-120b:exacto"
 
 
-# Define fallback models for rate limit retries
-FALLBACK_MODELS = [
+# Default fallback models for rate limit retries (used if not configured via env)
+DEFAULT_FALLBACK_MODELS = [
     OpenRouterModel.GPT_4O_MINI,
     OpenRouterModel.CLAUDE_3_HAIKU,
     OpenRouterModel.LLAMA_3_1_8B
@@ -81,6 +81,47 @@ class OpenRouterClient:
             api_key=self.api_key
         )
         self._http_client: Optional[httpx.AsyncClient] = None
+        self._fallback_models: Optional[List[OpenRouterModel]] = None
+    
+    def _get_fallback_models(self) -> List[OpenRouterModel]:
+        """Get fallback models from settings or use defaults.
+        
+        Returns:
+            List of fallback models to try
+        """
+        if self._fallback_models is not None:
+            return self._fallback_models
+        
+        # Try to load from settings
+        try:
+            from src.infrastructure.config.settings import get_settings
+            settings = get_settings()
+            fallback_model_str = settings.ai_service.fallback_model
+            
+            if fallback_model_str:
+                # Try to convert string to OpenRouterModel
+                try:
+                    fallback_model = OpenRouterModel(fallback_model_str)
+                    self._fallback_models = [fallback_model]
+                    logger.info(f"Using configured fallback model: {fallback_model.value}")
+                    return self._fallback_models
+                except ValueError:
+                    # Try to find by value
+                    for model in OpenRouterModel:
+                        if model.value == fallback_model_str:
+                            self._fallback_models = [model]
+                            logger.info(f"Using configured fallback model: {model.value}")
+                            return self._fallback_models
+                    logger.warning(
+                        f"Configured fallback model '{fallback_model_str}' not found in OpenRouterModel enum, "
+                        "using default fallback chain"
+                    )
+        except Exception as e:
+            logger.debug(f"Could not load fallback model from settings: {e}, using defaults")
+        
+        # Use default fallback chain
+        self._fallback_models = DEFAULT_FALLBACK_MODELS
+        return self._fallback_models
 
     async def _get_http_client(self) -> httpx.AsyncClient:
         """Get or create async HTTP client with connection pooling."""
@@ -183,7 +224,8 @@ class OpenRouterClient:
         system_msg = system_message or default_system
         
         # Use fallback models for rate limit retries
-        models_to_try = [model] + FALLBACK_MODELS
+        fallback_models = self._get_fallback_models()
+        models_to_try = [model] + fallback_models
         
         last_exception = None
         current_retry_delay = retry_delay
@@ -442,8 +484,9 @@ class OpenRouterClient:
             model_used_str = first_attempt.get("model_used", model.value)
             
             # Find which model was actually used
+            fallback_models = self._get_fallback_models()
             model_used = model
-            for m in [model] + FALLBACK_MODELS:
+            for m in [model] + fallback_models:
                 if m.value == model_used_str:
                     model_used = m
                     break
@@ -493,7 +536,8 @@ class OpenRouterClient:
                         model = OpenRouterModel.LLAMA_3_1_8B
             
             # Use fallback models for rate limit retries
-            models_to_try = [model] + FALLBACK_MODELS
+            fallback_models = self._get_fallback_models()
+            models_to_try = [model] + fallback_models
             
             last_exception = None
             current_retry_delay = retry_delay
