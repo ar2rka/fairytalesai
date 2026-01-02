@@ -28,6 +28,7 @@ class LangGraphWorkflowResult:
         success: bool,
         story_content: Optional[str] = None,
         story_title: Optional[str] = None,
+        prompt: Optional[str] = None,
         quality_score: Optional[int] = None,
         attempts_count: int = 0,
         selected_attempt_number: Optional[int] = None,
@@ -43,6 +44,7 @@ class LangGraphWorkflowResult:
             success: Whether workflow succeeded
             story_content: Generated story content
             story_title: Story title
+            prompt: Prompt used for story generation
             quality_score: Overall quality score (1-10)
             attempts_count: Number of generation attempts
             selected_attempt_number: Which attempt was selected
@@ -55,6 +57,7 @@ class LangGraphWorkflowResult:
         self.success = success
         self.story_content = story_content
         self.story_title = story_title
+        self.prompt = prompt
         self.quality_score = quality_score
         self.attempts_count = attempts_count
         self.selected_attempt_number = selected_attempt_number
@@ -280,7 +283,8 @@ class LangGraphWorkflowService:
                 logger.error("Workflow succeeded but no best story selected")
                 return LangGraphWorkflowResult(
                     success=False,
-                    error_message="No story selected despite successful workflow"
+                    error_message="No story selected despite successful workflow",
+                    prompt=final_state.get("original_prompt")
                 )
             
             # Extract quality assessment from best story
@@ -309,6 +313,7 @@ class LangGraphWorkflowService:
                 success=True,
                 story_content=best_story.get("content", ""),
                 story_title=best_story.get("title", ""),
+                prompt=final_state.get("original_prompt"),
                 quality_score=quality_score,
                 attempts_count=final_state.get("current_attempt", 1),
                 selected_attempt_number=final_state.get("selected_attempt_number"),
@@ -326,6 +331,7 @@ class LangGraphWorkflowService:
             return LangGraphWorkflowResult(
                 success=False,
                 error_message=f"Prompt rejected: {reasoning}",
+                prompt=final_state.get("original_prompt"),
                 validation_result=validation_result,
                 workflow_metadata={
                     "workflow_status": workflow_status,
@@ -343,6 +349,7 @@ class LangGraphWorkflowService:
             return LangGraphWorkflowResult(
                 success=False,
                 error_message=error_msg,
+                prompt=final_state.get("original_prompt"),
                 workflow_metadata={
                     "workflow_status": workflow_status,
                     "error_messages": error_messages

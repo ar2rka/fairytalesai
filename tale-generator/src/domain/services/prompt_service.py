@@ -21,7 +21,7 @@ class PromptService:
         
         Args:
             supabase_client: Optional Supabase client for loading prompts from database.
-                           If None, will use legacy prompt generation methods.
+                           If None, will use built-in prompt generation methods.
         """
         self._supabase_client = supabase_client
         self._template_service: Optional[PromptTemplateService] = None
@@ -32,10 +32,10 @@ class PromptService:
                 self._template_service = PromptTemplateService(repository)
                 logger.info("PromptTemplateService initialized with Supabase")
             except Exception as e:
-                logger.warning(f"Failed to initialize PromptTemplateService: {e}. Using legacy methods.")
+                logger.warning(f"Failed to initialize PromptTemplateService: {e}. Using built-in methods.")
                 self._template_service = None
         else:
-            logger.info("No Supabase client provided. Using legacy prompt generation methods.")
+            logger.info("No Supabase client provided. Using built-in prompt generation methods.")
     
     def generate_child_prompt(
         self,
@@ -80,9 +80,9 @@ class PromptService:
                     parent_story=parent_story
                 )
             except Exception as e:
-                logger.warning(f"Template service failed, falling back to legacy: {e}")
+                logger.warning(f"Template service failed, falling back to built-in methods: {e}")
         
-        # Fallback to legacy methods
+        # Fallback to built-in methods
         if language == Language.RUSSIAN:
             return self._generate_russian_child_prompt(child, moral, story_length, parent_story)
         else:
@@ -133,9 +133,9 @@ class PromptService:
                     parent_story=parent_story
                 )
             except Exception as e:
-                logger.warning(f"Template service failed, falling back to legacy: {e}")
+                logger.warning(f"Template service failed, falling back to built-in methods: {e}")
         
-        # Fallback to legacy methods
+        # Fallback to built-in methods
         if hero.language == Language.RUSSIAN:
             return self._generate_russian_hero_prompt(hero, moral, story_length, parent_story)
         else:
@@ -210,9 +210,9 @@ class PromptService:
                     parent_story=parent_story
                 )
             except Exception as e:
-                logger.warning(f"Template service failed, falling back to legacy: {e}")
+                logger.warning(f"Template service failed, falling back to built-in methods: {e}")
         
-        # Fallback to legacy methods
+        # Fallback to built-in methods
         if language == Language.RUSSIAN:
             return self._generate_russian_combined_prompt(child, hero, moral, story_length, parent_story)
         else:

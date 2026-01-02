@@ -5,11 +5,12 @@ from typing import Dict, Any
 
 
 class BaseCharacter(ABC):
-    """Base interface for all character types used in story generation."""
+    """Base interface for all character types used in story generation.
     
-    name: str
-    age: int
-    gender: str
+    Note: Different character types use different age representations:
+    - ChildCharacter uses age_category (str, e.g., '3-5')
+    - HeroCharacter uses age (int)
+    """
     
     @abstractmethod
     def get_description_data(self) -> Dict[str, Any]:

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Просмотр генераций - Tale Generator</title>
-    <link rel="stylesheet" href="/admin/static/css/admin.css">
+    <link rel="stylesheet" href="/adminui/static/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .generations-container {
@@ -395,7 +395,7 @@
                 
                 row.innerHTML = `
                     <td>
-                        <a href="/admin/generations/${gen.generation_id}" style="color: var(--primary-color); text-decoration: none;">
+                        <a href="/adminui/generations/${gen.generation_id}" style="color: var(--primary-color); text-decoration: none;">
                             <code style="font-size: 0.8rem;">${gen.generation_id.substring(0, 8)}...</code>
                             <i class="fas fa-external-link-alt" style="margin-left: 0.5rem; font-size: 0.7rem;"></i>
                         </a>

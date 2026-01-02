@@ -795,8 +795,9 @@ async def generate_story(
         # Clean the content to remove formatting markers
         cleaned_content = _clean_story_content(result.content)
         
-        # Extract title
-        title = _extract_title(cleaned_content)
+        # Use title from result if available and not empty, otherwise extract from content
+        result_title = getattr(result, 'title', None)
+        title = result_title if result_title else _extract_title(cleaned_content)
         
         # Generate summary
         summary = await _generate_summary(cleaned_content, title, language)
@@ -895,82 +896,6 @@ async def generate_story(
         raise HTTPException(
             status_code=500,
             detail=f"Error generating story: {str(e)}"
-        )
-
-
-@router.post("/children")
-async def create_child(
-    request: ChildRequestDTO,
-    user: AuthUser = Depends(get_current_user)
-):
-    """Create a new child profile with subscription limit validation."""
-    try:
-        # Initialize subscription validator
-        subscription_validator = SubscriptionValidator()
-        
-        # Validate subscription and child limit BEFORE creation
-        subscription = await subscription_validator.validate_child_creation(user=user)
-        
-        logger.info(f"Child creation validated for user {user.user_id}, plan: {subscription.plan.value}")
-        
-        # Validate services
-        if supabase_client is None:
-            logger.error("Supabase not configured")
-            raise HTTPException(
-                status_code=500,
-                detail="Supabase not configured"
-            )
-        
-        # Create child entity
-        # Calculate age from age_category for backward compatibility
-        from src.utils.age_category_utils import calculate_age_from_category
-        age = calculate_age_from_category(request.age_category)
-        
-        child_db = ChildDB(
-            name=request.name,
-            age_category=request.age_category,  # Already normalized by DTO validator
-            age=age,
-            gender=request.gender,
-            interests=request.interests,
-            user_id=user.user_id
-        )
-        
-        # Save to database
-        saved_child = await supabase_client.save_child(child_db)
-        
-        # Track usage
-        try:
-            await supabase_client.track_usage(
-                user_id=user.user_id,
-                action_type='child_creation',
-                resource_id=saved_child.id,
-                metadata={
-                    'plan': subscription.plan.value,
-                    'child_name': saved_child.name
-                }
-            )
-            logger.info(f"Child creation tracked for user {user.user_id}, child {saved_child.id}")
-        except Exception as tracking_error:
-            logger.warning(f"Failed to track child creation: {str(tracking_error)}")
-        
-        logger.info(f"Child profile created successfully: {saved_child.id}")
-        
-        return {
-            "id": saved_child.id,
-            "name": saved_child.name,
-            "age_category": saved_child.age_category,
-            "gender": saved_child.gender,
-            "interests": saved_child.interests,
-            "created_at": saved_child.created_at.isoformat() if saved_child.created_at else None
-        }
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error creating child: {str(e)}", exc_info=True)
-        raise HTTPException(
-            status_code=500,
-            detail=f"Error creating child: {str(e)}"
         )
 
 
@@ -1274,7 +1199,9 @@ async def get_purchase_history(
 
 
 @router.get("/admin/generations/test")
-async def test_generations_access():
+async def test_generations_access(
+    user: AuthUser = Depends(get_current_user)
+):
     """Test endpoint to check if we can access generations table."""
     try:
         if supabase_client is None:
@@ -1300,7 +1227,10 @@ async def test_generations_access():
 
 
 @router.get("/admin/generations/{generation_id}/test")
-async def test_generation_detail(generation_id: str):
+async def test_generation_detail(
+    generation_id: str,
+    user: AuthUser = Depends(get_current_user)
+):
     """Test endpoint to check if we can access a specific generation."""
     try:
         logger.info(f"Testing generation detail access for ID: {generation_id}")
@@ -1338,7 +1268,8 @@ async def get_generations(
     limit: int = 100,
     status: Optional[str] = None,
     model_used: Optional[str] = None,
-    story_type: Optional[str] = None
+    story_type: Optional[str] = None,
+    user: AuthUser = Depends(get_current_user)
 ):
     """Get all generations with optional filters (admin endpoint)."""
     try:
@@ -1414,7 +1345,10 @@ async def get_generations(
 
 
 @router.get("/admin/generations/{generation_id}")
-async def get_generation_detail(generation_id: str):
+async def get_generation_detail(
+    generation_id: str,
+    user: AuthUser = Depends(get_current_user)
+):
     """Get detailed information about a specific generation including all attempts (admin endpoint)."""
     try:
         logger.info(f"Fetching generation detail for ID: {generation_id}")
@@ -1483,7 +1417,7 @@ async def get_generation_detail(generation_id: str):
 
 
 # ============================================================================
-# FREE STORIES ENDPOINTS (Public, no authentication required)
+# FREE STORIES ENDPOINTS
 # ============================================================================
 
 @router.get("/free-stories", response_model=List[FreeStoryResponseDTO])

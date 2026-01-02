@@ -1,20 +1,15 @@
-"""Language-specific prompts for story generation.
+"""Backward compatibility module for old prompts classes.
 
 This module provides backward compatibility with the old monolithic prompts module.
-All functionality now delegates to the new modular prompt system in src/prompts/.
+It re-exports data classes (Heroes, Children) that are still used in migration scripts.
 
-For new code, prefer using the modular system directly:
-    from src.prompts import ChildCharacter, HeroCharacter, EnglishPromptBuilder
+Note: Prompt generation functionality now uses Jinja2 templates via PromptTemplateService.
+Character types are available from src.prompts:
+    from src.prompts import ChildCharacter, HeroCharacter, CombinedCharacter
 """
 
-# Import legacy compatibility functions
-from src.prompts.legacy import (
-    get_heroic_story_prompt,
-    get_child_story_prompt,
-    get_story_prompt
-)
-
 # Re-export classes from old prompts.py for backward compatibility
+# (used in migration scripts and data population)
 from src.prompts_old import (
     Hero,
     Child,
@@ -31,11 +26,7 @@ from src.prompts_old import (
 )
 
 __all__ = [
-    # Legacy functions
-    "get_heroic_story_prompt",
-    "get_child_story_prompt",
-    "get_story_prompt",
-    # Legacy classes
+    # Data classes (still used in scripts)
     "Hero",
     "Child",
     "StoryPrompt",

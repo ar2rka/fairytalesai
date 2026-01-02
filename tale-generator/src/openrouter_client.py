@@ -52,11 +52,12 @@ DEFAULT_FALLBACK_MODELS = [
 class StoryGenerationResult:
     """Result of story generation including model info and full response."""
     
-    def __init__(self, content: str, model: OpenRouterModel, full_response: Dict[str, Any], generation_info: Optional[Dict[str, Any]] = None):
+    def __init__(self, content: str, model: OpenRouterModel, full_response: Dict[str, Any], generation_info: Optional[Dict[str, Any]] = None, title: Optional[str] = None):
         self.content = content
         self.model = model
         self.full_response = full_response
         self.generation_info = generation_info
+        self.title = title
 
 
 class OpenRouterClient:
@@ -514,7 +515,8 @@ class OpenRouterClient:
                 content=story_content,
                 model=model_used,
                 full_response=full_response,
-                generation_info=generation_info
+                generation_info=generation_info,
+                title=story_title
             )
         else:
             # Legacy direct API call (fallback)

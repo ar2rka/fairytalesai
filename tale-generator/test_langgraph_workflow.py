@@ -15,7 +15,7 @@ os.environ["LANGGRAPH_ENABLED"] = "true"
 os.environ["LANGGRAPH_QUALITY_THRESHOLD"] = "7"
 os.environ["LANGGRAPH_MAX_GENERATION_ATTEMPTS"] = "3"
 
-from src.openrouter_client import AsyncOpenRouterClient
+from src.openrouter_client import OpenRouterClient
 from src.domain.services.prompt_service import PromptService
 from src.domain.services.langgraph import LangGraphWorkflowService
 from src.domain.entities import Child
@@ -38,7 +38,7 @@ async def test_workflow():
     
     # Initialize services
     print("\n1. Initializing services...")
-    openrouter_client = AsyncOpenRouterClient()
+    openrouter_client = OpenRouterClient()
     prompt_service = PromptService()
     
     # Create mock repositories (in real usage, use actual repositories)
@@ -66,11 +66,11 @@ async def test_workflow():
     print("\n2. Creating test child...")
     child = Child(
         name="Emma",
-        age=7,
+        age_category="5-7",
         gender=Gender.FEMALE,
         interests=["unicorns", "reading", "art"]
     )
-    print(f"✓ Child created: {child.name}, age {child.age}")
+    print(f"✓ Child created: {child.name}, age_category {child.age_category}")
     
     # Test workflow execution
     print("\n3. Executing LangGraph workflow...")
@@ -108,7 +108,11 @@ async def test_workflow():
             
             print(f"\nAll Scores: {result.quality_metadata.get('all_scores', [])}")
             print(f"Selection Reason: {result.quality_metadata.get('selection_reason', 'N/A')}")
-            
+
+            print(f" Prompt: {result.prompt}")
+            print(f" Story Title: {result.story_title}")
+            print(f" Story content: { len(result.story_content)}")
+
             print(f"\n--- Story Content ---")
             print(result.story_content[:500] + "..." if len(result.story_content) > 500 else result.story_content)
             
@@ -165,7 +169,7 @@ async def test_validation_rejection():
     print("=" * 60)
     
     # Initialize services
-    openrouter_client = AsyncOpenRouterClient()
+    openrouter_client = OpenRouterClient()
     prompt_service = PromptService()
     
     class MockChildRepository:
@@ -189,7 +193,7 @@ async def test_validation_rejection():
     # Create child with licensed character interest
     child = Child(
         name="Test Child",
-        age=5,
+        age_category="3-5",
         gender=Gender.MALE,
         interests=["Mickey Mouse", "Disney characters"]  # Should trigger rejection
     )
@@ -201,7 +205,7 @@ async def test_validation_rejection():
             child=child,
             moral="sharing",
             language=Language.ENGLISH,
-            story_length=StoryLength(minutes=3),
+            story_length=StoryLength(minutes=5),
             story_type="child",
             user_id="test-user"
         )
