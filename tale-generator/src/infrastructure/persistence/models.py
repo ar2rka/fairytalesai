@@ -100,3 +100,28 @@ class PromptDB(BaseModel):
     description: Optional[str] = None  # Optional description of the prompt part
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+
+
+class DailyFreeStoryDB(BaseModel):
+    """Database model for daily free stories."""
+    id: Optional[str] = None
+    story_date: str  # Date in YYYY-MM-DD format
+    title: str  # Заголовок истории
+    name: str  # Название истории
+    content: str
+    moral: str  # Мораль истории
+    age_category: str  # Age category as string interval (e.g., '2-3', '4-5', '6-7')
+    language: str  # Language code: 'en' or 'ru'
+    is_active: bool = True
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+
+class DailyStoryReactionDB(BaseModel):
+    """Database model for daily story reactions (likes/dislikes)."""
+    id: Optional[str] = None
+    story_id: str
+    user_id: Optional[str] = None  # NULL for anonymous users
+    reaction_type: str  # 'like' or 'dislike'
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None

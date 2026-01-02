@@ -150,7 +150,7 @@ def get_current_user(
 
 
 def get_optional_user(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
+    credentials: Optional[HTTPAuthorizationCredentials] = Security(HTTPBearer(auto_error=False))
 ) -> Optional[AuthUser]:
     """
     Dependency to optionally get the current authenticated user.

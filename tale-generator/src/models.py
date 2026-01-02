@@ -123,3 +123,23 @@ class StoryDB(BaseModel):
 class StoryRatingRequest(BaseModel):
     """Request model for rating a story."""
     rating: int = Field(..., ge=1, le=10)
+
+
+class DailyFreeStoryDB(BaseModel):
+    """Database model for daily free stories."""
+    id: Optional[str] = None
+    story_date: str  # Date in YYYY-MM-DD format
+    title: str  # Заголовок истории
+    name: str  # Название истории
+    content: str
+    moral: str  # Мораль истории
+    age_category: str  # Age category as string interval (e.g., '2-3', '4-5', '6-7')
+    language: Language = Language.ENGLISH
+    is_active: bool = True
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+
+class DailyStoryReactionRequest(BaseModel):
+    """Request model for reacting to a daily story (like/dislike)."""
+    reaction_type: str = Field(..., description="Reaction type: 'like' or 'dislike'")

@@ -208,3 +208,40 @@ class FreeStoryResponseDTO(BaseModel):
     age_category: str = Field(..., description="Age category as string interval (e.g., '2-3', '4-5', '6-7')")
     language: str = Field(..., description="Language code: 'en' or 'ru'")
     created_at: str = Field(..., description="Creation timestamp")
+
+
+class DailyFreeStoryResponseDTO(BaseModel):
+    """Daily free story response DTO."""
+    id: str = Field(..., description="Story ID")
+    story_date: str = Field(..., description="Story date in YYYY-MM-DD format")
+    title: str = Field(..., description="Заголовок истории")
+    name: str = Field(..., description="Название истории")
+    content: str = Field(..., description="Story content")
+    moral: str = Field(..., description="Мораль истории")
+    age_category: str = Field(..., description="Age category as string interval (e.g., '2-3', '4-5', '6-7')")
+    language: str = Field(..., description="Language code: 'en' or 'ru'")
+    likes_count: int = Field(default=0, description="Number of likes")
+    dislikes_count: int = Field(default=0, description="Number of dislikes")
+    user_reaction: Optional[str] = Field(None, description="User's reaction: 'like', 'dislike', or None")
+    created_at: str = Field(..., description="Creation timestamp")
+
+
+class DailyStoryReactionRequestDTO(BaseModel):
+    """Request DTO for reacting to a daily story."""
+    reaction_type: str = Field(..., description="Reaction type: 'like' or 'dislike'")
+    
+    @field_validator('reaction_type')
+    @classmethod
+    def validate_reaction_type(cls, v: str) -> str:
+        """Validate reaction type."""
+        if v not in ['like', 'dislike']:
+            raise ValueError("reaction_type must be 'like' or 'dislike'")
+        return v
+
+
+class DailyStoryReactionResponseDTO(BaseModel):
+    """Response DTO for story reaction."""
+    story_id: str = Field(..., description="Story ID")
+    reaction_type: Optional[str] = Field(None, description="User's reaction: 'like', 'dislike', or None")
+    likes_count: int = Field(..., description="Total number of likes")
+    dislikes_count: int = Field(..., description="Total number of dislikes")

@@ -5,8 +5,8 @@ import os
 from typing import List, Optional, Any, Dict
 from supabase import create_client, Client
 from supabase.client import ClientOptions
-from src.models import StoryDB, ChildDB, HeroDB
-from src.infrastructure.persistence.models import GenerationDB, FreeStoryDB
+from src.models import StoryDB, ChildDB, HeroDB, DailyFreeStoryDB
+from src.infrastructure.persistence.models import GenerationDB, FreeStoryDB, DailyFreeStoryDB as PersistenceDailyFreeStoryDB, DailyStoryReactionDB
 from src.domain.services.subscription_service import UserSubscription, SubscriptionPlan, SubscriptionStatus
 from dotenv import load_dotenv
 from typing import Optional
@@ -1796,3 +1796,354 @@ class SupabaseClient:
         except Exception as e:
             logger.error(f"Error updating prompt: {str(e)}")
             return None
+    
+    # Daily free stories methods
+    
+    def get_daily_stories(
+        self,
+        age_category: Optional[str] = None,
+        language: Optional[str] = None,
+        limit: Optional[int] = None,
+        user_id: Optional[str] = None
+    ) -> List[DailyFreeStoryDB]:
+        """Get active daily free stories, optionally filtered by age category and language.
+        
+        Args:
+            age_category: Optional age category filter ('2-3', '3-5', '5-7')
+            language: Optional language filter ('en', 'ru')
+            limit: Optional limit on number of results
+            user_id: Optional user ID to get user's reaction
+            
+        Returns:
+            List of active daily free stories, sorted by story_date DESC
+        """
+        try:
+            query = self.client.table("daily_free_stories").select("*").eq("is_active", True)
+            
+            if age_category:
+                query = query.eq("age_category", age_category)
+            
+            if language:
+                query = query.eq("language", language)
+            
+            # Sort by story_date descending (newest first)
+            query = query.order("story_date", desc=True)
+            
+            if limit:
+                query = query.limit(limit)
+            
+            response = query.execute()
+            
+            daily_stories = []
+            for story_data in response.data:
+                # Handle datetime conversion
+                created_at = None
+                updated_at = None
+                if story_data.get('created_at'):
+                    created_at_value = story_data['created_at']
+                    if isinstance(created_at_value, datetime):
+                        created_at = created_at_value
+                    elif isinstance(created_at_value, str):
+                        created_at_str = created_at_value.replace('Z', '+00:00')
+                        try:
+                            created_at = datetime.fromisoformat(created_at_str)
+                        except ValueError:
+                            logger.warning(f"Could not parse created_at: {created_at_value}")
+                
+                if story_data.get('updated_at'):
+                    updated_at_value = story_data['updated_at']
+                    if isinstance(updated_at_value, datetime):
+                        updated_at = updated_at_value
+                    elif isinstance(updated_at_value, str):
+                        updated_at_str = updated_at_value.replace('Z', '+00:00')
+                        try:
+                            updated_at = datetime.fromisoformat(updated_at_str)
+                        except ValueError:
+                            logger.warning(f"Could not parse updated_at: {updated_at_value}")
+                
+                daily_stories.append(DailyFreeStoryDB(
+                    id=story_data.get('id'),
+                    story_date=story_data.get('story_date'),
+                    title=story_data.get('title'),
+                    name=story_data.get('name'),
+                    content=story_data.get('content'),
+                    moral=story_data.get('moral'),
+                    age_category=story_data.get('age_category'),
+                    language=story_data.get('language'),
+                    is_active=story_data.get('is_active', True),
+                    created_at=created_at,
+                    updated_at=updated_at
+                ))
+            
+            return daily_stories
+            
+        except Exception as e:
+            logger.error(f"Error retrieving daily free stories: {str(e)}")
+            raise Exception(f"Error retrieving daily free stories: {str(e)}")
+    
+    def get_daily_story_by_date(
+        self,
+        story_date: str,
+        user_id: Optional[str] = None
+    ) -> Optional[DailyFreeStoryDB]:
+        """Get a daily free story by date.
+        
+        Args:
+            story_date: Date in YYYY-MM-DD format
+            user_id: Optional user ID to get user's reaction
+            
+        Returns:
+            The daily free story if found and active, None otherwise
+        """
+        try:
+            query = self.client.table("daily_free_stories").select("*").eq("story_date", story_date).eq("is_active", True)
+            response = query.execute()
+            
+            if response.data:
+                story_data = response.data[0]
+                # Handle datetime conversion
+                created_at = None
+                updated_at = None
+                if story_data.get('created_at'):
+                    created_at_value = story_data['created_at']
+                    if isinstance(created_at_value, datetime):
+                        created_at = created_at_value
+                    elif isinstance(created_at_value, str):
+                        created_at_str = created_at_value.replace('Z', '+00:00')
+                        try:
+                            created_at = datetime.fromisoformat(created_at_str)
+                        except ValueError:
+                            logger.warning(f"Could not parse created_at: {created_at_value}")
+                
+                if story_data.get('updated_at'):
+                    updated_at_value = story_data['updated_at']
+                    if isinstance(updated_at_value, datetime):
+                        updated_at = updated_at_value
+                    elif isinstance(updated_at_value, str):
+                        updated_at_str = updated_at_value.replace('Z', '+00:00')
+                        try:
+                            updated_at = datetime.fromisoformat(updated_at_str)
+                        except ValueError:
+                            logger.warning(f"Could not parse updated_at: {updated_at_value}")
+                
+                return DailyFreeStoryDB(
+                    id=story_data.get('id'),
+                    story_date=story_data.get('story_date'),
+                    title=story_data.get('title'),
+                    name=story_data.get('name'),
+                    content=story_data.get('content'),
+                    moral=story_data.get('moral'),
+                    age_category=story_data.get('age_category'),
+                    language=story_data.get('language'),
+                    is_active=story_data.get('is_active', True),
+                    created_at=created_at,
+                    updated_at=updated_at
+                )
+            return None
+        except Exception as e:
+            logger.error(f"Error retrieving daily free story by date: {str(e)}")
+            raise Exception(f"Error retrieving daily free story by date: {str(e)}")
+    
+    def get_daily_story_by_id(
+        self,
+        story_id: str,
+        user_id: Optional[str] = None
+    ) -> Optional[DailyFreeStoryDB]:
+        """Get a daily free story by ID.
+        
+        Args:
+            story_id: The ID of the daily free story to retrieve
+            user_id: Optional user ID to get user's reaction
+            
+        Returns:
+            The daily free story if found and active, None otherwise
+        """
+        try:
+            query = self.client.table("daily_free_stories").select("*").eq("id", story_id).eq("is_active", True)
+            response = query.execute()
+            
+            if response.data:
+                story_data = response.data[0]
+                # Handle datetime conversion
+                created_at = None
+                updated_at = None
+                if story_data.get('created_at'):
+                    created_at_value = story_data['created_at']
+                    if isinstance(created_at_value, datetime):
+                        created_at = created_at_value
+                    elif isinstance(created_at_value, str):
+                        created_at_str = created_at_value.replace('Z', '+00:00')
+                        try:
+                            created_at = datetime.fromisoformat(created_at_str)
+                        except ValueError:
+                            logger.warning(f"Could not parse created_at: {created_at_value}")
+                
+                if story_data.get('updated_at'):
+                    updated_at_value = story_data['updated_at']
+                    if isinstance(updated_at_value, datetime):
+                        updated_at = updated_at_value
+                    elif isinstance(updated_at_value, str):
+                        updated_at_str = updated_at_value.replace('Z', '+00:00')
+                        try:
+                            updated_at = datetime.fromisoformat(updated_at_str)
+                        except ValueError:
+                            logger.warning(f"Could not parse updated_at: {updated_at_value}")
+                
+                return DailyFreeStoryDB(
+                    id=story_data.get('id'),
+                    story_date=story_data.get('story_date'),
+                    title=story_data.get('title'),
+                    name=story_data.get('name'),
+                    content=story_data.get('content'),
+                    moral=story_data.get('moral'),
+                    age_category=story_data.get('age_category'),
+                    language=story_data.get('language'),
+                    is_active=story_data.get('is_active', True),
+                    created_at=created_at,
+                    updated_at=updated_at
+                )
+            return None
+        except Exception as e:
+            logger.error(f"Error retrieving daily free story by ID: {str(e)}")
+            raise Exception(f"Error retrieving daily free story by ID: {str(e)}")
+    
+    # Daily story reactions methods
+    
+    def get_reaction_counts(self, story_id: str) -> Dict[str, int]:
+        """Get reaction counts (likes and dislikes) for a story.
+        
+        Args:
+            story_id: The ID of the story
+            
+        Returns:
+            Dictionary with 'likes' and 'dislikes' counts
+        """
+        try:
+            likes_response = self.client.table("daily_story_reactions").select("id", count="exact").eq("story_id", story_id).eq("reaction_type", "like").execute()
+            dislikes_response = self.client.table("daily_story_reactions").select("id", count="exact").eq("story_id", story_id).eq("reaction_type", "dislike").execute()
+            
+            likes_count = likes_response.count if hasattr(likes_response, 'count') else len(likes_response.data) if likes_response.data else 0
+            dislikes_count = dislikes_response.count if hasattr(dislikes_response, 'count') else len(dislikes_response.data) if dislikes_response.data else 0
+            
+            return {
+                "likes": likes_count,
+                "dislikes": dislikes_count
+            }
+        except Exception as e:
+            logger.error(f"Error getting reaction counts: {str(e)}")
+            return {"likes": 0, "dislikes": 0}
+    
+    def get_user_reaction(self, story_id: str, user_id: Optional[str] = None) -> Optional[str]:
+        """Get user's reaction to a story.
+        
+        Args:
+            story_id: The ID of the story
+            user_id: Optional user ID (None for anonymous)
+            
+        Returns:
+            Reaction type ('like' or 'dislike') or None if no reaction
+        """
+        try:
+            query = self.client.table("daily_story_reactions").select("reaction_type").eq("story_id", story_id)
+            
+            if user_id:
+                query = query.eq("user_id", user_id)
+            else:
+                query = query.is_("user_id", "null")
+            
+            response = query.execute()
+            
+            if response.data:
+                return response.data[0].get('reaction_type')
+            return None
+        except Exception as e:
+            logger.error(f"Error getting user reaction: {str(e)}")
+            return None
+    
+    def create_or_update_reaction(
+        self,
+        story_id: str,
+        reaction_type: str,
+        user_id: Optional[str] = None
+    ) -> Optional[DailyStoryReactionDB]:
+        """Create or update a reaction to a daily story.
+        
+        Args:
+            story_id: The ID of the story
+            reaction_type: 'like' or 'dislike'
+            user_id: Optional user ID (None for anonymous)
+            
+        Returns:
+            The created or updated reaction
+        """
+        try:
+            if reaction_type not in ['like', 'dislike']:
+                raise ValueError("reaction_type must be 'like' or 'dislike'")
+            
+            # Check if reaction already exists
+            query = self.client.table("daily_story_reactions").select("*").eq("story_id", story_id)
+            if user_id:
+                query = query.eq("user_id", user_id)
+            else:
+                query = query.is_("user_id", "null")
+            
+            existing = query.execute()
+            
+            reaction_data = {
+                "story_id": story_id,
+                "reaction_type": reaction_type,
+                "user_id": user_id
+            }
+            
+            if existing.data:
+                # Update existing reaction
+                reaction_id = existing.data[0]['id']
+                response = self.client.table("daily_story_reactions").update(reaction_data).eq("id", reaction_id).execute()
+                if response.data:
+                    reaction_data = response.data[0]
+                else:
+                    return None
+            else:
+                # Create new reaction
+                response = self.client.table("daily_story_reactions").insert(reaction_data).execute()
+                if response.data:
+                    reaction_data = response.data[0]
+                else:
+                    return None
+            
+            # Handle datetime conversion
+            created_at = None
+            updated_at = None
+            if reaction_data.get('created_at'):
+                created_at_value = reaction_data['created_at']
+                if isinstance(created_at_value, datetime):
+                    created_at = created_at_value
+                elif isinstance(created_at_value, str):
+                    created_at_str = created_at_value.replace('Z', '+00:00')
+                    try:
+                        created_at = datetime.fromisoformat(created_at_str)
+                    except ValueError:
+                        logger.warning(f"Could not parse created_at: {created_at_value}")
+            
+            if reaction_data.get('updated_at'):
+                updated_at_value = reaction_data['updated_at']
+                if isinstance(updated_at_value, datetime):
+                    updated_at = updated_at_value
+                elif isinstance(updated_at_value, str):
+                    updated_at_str = updated_at_value.replace('Z', '+00:00')
+                    try:
+                        updated_at = datetime.fromisoformat(updated_at_str)
+                    except ValueError:
+                        logger.warning(f"Could not parse updated_at: {updated_at_value}")
+            
+            return DailyStoryReactionDB(
+                id=reaction_data.get('id'),
+                story_id=reaction_data.get('story_id'),
+                user_id=reaction_data.get('user_id'),
+                reaction_type=reaction_data.get('reaction_type'),
+                created_at=created_at,
+                updated_at=updated_at
+            )
+        except Exception as e:
+            logger.error(f"Error creating/updating reaction: {str(e)}")
+            raise Exception(f"Error creating/updating reaction: {str(e)}")

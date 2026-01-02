@@ -4,8 +4,8 @@ import asyncio
 import logging
 from typing import List, Optional, Dict, Any
 from src.supabase_client import SupabaseClient
-from src.models import StoryDB, ChildDB, HeroDB
-from src.infrastructure.persistence.models import GenerationDB, FreeStoryDB
+from src.models import StoryDB, ChildDB, HeroDB, DailyFreeStoryDB
+from src.infrastructure.persistence.models import GenerationDB, FreeStoryDB, DailyStoryReactionDB
 from src.domain.services.subscription_service import UserSubscription
 
 # Set up logger
@@ -259,3 +259,78 @@ class AsyncSupabaseClient:
     async def update_prompt(self, prompt_id: str, prompt_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """Update an existing prompt in the database asynchronously."""
         return await asyncio.to_thread(self._sync_client.update_prompt, prompt_id, prompt_data)
+    
+    # Daily free stories operations
+    async def get_daily_stories(
+        self,
+        age_category: Optional[str] = None,
+        language: Optional[str] = None,
+        limit: Optional[int] = None,
+        user_id: Optional[str] = None
+    ) -> List[DailyFreeStoryDB]:
+        """Get active daily free stories asynchronously."""
+        return await asyncio.to_thread(
+            self._sync_client.get_daily_stories,
+            age_category,
+            language,
+            limit,
+            user_id
+        )
+    
+    async def get_daily_story_by_date(
+        self,
+        story_date: str,
+        user_id: Optional[str] = None
+    ) -> Optional[DailyFreeStoryDB]:
+        """Get a daily free story by date asynchronously."""
+        return await asyncio.to_thread(
+            self._sync_client.get_daily_story_by_date,
+            story_date,
+            user_id
+        )
+    
+    async def get_daily_story_by_id(
+        self,
+        story_id: str,
+        user_id: Optional[str] = None
+    ) -> Optional[DailyFreeStoryDB]:
+        """Get a daily free story by ID asynchronously."""
+        return await asyncio.to_thread(
+            self._sync_client.get_daily_story_by_id,
+            story_id,
+            user_id
+        )
+    
+    # Daily story reactions operations
+    async def get_reaction_counts(self, story_id: str) -> Dict[str, int]:
+        """Get reaction counts (likes and dislikes) for a story asynchronously."""
+        return await asyncio.to_thread(
+            self._sync_client.get_reaction_counts,
+            story_id
+        )
+    
+    async def get_user_reaction(
+        self,
+        story_id: str,
+        user_id: Optional[str] = None
+    ) -> Optional[str]:
+        """Get user's reaction to a story asynchronously."""
+        return await asyncio.to_thread(
+            self._sync_client.get_user_reaction,
+            story_id,
+            user_id
+        )
+    
+    async def create_or_update_reaction(
+        self,
+        story_id: str,
+        reaction_type: str,
+        user_id: Optional[str] = None
+    ) -> Optional[DailyStoryReactionDB]:
+        """Create or update a reaction to a daily story asynchronously."""
+        return await asyncio.to_thread(
+            self._sync_client.create_or_update_reaction,
+            story_id,
+            reaction_type,
+            user_id
+        )
