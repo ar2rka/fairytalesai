@@ -95,6 +95,11 @@ struct AppTheme {
     
     // Corner Radius for Whimsical Design
     static let cornerRadius: CGFloat = 25
+    
+    // Legacy static properties for backward compatibility
+    static let textPrimary = darkTextPrimary
+    static let textSecondary = darkTextSecondary
+    static let cardBackground = darkCardBackground
 }
 
 

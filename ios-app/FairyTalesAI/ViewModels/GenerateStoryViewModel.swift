@@ -8,6 +8,7 @@ class GenerateStoryViewModel: ObservableObject {
     @Published var plot: String = ""
     @Published var showingStoryResult = false
     @Published var showingPaywall = false
+    @Published var showingAddChild = false
     @Published var generatedStory: Story? = nil
     
     func validateDuration(newValue: Double, isPremium: Bool) {

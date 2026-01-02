@@ -173,17 +173,6 @@ struct HomeView: View {
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
-<<<<<<< HEAD
-=======
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {}) {
-                        Image(systemName: "bell.fill")
-                            .foregroundColor(AppTheme.textPrimary(for: colorScheme))
-                    }
-                }
-            }
->>>>>>> d586088bf77ddd623d794f3e1676750124dbcf7f
         }
     }
     
@@ -262,30 +251,6 @@ struct FeatureCard: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-<<<<<<< HEAD
-
-                
-                Text("Spark a New Adventure")
-                    .font(.system(size: 24, weight: .bold))
-                    .foregroundColor(AppTheme.textPrimary)
-                
-                Text("Create a custom fairy tale instantly with the power of AI magic.")
-                    .font(.system(size: 14))
-                    .foregroundColor(AppTheme.textSecondary)
-                
-                HStack {
-                    Image(systemName: "sparkles")
-=======
-            HStack {
-                Text("New Feature")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundColor(AppTheme.primaryPurple)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 4)
-                    .background(AppTheme.primaryPurple.opacity(0.2))
-                    .cornerRadius(AppTheme.cornerRadius)
-            }
-            
             Text("Spark a New Adventure")
                 .font(.system(size: 24, weight: .bold))
                 .foregroundColor(AppTheme.textPrimary(for: colorScheme))
@@ -296,10 +261,9 @@ struct FeatureCard: View {
             
             HStack {
                 Image(systemName: "sparkles")
->>>>>>> d586088bf77ddd623d794f3e1676750124dbcf7f
                 Text("Create New Tale")
                     .font(.system(size: 16, weight: .semibold))
-                    Image(systemName: "sparkles")
+                Image(systemName: "sparkles")
             }
             .foregroundColor(.white)
             .frame(maxWidth: .infinity)
@@ -342,9 +306,9 @@ struct GetStartedCard: View {
                 )
                 .cornerRadius(AppTheme.cornerRadius)
             }
-            }
-            .padding()
-            .background(AppTheme.cardBackground)
+        }
+        .padding()
+        .background(AppTheme.cardBackground)
         .cornerRadius(AppTheme.cornerRadius)
         .sheet(isPresented: $showingAddChild) {
             AddChildView()
@@ -448,9 +412,8 @@ struct ThemeButton: View {
                     .font(.system(size: 28))
                 
                 Text(theme.name)
-<<<<<<< HEAD
                     .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(AppTheme.textPrimary)
+                    .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                     .lineLimit(1)
             }
             .frame(maxWidth: .infinity)
@@ -461,14 +424,6 @@ struct ThemeButton: View {
                 RoundedRectangle(cornerRadius: AppTheme.cornerRadius)
                     .stroke(themeColor.opacity(0.3), lineWidth: 1)
             )
-=======
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(AppTheme.textPrimary(for: colorScheme))
-            }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(AppTheme.cardBackground(for: colorScheme))
->>>>>>> d586088bf77ddd623d794f3e1676750124dbcf7f
             .cornerRadius(AppTheme.cornerRadius)
         }
     }
@@ -541,29 +496,23 @@ struct StoryReadingView: View {
                         .lineSpacing(12)
                         .fixedSize(horizontal: false, vertical: true)
                 }
-            .padding()
+                .padding()
             }
         }
         .navigationTitle("Story")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-<<<<<<< HEAD
                 HStack(spacing: 16) {
                     Button(action: { showShareSheet = true }) {
                         Image(systemName: "square.and.arrow.up")
-                            .foregroundColor(AppTheme.textPrimary)
+                            .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                     }
                     
                     Button(action: { dismiss() }) {
                         Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(AppTheme.textSecondary)
+                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                     }
-=======
-                Button(action: { dismiss() }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
->>>>>>> d586088bf77ddd623d794f3e1676750124dbcf7f
                 }
             }
         }
