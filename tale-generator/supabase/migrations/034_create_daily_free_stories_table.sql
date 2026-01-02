@@ -2,7 +2,7 @@
 -- These are stories that are published daily and available to all users
 CREATE TABLE IF NOT EXISTS tales.daily_free_stories (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    story_date DATE NOT NULL UNIQUE, -- One story per day
+    story_date DATE NOT NULL, -- One story per day
     title TEXT NOT NULL, -- Заголовок истории
     name TEXT NOT NULL, -- Название истории
     content TEXT NOT NULL,
@@ -28,6 +28,7 @@ ON tales.daily_free_stories(is_active, age_category, language, story_date DESC);
 -- Grant SELECT permissions to anon and authenticated roles for public access
 GRANT SELECT ON tales.daily_free_stories TO anon;
 GRANT SELECT ON tales.daily_free_stories TO authenticated;
+
 
 -- Enable Row Level Security (RLS) but with a permissive policy
 ALTER TABLE tales.daily_free_stories ENABLE ROW LEVEL SECURITY;
