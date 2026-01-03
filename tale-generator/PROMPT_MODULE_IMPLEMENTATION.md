@@ -1,7 +1,11 @@
 # Prompt Module Refactoring - Implementation Summary
 
+> **Примечание**: Для актуальной документации по использованию системы промптов см. [PROMPT_SYSTEM_DOCUMENTATION.md](./PROMPT_SYSTEM_DOCUMENTATION.md)
+
 ## Overview
 Successfully refactored the monolithic `src/prompts.py` into a modular, composable architecture that supports multiple character types (child, hero, combined) with optional freeform descriptions, while maintaining full backward compatibility.
+
+**Текущая архитектура**: Система использует `PromptTemplateService` с шаблонами Jinja2, хранящимися в базе данных Supabase. Старая система builders/components больше не используется в основной реализации.
 
 ## What Was Implemented
 
