@@ -72,7 +72,7 @@ WITH CHECK (true);
 -- Intentionally no UPDATE or DELETE policies
 
 -- Step 3: Create helper function to check if monthly reset is needed
-CREATE OR REPLACE FUNCTION check_and_reset_monthly_counter(p_user_id UUID)
+CREATE OR REPLACE FUNCTION tales.check_and_reset_monthly_counter(p_user_id UUID)
 RETURNS VOID AS $$
 DECLARE
     v_last_reset_date TIMESTAMPTZ;
