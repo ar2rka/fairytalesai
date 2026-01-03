@@ -77,7 +77,7 @@ async def test_workflow():
         name="Emma",
         age_category="5-7",
         gender=Gender.FEMALE,
-        interests=["unicorns", "reading", "art"]
+        interests=["reading", "art", "cats", "dolls", "unicorns"]
     )
     print(f"✓ Child created: {child.name}, age_category {child.age_category}")
     

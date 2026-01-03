@@ -114,7 +114,7 @@ async function generateStory(event) {
     
     // Get form data
     const childName = document.getElementById('child-name').value;
-    const childAge = parseInt(document.getElementById('child-age').value);
+    const childAgeCategory = document.getElementById('child-age-category').value;
     const childGender = document.getElementById('child-gender').value;
     const childInterests = document.getElementById('child-interests').value.split(',').map(item => item.trim()).filter(item => item);
     const storyMoral = document.getElementById('story-moral').value;
@@ -122,7 +122,7 @@ async function generateStory(event) {
     const storyLanguage = document.getElementById('story-language').value;
     
     // Validate required fields
-    if (!childName || !childAge || !childGender) {
+    if (!childName || !childAgeCategory || !childGender) {
         alert('Please fill in all required fields');
         return;
     }
@@ -135,7 +135,7 @@ async function generateStory(event) {
         const payload = {
             child: {
                 name: childName,
-                age: childAge,
+                age_category: childAgeCategory,
                 gender: childGender,
                 interests: childInterests
             },
@@ -150,7 +150,7 @@ async function generateStory(event) {
         }
         
         // Send request to generate story
-        const response = await fetch(`${API_BASE_URL}/generate-story`, {
+        const response = await fetch(`${API_BASE_URL}/generate_story`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -421,7 +421,7 @@ async function generateStory(event) {
     
     // Get form data
     const childName = document.getElementById('child-name').value;
-    const childAge = parseInt(document.getElementById('child-age').value);
+    const childAgeCategory = document.getElementById('child-age-category').value;
     const childGender = document.getElementById('child-gender').value;
     const childInterests = document.getElementById('child-interests').value.split(',').map(item => item.trim()).filter(item => item);
     const storyMoral = document.getElementById('story-moral').value;
@@ -429,7 +429,7 @@ async function generateStory(event) {
     const storyLanguage = document.getElementById('story-language').value;
     
     // Validate required fields
-    if (!childName || !childAge || !childGender) {
+    if (!childName || !childAgeCategory || !childGender) {
         alert('Please fill in all required fields');
         return;
     }
@@ -442,7 +442,7 @@ async function generateStory(event) {
         const payload = {
             child: {
                 name: childName,
-                age: childAge,
+                age_category: childAgeCategory,
                 gender: childGender,
                 interests: childInterests
             },
@@ -457,7 +457,7 @@ async function generateStory(event) {
         }
         
         // Send request to generate story
-        const response = await fetch(`${API_BASE_URL}/generate-story`, {
+        const response = await fetch(`${API_BASE_URL}/stories/generate`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

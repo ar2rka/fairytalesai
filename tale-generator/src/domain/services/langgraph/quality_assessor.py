@@ -2,6 +2,7 @@
 
 import json
 import logging
+import re
 from typing import Dict, Any, Optional
 from datetime import datetime
 
@@ -203,16 +204,92 @@ IMPORTANT: Be critical but fair. A score of 7+ means high quality. Scores of 5-6
                 json_start = response.find("```json") + 7
                 json_end = response.find("```", json_start)
                 json_str = response[json_start:json_end].strip()
+            elif "```" in response:
+                json_start = response.find("```") + 3
+                json_end = response.find("```", json_start)
+                json_str = response[json_start:json_end].strip()
             elif "{" in response and "}" in response:
                 json_start = response.find("{")
                 json_end = response.rfind("}") + 1
                 json_str = response[json_start:json_end]
+                # Ensure we have a closing brace
+                if not json_str.endswith("}"):
+                    # Try to find the last closing brace more carefully
+                    brace_count = 0
+                    for i in range(json_start, len(response)):
+                        if response[i] == '{':
+                            brace_count += 1
+                        elif response[i] == '}':
+                            brace_count -= 1
+                            if brace_count == 0:
+                                json_str = response[json_start:i+1]
+                                break
+                    # If still no closing brace, add one
+                    if not json_str.endswith("}"):
+                        json_str += "}"
             else:
                 logger.warning("No JSON found in assessment response")
                 return self._create_default_assessment()
             
-            # Parse JSON
-            data = json.loads(json_str)
+            # Clean JSON string - remove ALL control characters (more aggressive)
+            json_str = re.sub(r'[\x00-\x1f]', '', json_str)
+            
+            # Try to parse JSON
+            try:
+                data = json.loads(json_str)
+            except json.JSONDecodeError as json_error:
+                logger.warning(f"Initial JSON parse failed: {json_error}. Attempting recovery...")
+                
+                # Try to extract fields using regex as fallback
+                try:
+                    # Extract scores using regex
+                    data = {}
+                    
+                    # Extract all score fields
+                    score_fields = [
+                        "age_appropriateness_score",
+                        "moral_clarity_score",
+                        "narrative_coherence_score",
+                        "character_consistency_score",
+                        "engagement_score",
+                        "language_quality_score",
+                        "overall_score"
+                    ]
+                    
+                    for field in score_fields:
+                        pattern = rf'"{field}"\s*:\s*(\d+)'
+                        match = re.search(pattern, json_str)
+                        if match:
+                            data[field] = int(match.group(1))
+                    
+                    # Extract feedback
+                    feedback_match = re.search(r'"feedback"\s*:\s*"((?:[^"\\]|\\.)*)"', json_str, re.DOTALL)
+                    if feedback_match:
+                        # Unescape JSON string
+                        feedback = feedback_match.group(1).replace('\\"', '"').replace('\\n', '\n')
+                        data["feedback"] = feedback
+                    else:
+                        data["feedback"] = ""
+                    
+                    # Extract improvement_suggestions
+                    suggestions_match = re.search(r'"improvement_suggestions"\s*:\s*\[(.*?)\]', json_str, re.DOTALL)
+                    if suggestions_match:
+                        suggestions_str = suggestions_match.group(1)
+                        # Try to extract individual suggestions
+                        suggestions = []
+                        for match in re.finditer(r'"((?:[^"\\]|\\.)*)"', suggestions_str):
+                            suggestion = match.group(1).replace('\\"', '"')
+                            if suggestion:
+                                suggestions.append(suggestion)
+                        data["improvement_suggestions"] = suggestions
+                    else:
+                        data["improvement_suggestions"] = []
+                    
+                    logger.info(f"Successfully extracted assessment data using regex fallback")
+                    
+                except Exception as regex_error:
+                    logger.error(f"Regex extraction also failed: {regex_error}")
+                    raise json_error
             
             # Validate and clamp scores to 1-10 range
             score_fields = [

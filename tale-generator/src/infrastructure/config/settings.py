@@ -172,11 +172,11 @@ class LangGraphWorkflowSettings(BaseSettings):
     
     # Model configuration
     validation_model: str = Field(
-        default="openai/gpt-4o-mini",
+        default="anthropic/claude-3-haiku",
         description="Model for prompt validation (can be set via LANGGRAPH_VALIDATION_MODEL env var)"
     )
     assessment_model: str = Field(
-        default="openai/gpt-4o-mini",
+        default="anthropic/claude-3-haiku",
         description="Model for quality assessment"
     )
     generation_model: Optional[str] = Field(

@@ -229,6 +229,7 @@ class OpenRouterModel(StrEnum):
     GPT_4O_MINI = "openai/gpt-4o-mini"
     CLAUDE_3_5_SONNET = "anthropic/claude-3.5-sonnet"
     CLAUDE_3_HAIKU = "anthropic/claude-3-haiku"
+    CLAUDE_4_5_HAIKU = "anthropic/claude-haiku-4.5"
     LLAMA_3_1_405B = "meta-llama/llama-3.1-405b-instruct"
     LLAMA_3_1_70B = "meta-llama/llama-3.1-70b-instruct"
     LLAMA_3_1_8B = "meta-llama/llama-3.1-8b-instruct"
@@ -237,6 +238,8 @@ class OpenRouterModel(StrEnum):
     GEMINI_20_FREE = "google/gemini-2.0-flash-exp:free"
     GROK_41_FREE = "x-ai/grok-4.1-fast:free"
     GPT_OSS_120B = "openai/gpt-oss-120b:exacto"
+    MISTRAL_CREATIVE="mistralai/mistral-small-creative"
+    MISTRAL_MEDIUM="mistralai/magistral-medium-2506"
 
 
 # Default fallback models for rate limit retries (used if not configured via env)
@@ -454,7 +457,10 @@ class OpenRouterClient:
                             ],
                             response_format={"type": "json_object"},
                             max_tokens=max_tokens,
-                            temperature=temperature
+                            temperature=temperature,
+                            top_p=0.88,
+                            presence_penalty=1.2,
+                            frequency_penalty=0.3
                         )
                     except Exception as api_error:
                         # If structured output API fails, try parse() as fallback
