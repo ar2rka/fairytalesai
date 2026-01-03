@@ -53,12 +53,18 @@ class PromptRepository:
         try:
             # Query Supabase
             # Handle both SupabaseClient (has .client) and direct client
+            logger.debug(f"PromptRepository client type: {type(self._client)}")
             if hasattr(self._client, 'client'):
                 client = self._client.client
+                logger.debug("Using client.client (SupabaseClient)")
             elif hasattr(self._client, 'supabase'):
                 client = self._client.supabase
+                logger.debug("Using client.supabase")
             else:
                 client = self._client
+                logger.debug("Using client directly")
+            
+            logger.debug(f"Final client type: {type(client)}")
             
             query = client.table("prompts").select("*")
             

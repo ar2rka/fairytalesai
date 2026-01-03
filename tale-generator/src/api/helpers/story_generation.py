@@ -39,15 +39,28 @@ def generate_prompt(
     parent_story: Optional[StoryDB] = None
 ) -> str:
     """Generate appropriate prompt based on story type."""
+    # Log prompt service status
+    if prompt_service._template_service:
+        logger.info(f"✅ PromptService has PromptTemplateService - will use prompts from Supabase")
+    else:
+        logger.warning(f"⚠️ PromptService does NOT have PromptTemplateService - will use built-in methods (includes 'IMPORTANT: Start directly...' text)")
+    
     if story_type == "child":
         logger.info(f"Generating child story for {child.name}")
-        return prompt_service.generate_child_prompt(child, moral, language, story_length, parent_story)
+        prompt = prompt_service.generate_child_prompt(child, moral, language, story_length, parent_story)
     elif story_type == "hero":
         logger.info(f"Generating hero story for {hero.name}")
-        return prompt_service.generate_hero_prompt(hero, moral, story_length, parent_story)
+        prompt = prompt_service.generate_hero_prompt(hero, moral, story_length, parent_story)
     else:  # combined
         logger.info(f"Generating combined story for {child.name} and {hero.name}")
-        return prompt_service.generate_combined_prompt(child, hero, moral, language, story_length, parent_story)
+        prompt = prompt_service.generate_combined_prompt(child, hero, moral, language, story_length, parent_story)
+    
+    # Check if prompt contains fallback text
+    if "IMPORTANT: Start directly with the story" in prompt:
+        logger.error(f"❌ ERROR: Generated prompt contains 'IMPORTANT: Start directly...' - this means fallback methods were used instead of Supabase prompts!")
+        logger.error(f"PromptService._template_service is None: {prompt_service._template_service is None}")
+    
+    return prompt
 
 
 async def create_generation_record(

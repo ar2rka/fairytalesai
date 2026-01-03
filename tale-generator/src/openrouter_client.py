@@ -7,7 +7,7 @@ import time
 import uuid
 from enum import StrEnum
 from typing import Optional, Dict, Any, List, Type, TypeVar
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 import httpx
 from openai import AsyncOpenAI
 from dotenv import load_dotenv
@@ -23,6 +23,204 @@ logger = logging.getLogger("tale_generator.openrouter")
 
 # Type variable for structured output models
 T = TypeVar('T', bound=BaseModel)
+
+
+def escape_quotes_in_json_strings(json_str: str) -> str:
+    """Escape unescaped quotes inside JSON string values.
+    
+    This function finds all JSON string values and escapes any unescaped quotes
+    inside them using regex pattern matching.
+    
+    Args:
+        json_str: JSON string that may contain unescaped quotes in string values
+        
+    Returns:
+        JSON string with properly escaped quotes
+    """
+    import re
+    
+    # Pattern to match JSON string values: "key": "value"
+    # This pattern matches: "..." where ... can contain escaped characters
+    # We'll use a more sophisticated approach: find all string values and fix them
+    
+    def fix_string_value(match):
+        """Fix a single JSON string value by escaping unescaped quotes."""
+        full_match = match.group(0)  # The full match including quotes
+        content = match.group(1)  # Content inside quotes
+        
+        # Process content character by character to escape unescaped quotes
+        result = []
+        i = 0
+        while i < len(content):
+            if content[i] == '\\' and i + 1 < len(content):
+                # This is an escape sequence, preserve it
+                result.append(content[i])
+                result.append(content[i + 1])
+                i += 2
+            elif content[i] == '"':
+                # This is an unescaped quote inside the string, escape it
+                result.append('\\"')
+                i += 1
+            else:
+                result.append(content[i])
+                i += 1
+        
+        return f'"{"".join(result)}"'
+    
+    # Pattern to match JSON string values
+    # This matches: "key" or "value" where value can be any string
+    # We need to be careful to only match string values, not keys
+    # A simple approach: match all "..." patterns and fix them
+    # But we need to distinguish between keys and values
+    # Actually, let's just fix all string values - it's safer
+    
+    # Match all string patterns: "content"
+    # But we need to handle the case where quotes might be unescaped
+    # Use a greedy approach: find all "..." and fix the content
+    
+    # First, let's try a simpler approach: use state machine to find strings
+    result = []
+    i = 0
+    in_string = False
+    string_start = None
+    
+    while i < len(json_str):
+        char = json_str[i]
+        
+        if not in_string:
+            # We're not in a string
+            result.append(char)
+            if char == '"':
+                # Start of a string
+                in_string = True
+                string_start = len(result) - 1
+            i += 1
+        else:
+            # We're inside a string
+            if char == '\\' and i + 1 < len(json_str):
+                # Escape sequence
+                result.append(char)
+                result.append(json_str[i + 1])
+                i += 2
+            elif char == '"':
+                # Check if this is the end of the string
+                # Look ahead (skip whitespace and newlines) to see what comes next
+                j = i + 1
+                while j < len(json_str) and json_str[j] in ' \n\r\t':
+                    j += 1
+                
+                if j >= len(json_str):
+                    # End of input, this must be the closing quote
+                    result.append(char)
+                    in_string = False
+                    string_start = None
+                    i += 1
+                elif json_str[j] in [':', ',', '}', ']']:
+                    # This is the end of the string (followed by JSON structure)
+                    result.append(char)
+                    in_string = False
+                    string_start = None
+                    i += 1
+                elif json_str[j] == '"':
+                    # Two quotes in a row - this might be an empty string or error
+                    # Check what comes after the second quote
+                    k = j + 1
+                    while k < len(json_str) and json_str[k] in ' \n\r\t':
+                        k += 1
+                    if k < len(json_str) and json_str[k] in [':', ',', '}', ']']:
+                        # Empty string, close it
+                        result.append(char)
+                        in_string = False
+                        string_start = None
+                        i += 1
+                    else:
+                        # This is an unescaped quote inside the string
+                        result.append('\\"')
+                        i += 1
+                else:
+                    # This is an unescaped quote inside the string
+                    result.append('\\"')
+                    i += 1
+            else:
+                result.append(char)
+                i += 1
+    
+    return ''.join(result)
+
+
+def clean_json_string(json_str: str) -> str:
+    """Clean JSON string from control characters and escape quotes.
+    
+    This function:
+    - Escapes unescaped quotes in string values
+    - Removes control characters from string values (inside quotes)
+    - Preserves JSON structure (braces, brackets, commas, colons)
+    - Handles escaped characters properly
+    
+    Args:
+        json_str: Raw JSON string that may contain control characters and unescaped quotes
+        
+    Returns:
+        Cleaned JSON string without control characters and with properly escaped quotes
+    """
+    import re
+    
+    # First, escape unescaped quotes in string values
+    json_str = escape_quotes_in_json_strings(json_str)
+    
+    # Use a more sophisticated approach: find all string values and clean them
+    # Pattern to match JSON string values, handling escaped quotes and backslashes
+    # This pattern matches: "..." where ... can contain escaped characters
+    string_pattern = r'"((?:[^"\\]|\\.)*)"'
+    
+    def clean_string_content(match):
+        """Clean control characters from a JSON string value."""
+        # Get the content inside quotes (group 1)
+        content = match.group(1)
+        
+        # Remove control characters from content
+        # Control characters are \x00-\x1f except \n (0x0a), \r (0x0d), \t (0x09)
+        # But we need to be careful with escape sequences
+        cleaned_content = []
+        i = 0
+        while i < len(content):
+            char = content[i]
+            # Check if this is part of an escape sequence
+            if char == '\\' and i + 1 < len(content):
+                # This is an escape sequence, preserve it
+                cleaned_content.append(char)
+                cleaned_content.append(content[i + 1])
+                i += 2
+            else:
+                # Check if it's a control character (but not \n, \r, \t)
+                char_code = ord(char)
+                if char_code < 0x20 and char_code not in [0x09, 0x0a, 0x0d]:
+                    # Skip this control character
+                    i += 1
+                else:
+                    cleaned_content.append(char)
+                    i += 1
+        
+        return f'"{"".join(cleaned_content)}"'
+    
+    # Replace all string values in JSON
+    cleaned = re.sub(string_pattern, clean_string_content, json_str)
+    
+    # Also remove any control characters that might be outside of strings
+    # (in JSON structure itself, which shouldn't happen but just in case)
+    cleaned = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f]', '', cleaned)
+    
+    return cleaned
+
+
+class StoryOutput(BaseModel):
+    """Structured output model for story generation.
+    
+    This model ensures that the AI returns only the title and content
+    without any introductory text or metadata.
+    """
+    title: str = Field(..., description="The title of the story (should NOT be included in content)")
+    content: str = Field(..., description="The full story content WITHOUT the title. Only the story text itself, no title, no introductory text, no metadata.")
 
 
 class OpenRouterModel(StrEnum):
@@ -177,7 +375,7 @@ class OpenRouterClient:
         self,
         prompt: str,
         output_model: Type[T],
-        model: OpenRouterModel = OpenRouterModel.LLAMA_3_1_8B,
+        model: OpenRouterModel = OpenRouterModel.CLAUDE_3_HAIKU,
         system_message: Optional[str] = None,
         max_tokens: int = 10000,
         temperature: float = 0.7,
@@ -238,42 +436,244 @@ class OpenRouterClient:
             
             # Attempt to generate with current model
             for attempt in range(max_retries + 1):
+                response = None
                 try:
                     logger.debug(
                         f"Attempting structured output with model {current_model.value} "
                         f"(attempt {attempt + 1}/{max_retries + 1})"
                     )
                     
-                    # Use structured output for automatic parsing
-                    response = await self.client.beta.chat.completions.parse(
-                        model=current_model.value,
-                        messages=[
-                            {"role": "system", "content": system_msg},
-                            {"role": "user", "content": prompt}
-                        ],
-                        response_format=output_model,
-                        max_tokens=max_tokens,
-                        temperature=temperature
-                    )
-                    
-                    # Extract parsed structured data
-                    message = response.choices[0].message
-                    parsed_data = message.parsed
-                    
-                    if parsed_data is None:
-                        refusal_reason = getattr(message, 'refusal', None) or "Unknown reason"
-                        raise ValueError(
-                            f"Structured output parsing returned None. "
-                            f"Model refusal: {refusal_reason}"
+                    # Use regular chat.completions.create with response_format instead of parse()
+                    # This gives us more control over error handling
+                    try:
+                        response = await self.client.chat.completions.create(
+                            model=current_model.value,
+                            messages=[
+                                {"role": "system", "content": system_msg},
+                                {"role": "user", "content": prompt}
+                            ],
+                            response_format={"type": "json_object"},
+                            max_tokens=max_tokens,
+                            temperature=temperature
                         )
+                    except Exception as api_error:
+                        # If structured output API fails, try parse() as fallback
+                        error_str = str(api_error)
+                        if "control character" in error_str.lower() or "json_invalid" in error_str.lower():
+                            # Try parse() method as it might handle it better
+                            try:
+                                response = await self.client.beta.chat.completions.parse(
+                                    model=current_model.value,
+                                    messages=[
+                                        {"role": "system", "content": system_msg},
+                                        {"role": "user", "content": prompt}
+                                    ],
+                                    response_format=output_model,
+                                    max_tokens=max_tokens,
+                                    temperature=temperature
+                                )
+                            except:
+                                # If both fail, we'll handle it in the outer exception handler
+                                raise api_error
+                        else:
+                            raise api_error
+                    
+                    # Extract message content
+                    if not response or not response.choices:
+                        raise ValueError("Empty response from API")
+                    
+                    message = response.choices[0].message
+                    raw_content = message.content
+                    
+                    if not raw_content:
+                        refusal_reason = getattr(message, 'refusal', None) or "Unknown reason"
+                        raise ValueError(f"Empty content in response. Model refusal: {refusal_reason}")
+                    
+                    # Try to get parsed data if using parse() method
+                    parsed_data = None
+                    if hasattr(message, 'parsed') and message.parsed is not None:
+                        parsed_data = message.parsed
+                    else:
+                        # Extract and parse JSON manually
+                        import json
+                        import re
+                        
+                        # Extract JSON from response
+                        if "```json" in raw_content:
+                            json_start = raw_content.find("```json") + 7
+                            json_end = raw_content.find("```", json_start)
+                            json_str = raw_content[json_start:json_end].strip()
+                        elif "```" in raw_content:
+                            json_start = raw_content.find("```") + 3
+                            json_end = raw_content.find("```", json_start)
+                            json_str = raw_content[json_start:json_end].strip()
+                        elif "{" in raw_content and "}" in raw_content:
+                            json_start = raw_content.find("{")
+                            json_end = raw_content.rfind("}") + 1
+                            json_str = raw_content[json_start:json_end]
+                            # Ensure we have a closing brace
+                            if not json_str.endswith("}"):
+                                # Try to find the last closing brace more carefully
+                                brace_count = 0
+                                for i in range(json_start, len(raw_content)):
+                                    if raw_content[i] == '{':
+                                        brace_count += 1
+                                    elif raw_content[i] == '}':
+                                        brace_count -= 1
+                                        if brace_count == 0:
+                                            json_str = raw_content[json_start:i+1]
+                                            break
+                                # If still no closing brace, add one
+                                if not json_str.endswith("}"):
+                                    json_str += "}"
+                        else:
+                            json_str = raw_content
+                        
+                        # Clean control characters from JSON string using smart cleaning
+                        # First pass: clean string values
+                        json_str = clean_json_string(json_str)
+                        
+                        # Second pass: remove ALL control characters from entire JSON
+                        # This is more aggressive but ensures no control characters remain
+                        json_str = re.sub(r'[\x00-\x1f]', '', json_str)
+                        if not json_str.endswith("}"):
+                            json_str += "}"
+                        
+                        # Parse JSON with error recovery
+                        data = None
+                        try:
+                            logger.warning(f"JSON string: {json_str}")
+                            data = json.loads(json_str)
+                        except json.JSONDecodeError as json_error:
+                            logger.warning(f"JSON parse error: {str(json_error)}. Attempting regex extraction...")
+                            
+                            # Skip aggressive cleaning since we already did it
+                            json_str_aggressive = json_str
+                            
+                            try:
+                                data = json.loads(json_str_aggressive)
+                                logger.info("Successfully parsed JSON after aggressive cleaning")
+                            except json.JSONDecodeError:
+                                # Last resort: try to extract fields using regex
+                                logger.warning("Standard JSON parsing failed, trying regex extraction...")
+                                try:
+                                    # Extract title and content using regex as fallback
+                                    # Use non-greedy matching and handle escaped characters
+                                    title_match = re.search(r'"title"\s*:\s*"((?:[^"\\]|\\.)*)"', json_str_aggressive, re.DOTALL)
+                                    content_match = re.search(r'"content"\s*:\s*"((?:[^"\\]|\\.)*)"', json_str_aggressive, re.DOTALL)
+                                    
+                                    if title_match and content_match:
+                                        # Unescape JSON string values
+                                        def unescape_json_string(s):
+                                            """Unescape a JSON string value."""
+                                            return (s
+                                                .replace('\\"', '"')
+                                                .replace('\\n', '\n')
+                                                .replace('\\r', '\r')
+                                                .replace('\\t', '\t')
+                                                .replace('\\\\', '\\'))
+                                        
+                                        data = {
+                                            "title": unescape_json_string(title_match.group(1)),
+                                            "content": unescape_json_string(content_match.group(1))
+                                        }
+                                        logger.info("Successfully extracted JSON fields using regex fallback")
+                                    else:
+                                        raise json_error
+                                except Exception as regex_error:
+                                    logger.error(f"Regex extraction also failed: {str(regex_error)}")
+                                    raise json_error
+                        
+                        # Clean string fields in data
+                        if isinstance(data, dict):
+                            for key, value in data.items():
+                                if isinstance(value, str):
+                                    # Remove control characters from string values
+                                    data[key] = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f]', '', value)
+                        
+                        # Create model instance from parsed data
+                        parsed_data = output_model(**data)
+                    
+                    # Clean content fields from control characters
+                    if hasattr(parsed_data, 'content'):
+                        import re
+                        # Remove control characters (except \n, \r, \t)
+                        parsed_data.content = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f]', '', parsed_data.content)
+                    if hasattr(parsed_data, 'title'):
+                        import re
+                        parsed_data.title = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f]', '', parsed_data.title).strip()
                     
                     logger.info(f"Successfully generated structured output with model {current_model.value}")
                     return parsed_data
                     
                 except Exception as e:
                     last_exception = e
+                    error_str = str(e)
+                    
+                    # Check if this is a JSON parsing error with control characters
+                    if ("control character" in error_str.lower() or "json_invalid" in error_str.lower()) and response:
+                        logger.warning(
+                            f"JSON parsing error with control characters detected. "
+                            f"Attempting to extract and clean JSON from response..."
+                        )
+                        
+                        try:
+                            # Try to get raw content and parse it manually
+                            if response and response.choices:
+                                message = response.choices[0].message
+                                raw_content = message.content
+                                
+                                if raw_content:
+                                    import json
+                                    import re
+                                    
+                                    # Extract JSON from response
+                                    if "```json" in raw_content:
+                                        json_start = raw_content.find("```json") + 7
+                                        json_end = raw_content.find("```", json_start)
+                                        json_str = raw_content[json_start:json_end].strip()
+                                    elif "```" in raw_content:
+                                        json_start = raw_content.find("```") + 3
+                                        json_end = raw_content.find("```", json_start)
+                                        json_str = raw_content[json_start:json_end].strip()
+                                    elif "{" in raw_content and "}" in raw_content:
+                                        json_start = raw_content.find("{")
+                                        json_end = raw_content.rfind("}") + 1
+                                        json_str = raw_content[json_start:json_end]
+                                    else:
+                                        json_str = raw_content
+                                    
+                                    # Clean control characters from JSON string
+                                    # Remove all control characters
+                                    json_str = re.sub(r'[\x00-\x1f]', '', json_str)
+                                    
+                                    # Parse JSON
+                                    data = json.loads(json_str)
+                                    
+                                    # Clean string fields in data
+                                    if isinstance(data, dict):
+                                        for key, value in data.items():
+                                            if isinstance(value, str):
+                                                # Remove control characters from string values
+                                                data[key] = re.sub(r'[\x00-\x1f]', '', value)
+                                    
+                                    # Create model instance from parsed data
+                                    parsed_data = output_model(**data)
+                                    
+                                    # Clean content fields from control characters
+                                    if hasattr(parsed_data, 'content'):
+                                        parsed_data.content = re.sub(r'[\x00-\x1f]', '', parsed_data.content)
+                                    if hasattr(parsed_data, 'title'):
+                                        parsed_data.title = re.sub(r'[\x00-\x1f]', '', parsed_data.title).strip()
+                                    
+                                    logger.info(f"Successfully recovered structured output after cleaning control characters")
+                                    return parsed_data
+                        except Exception as recovery_error:
+                            logger.warning(f"Failed to recover from JSON parsing error: {str(recovery_error)}")
+                            # Continue with normal error handling
+                    
                     # If this is a rate limit error (429), try the next model immediately
-                    if "429" in str(e) or "rate limit" in str(e).lower():
+                    if "429" in error_str or "rate limit" in error_str.lower():
                         logger.warning(
                             f"Rate limit hit with model {current_model.value}. "
                             "Trying next fallback model..."
@@ -283,7 +683,7 @@ class OpenRouterClient:
                     # For other errors, retry with exponential backoff
                     if attempt < max_retries:
                         logger.warning(
-                            f"Attempt {attempt + 1} failed: {str(e)}. "
+                            f"Attempt {attempt + 1} failed: {error_str}. "
                             f"Retrying in {current_retry_delay} seconds..."
                         )
                         await asyncio.sleep(current_retry_delay)
@@ -292,7 +692,7 @@ class OpenRouterClient:
                     else:
                         logger.error(
                             f"All {max_retries + 1} attempts failed for model {current_model.value}. "
-                            f"Last error: {str(last_exception)}"
+                            f"Last error: {error_str}"
                         )
             
             # Reset retry delay for next model
@@ -306,7 +706,7 @@ class OpenRouterClient:
     async def generate_story(
         self,
         prompt: str,
-        model: OpenRouterModel = OpenRouterModel.LLAMA_3_1_8B,
+        model: OpenRouterModel = OpenRouterModel.CLAUDE_3_HAIKU,
         max_tokens: int = 10000,
         max_retries: int = 3,
         retry_delay: float = 1.0,

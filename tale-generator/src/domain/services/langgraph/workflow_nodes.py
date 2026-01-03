@@ -313,33 +313,73 @@ async def generate_story_node(
             logger.info(f"🔁 Regeneration with feedback: previous score was {previous_feedback['score']}/10")
             logger.info(f"Feedback: {previous_feedback['feedback'][:100]}...")
         
-        # Generate story
-        logger.info("🚀 Calling OpenRouter API...")
-        # Use direct API call, NOT LangGraph workflow (we're already inside a workflow!)
-        result = await openrouter_client.generate_story(
-            prompt,
-            model=model,
+        # Generate story using structured output
+        logger.info("🚀 Calling OpenRouter API with structured output...")
+        from src.openrouter_client import StoryOutput
+        
+        # Add instruction to prompt to return only title and content
+        structured_prompt = prompt + "\n\nIMPORTANT: Return ONLY the story title and content as a JSON object with 'title' and 'content' fields. The 'content' field must contain ONLY the story text, WITHOUT the title. Do not include any introductory text, metadata, or explanations. The title should be separate from the content."
+        
+        # Use structured output to get clean title and content
+        story_output = await openrouter_client.generate_structured_output(
+            prompt=structured_prompt,
+            output_model=StoryOutput,
+            model=model or openrouter_client.OpenRouterModel.GPT_4O_MINI,
+            max_tokens=config.get("max_tokens", 10000),
             temperature=temperature,
             max_retries=3,
-            use_langgraph=False  # CRITICAL: Don't create nested workflow!
+            retry_delay=1.0
         )
         
-        # Extract title
-        lines = result.content.strip().split('\n')
-        title = lines[0].replace('#', '').strip() if lines else "A Bedtime Story"
+        # Extract title and content from structured output
+        title = story_output.title.strip()
+        content = story_output.content.strip()
+        
+        # Remove title from content if it appears at the beginning
+        # This handles cases where the model includes title in content
+        if title and content:
+            # Check if content starts with title (case-insensitive, with possible formatting)
+            content_lower = content.lower().strip()
+            title_lower = title.lower().strip()
+            
+            # Remove title if it appears at the start of content
+            if content_lower.startswith(title_lower):
+                # Find where title ends in content
+                # Try to find title followed by newline or space
+                title_len = len(title)
+                if len(content) > title_len:
+                    # Check if next character is whitespace or newline
+                    next_char = content[title_len:title_len+1]
+                    if next_char in ['\n', ' ', '\t', '\r']:
+                        # Remove title and leading whitespace
+                        content = content[title_len:].lstrip()
+                    elif content_lower == title_lower:
+                        # Content is exactly the title, this shouldn't happen but handle it
+                        content = ""
+            
+            # Also check for title with markdown formatting (# Title)
+            if content.startswith('#'):
+                lines = content.split('\n', 1)
+                first_line = lines[0].replace('#', '').strip()
+                if first_line.lower() == title_lower and len(lines) > 1:
+                    content = lines[1].lstrip()
+        
+        # Use only content, not combining with title
+        # Title is stored separately in GenerationAttempt
+        full_content = content
         
         # Safely extract model value (handle both enum and string)
         model_used_str = "unknown"
-        if result.model:
-            if hasattr(result.model, 'value'):
-                model_used_str = result.model.value
+        if model:
+            if hasattr(model, 'value'):
+                model_used_str = model.value
             else:
-                model_used_str = str(result.model)
+                model_used_str = str(model)
         
         # Create generation attempt
         generation_attempt = GenerationAttempt(
             attempt_number=attempt_number,
-            content=result.content,
+            content=full_content,  # Keep full content for backward compatibility
             title=title,
             model_used=model_used_str,
             temperature=temperature,
@@ -354,7 +394,7 @@ async def generate_story_node(
         
         logger.info(f"✅ Story generated successfully in {state['generation_duration']:.2f}s")
         logger.info(f"📚 Title: {title}")
-        logger.info(f"📝 Content length: {len(result.content)} chars, ~{len(result.content.split())} words")
+        logger.info(f"📝 Content length: {len(content)} chars, ~{len(content.split())} words")
         logger.info(f"🤖 Model used: {model_used_str}")
         logger.info(f"🌡️ Temperature: {temperature}")
         

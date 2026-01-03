@@ -28,14 +28,15 @@ class PromptService:
         
         if supabase_client:
             try:
+                logger.info(f"Initializing PromptTemplateService with supabase_client: {type(supabase_client)}")
                 repository = PromptRepository(supabase_client)
                 self._template_service = PromptTemplateService(repository)
-                logger.info("PromptTemplateService initialized with Supabase")
+                logger.info("✅ PromptTemplateService initialized with Supabase - prompts will be loaded from database")
             except Exception as e:
-                logger.warning(f"Failed to initialize PromptTemplateService: {e}. Using built-in methods.")
+                logger.error(f"❌ Failed to initialize PromptTemplateService: {e}. Using built-in methods.", exc_info=True)
                 self._template_service = None
         else:
-            logger.info("No Supabase client provided. Using built-in prompt generation methods.")
+            logger.warning("⚠️ No Supabase client provided. Using built-in prompt generation methods (will include 'IMPORTANT: Start directly...' text).")
     
     def generate_child_prompt(
         self,
@@ -62,6 +63,7 @@ class PromptService:
         # Use template service if available
         if self._template_service:
             try:
+                logger.info(f"✅ Using PromptTemplateService for child prompt generation (language={language.value}, story_type=child)")
                 # Convert Child entity to ChildCharacter
                 child_character = ChildCharacter(
                     name=child.name,
@@ -71,7 +73,7 @@ class PromptService:
                     description=None
                 )
                 
-                return self._template_service.render_prompt(
+                prompt = self._template_service.render_prompt(
                     character=child_character,
                     moral=moral,
                     language=language,
@@ -79,8 +81,14 @@ class PromptService:
                     story_type="child",
                     parent_story=parent_story
                 )
+                logger.info(f"✅ Successfully generated prompt using PromptTemplateService (length={len(prompt)} chars)")
+                if "IMPORTANT: Start directly" in prompt:
+                    logger.error("❌ ERROR: Prompt from Supabase contains 'IMPORTANT: Start directly' - this should NOT happen!")
+                return prompt
             except Exception as e:
-                logger.warning(f"Template service failed, falling back to built-in methods: {e}")
+                logger.error(f"❌ Template service failed, falling back to built-in methods: {e}", exc_info=True)
+        else:
+            logger.warning("⚠️ PromptTemplateService not available - using built-in methods (will include 'IMPORTANT: Start directly...' text)")
         
         # Fallback to built-in methods
         if language == Language.RUSSIAN:
@@ -111,6 +119,7 @@ class PromptService:
         # Use template service if available
         if self._template_service:
             try:
+                logger.info(f"Using PromptTemplateService for hero prompt generation (language={hero.language.value}, story_type=hero)")
                 # Convert Hero entity to HeroCharacter
                 hero_character = HeroCharacter(
                     name=hero.name,
@@ -124,7 +133,7 @@ class PromptService:
                     description=None
                 )
                 
-                return self._template_service.render_prompt(
+                prompt = self._template_service.render_prompt(
                     character=hero_character,
                     moral=moral,
                     language=hero.language,
@@ -132,8 +141,10 @@ class PromptService:
                     story_type="hero",
                     parent_story=parent_story
                 )
+                logger.info(f"Successfully generated prompt using PromptTemplateService (length={len(prompt)} chars)")
+                return prompt
             except Exception as e:
-                logger.warning(f"Template service failed, falling back to built-in methods: {e}")
+                logger.warning(f"Template service failed, falling back to built-in methods: {e}", exc_info=True)
         
         # Fallback to built-in methods
         if hero.language == Language.RUSSIAN:
@@ -168,6 +179,7 @@ class PromptService:
         # Use template service if available
         if self._template_service:
             try:
+                logger.info(f"Using PromptTemplateService for combined prompt generation (language={language.value}, story_type=combined)")
                 # Convert Child and Hero entities to Character objects
                 child_character = ChildCharacter(
                     name=child.name,
@@ -201,7 +213,7 @@ class PromptService:
                     relationship=relationship
                 )
                 
-                return self._template_service.render_prompt(
+                prompt = self._template_service.render_prompt(
                     character=combined_character,
                     moral=moral,
                     language=language,
@@ -209,8 +221,10 @@ class PromptService:
                     story_type="combined",
                     parent_story=parent_story
                 )
+                logger.info(f"Successfully generated prompt using PromptTemplateService (length={len(prompt)} chars)")
+                return prompt
             except Exception as e:
-                logger.warning(f"Template service failed, falling back to built-in methods: {e}")
+                logger.warning(f"Template service failed, falling back to built-in methods: {e}", exc_info=True)
         
         # Fallback to built-in methods
         if language == Language.RUSSIAN:
@@ -246,6 +260,8 @@ class PromptService:
         Include the child's name as the main character in the story.
         End the story with a clear message about the moral value.
         Write the story in English.
+        
+        IMPORTANT: Start directly with the story. Do not include any introductory text, explanations, or metadata. Just write the story title and content.
         """
     
     def _generate_russian_child_prompt(
@@ -277,6 +293,8 @@ class PromptService:
         Включи имя ребенка как главного героя сказки.
         Закончи сказку четким сообщением о нравственном уроке.
         Напиши сказку на русском языке.
+        
+        ВАЖНО: Начни сразу со сказки. Не включай вводный текст, объяснения или метаданные. Просто напиши заголовок и содержание сказки.
         """
     
     def _generate_english_hero_prompt(
@@ -311,6 +329,8 @@ class PromptService:
         Include the hero's name as the main character in the story.
         End the story with a clear message about the moral value.
         Write the story in English.
+        
+        IMPORTANT: Start directly with the story. Do not include any introductory text, explanations, or metadata. Just write the story title and content.
         """
     
     def _generate_russian_hero_prompt(
@@ -346,6 +366,8 @@ class PromptService:
         Включи имя героя как главного персонажа сказки.
         Закончи сказку четким сообщением о нравственном уроке.
         Напиши сказку на русском языке.
+        
+        ВАЖНО: Начни сразу со сказки. Не включай вводный текст, объяснения или метаданные. Просто напиши заголовок и содержание сказки.
         """
     
     def _get_parent_story_text(self, parent_story: Optional[StoryDB], language: Language) -> Optional[str]:
@@ -501,6 +523,8 @@ This story is a continuation of the previous one. Create a natural continuation 
         Include both characters' names throughout the story and show how they work together.
         End the story with a clear message about the moral value.
         Write the story in English.
+        
+        IMPORTANT: Start directly with the story. Do not include any introductory text, explanations, or metadata. Just write the story title and content.
         """
     
     def _generate_russian_combined_prompt(
@@ -550,4 +574,6 @@ This story is a continuation of the previous one. Create a natural continuation 
         Включи имена обоих персонажей в сказке и покажи, как они работают вместе.
         Закончи сказку четким сообщением о нравственном уроке.
         Напиши сказку на русском языке.
+        
+        ВАЖНО: Начни сразу со сказки. Не включай вводный текст, объяснения или метаданные. Просто напиши заголовок и содержание сказки.
         """

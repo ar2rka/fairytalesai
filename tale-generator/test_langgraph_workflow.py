@@ -39,7 +39,16 @@ async def test_workflow():
     # Initialize services
     print("\n1. Initializing services...")
     openrouter_client = OpenRouterClient()
-    prompt_service = PromptService()
+    
+    # Initialize PromptService with Supabase client if available
+    from src.api.helpers.services import initialize_supabase_client, initialize_prompt_service
+    supabase_client = initialize_supabase_client()
+    prompt_service = initialize_prompt_service(supabase_client)
+    
+    if prompt_service._template_service:
+        print("✅ PromptService initialized with Supabase prompts")
+    else:
+        print("⚠️ PromptService using built-in methods (Supabase not available)")
     
     # Create mock repositories (in real usage, use actual repositories)
     class MockChildRepository:
@@ -170,7 +179,10 @@ async def test_validation_rejection():
     
     # Initialize services
     openrouter_client = OpenRouterClient()
-    prompt_service = PromptService()
+    # Initialize PromptService with Supabase client if available
+    from src.api.helpers.services import initialize_supabase_client, initialize_prompt_service
+    supabase_client = initialize_supabase_client()
+    prompt_service = initialize_prompt_service(supabase_client)
     
     class MockChildRepository:
         async def find_exact_match(self, name, age, gender):

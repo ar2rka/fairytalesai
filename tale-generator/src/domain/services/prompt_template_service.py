@@ -60,7 +60,9 @@ class PromptTemplateService:
             Complete rendered prompt string
         """
         # Load prompt parts from repository
+        logger.info(f"Loading prompts from repository: language={language.value}, story_type={story_type}")
         prompt_parts = self._repository.get_prompts(language, story_type)
+        logger.info(f"Loaded {len(prompt_parts)} prompt parts for language={language.value}, story_type={story_type}")
         
         if not prompt_parts:
             logger.warning(
@@ -69,10 +71,16 @@ class PromptTemplateService:
             )
             # Try universal prompts (story_type = None)
             prompt_parts = self._repository.get_prompts(language, None)
+            logger.info(f"Loaded {len(prompt_parts)} universal prompt parts for language={language.value}")
         
         if not prompt_parts:
+            logger.error(
+                f"No prompts found in database for language={language.value}, story_type={story_type}. "
+                f"Please check that prompts are configured in Supabase."
+            )
             raise ValueError(
-                f"No prompts found for language={language.value}, story_type={story_type}"
+                f"No prompts found for language={language.value}, story_type={story_type}. "
+                f"Please ensure prompts are configured in the Supabase 'prompts' table."
             )
         
         # Calculate word count
