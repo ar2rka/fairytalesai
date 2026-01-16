@@ -23,6 +23,13 @@ struct SettingsView: View {
             
             ScrollView {
                 VStack(spacing: 24) {
+                    // Guest Mode Banner
+                    if authService.isGuest {
+                        GuestModeBanner()
+                            .padding(.horizontal)
+                            .padding(.top)
+                    }
+                    
                     // User Profile Section
                     HStack(spacing: 16) {
                         ZStack(alignment: .bottomTrailing) {
@@ -138,27 +145,36 @@ struct SettingsView: View {
                 .padding(.horizontal)
             
             if childrenStore.children.isEmpty {
-                VStack(spacing: 12) {
-                    Text("No children added yet")
+                VStack(spacing: 20) {
+                    Image(systemName: "person.fill.badge.plus")
+                        .font(.system(size: 50))
+                        .foregroundColor(AppTheme.primaryPurple.opacity(0.6))
+                    
+                    Text("Who is our hero today?")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundColor(AppTheme.textPrimary(for: colorScheme))
+                    
+                    Text("Add a profile to start the adventure.")
                         .font(.system(size: 14))
-                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 20)
+                        .foregroundColor(Color(white: 0.85)) // Lighter for better contrast
+                        .multilineTextAlignment(.center)
                     
                     Button(action: { showingAddChild = true }) {
                         HStack {
                             Image(systemName: "plus")
-                            Text("Add a new child")
+                            Text("Add Profile")
+                                .font(.system(size: 16, weight: .semibold))
                         }
-                        .font(.system(size: 14, weight: .semibold))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
+                        .padding(.vertical, 14)
                         .background(AppTheme.primaryPurple)
                         .cornerRadius(AppTheme.cornerRadius)
                     }
                 }
-                .padding()
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 40)
+                .padding(.horizontal)
                 .background(AppTheme.cardBackground(for: colorScheme))
                 .cornerRadius(AppTheme.cornerRadius)
                 .padding(.horizontal)
@@ -520,5 +536,68 @@ struct EditChildView: View {
     
     var body: some View {
         AddChildView(child: child)
+    }
+}
+
+struct GuestModeBanner: View {
+    @EnvironmentObject var authService: AuthService
+    @Environment(\.colorScheme) var colorScheme
+    @State private var showingSignUp = false
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 12) {
+                Image(systemName: "sparkles")
+                    .font(.system(size: 24))
+                    .foregroundColor(.white)
+                    .frame(width: 40, height: 40)
+                    .background(
+                        Circle()
+                            .fill(
+                                LinearGradient(
+                                    colors: [AppTheme.primaryPurple, AppTheme.pastelBlue],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                    )
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("✨ Save the Magic Forever")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(.white)
+                    
+                    Text("Sync profiles and stories across all your devices.")
+                        .font(.system(size: 13))
+                        .foregroundColor(.white.opacity(0.9))
+                }
+                
+                Spacer()
+            }
+            
+            Button(action: { showingSignUp = true }) {
+                Text("Create Account")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(Color.white.opacity(0.2))
+                    .cornerRadius(AppTheme.cornerRadius)
+            }
+        }
+        .padding()
+        .background(
+            LinearGradient(
+                colors: [AppTheme.primaryPurple, AppTheme.pastelBlue],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
+        .cornerRadius(AppTheme.cornerRadius)
+        .sheet(isPresented: $showingSignUp) {
+            SignUpView()
+                .environmentObject(authService)
+                .environmentObject(DataMigrationService.shared)
+        }
     }
 }

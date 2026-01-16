@@ -6,6 +6,7 @@ struct GenerateStoryView: View {
     @EnvironmentObject var premiumManager: PremiumManager
     @EnvironmentObject var userSettings: UserSettings
     @Environment(\.colorScheme) var colorScheme
+    @Environment(\.dismiss) var dismiss
     
     @StateObject private var viewModel = GenerateStoryViewModel()
     
@@ -76,6 +77,17 @@ struct GenerateStoryView: View {
             }
             .navigationTitle("Create Story")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        dismiss()
+                    }) {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                    }
+                }
+            }
             .task {
                 await childrenStore.loadChildrenIfNeeded()
             }

@@ -16,29 +16,52 @@ struct FairyTalesAIApp: App {
     var body: some Scene {
         WindowGroup {
             Group {
-                if !authService.isAuthenticated {
+                // If authenticated, show main app
+                if authService.isAuthenticated {
+                    if userSettings.hasCompletedOnboarding && userSettings.onboardingComplete {
+                        MainTabView()
+                            .environmentObject(childrenStore)
+                            .environmentObject(storiesStore)
+                            .environmentObject(premiumManager)
+                            .environmentObject(userSettings)
+                            .environmentObject(authService)
+                            .preferredColorScheme(.dark) // Force dark mode for bedtime-friendly UI
+                            .onAppear {
+                                premiumManager.syncWithUserSettings(userSettings)
+                            }
+                    } else {
+                        OnboardingView()
+                            .environmentObject(userSettings)
+                            .environmentObject(authService)
+                            .preferredColorScheme(.dark)
+                    }
+                } else if authService.isGuest {
+                    // Guest mode - show main app without authentication
+                    if userSettings.hasCompletedOnboarding && userSettings.onboardingComplete {
+                        MainTabView()
+                            .environmentObject(childrenStore)
+                            .environmentObject(storiesStore)
+                            .environmentObject(premiumManager)
+                            .environmentObject(userSettings)
+                            .environmentObject(authService)
+                            .preferredColorScheme(.dark) // Force dark mode for bedtime-friendly UI
+                            .onAppear {
+                                premiumManager.syncWithUserSettings(userSettings)
+                            }
+                    } else {
+                        OnboardingView()
+                            .environmentObject(userSettings)
+                            .environmentObject(authService)
+                            .preferredColorScheme(.dark)
+                    }
+                } else {
+                    // Not authenticated and not in guest mode - show login
                     LoginView()
                         .environmentObject(authService)
-                        .preferredColorScheme(themeMode.colorScheme)
-                } else if userSettings.hasCompletedOnboarding && userSettings.onboardingComplete {
-                    MainTabView()
-                        .environmentObject(childrenStore)
-                        .environmentObject(storiesStore)
-                        .environmentObject(premiumManager)
-                        .environmentObject(userSettings)
-                        .environmentObject(authService)
-                        .preferredColorScheme(themeMode.colorScheme)
-                        .onAppear {
-                            premiumManager.syncWithUserSettings(userSettings)
-                        }
-                } else {
-                    OnboardingView()
-                        .environmentObject(userSettings)
-                        .environmentObject(authService)
-                        .preferredColorScheme(themeMode.colorScheme)
+                        .preferredColorScheme(.dark)
                 }
             }
-            .preferredColorScheme(themeMode.colorScheme)
+            .preferredColorScheme(.dark) // Force dark mode globally
         }
     }
 }

@@ -81,6 +81,24 @@ class StoriesService: ObservableObject {
         
         return response?.toStory()
     }
+    
+    func createStory(_ story: Story, userId: UUID) async throws -> Story {
+        guard let supabase = supabase else {
+            throw StoriesError.supabaseNotConfigured
+        }
+        
+        let supabaseStory = SupabaseStory.fromStory(story, userId: userId)
+        
+        let response: SupabaseStory = try await supabase
+            .from("stories")
+            .insert(supabaseStory)
+            .select()
+            .single()
+            .execute()
+            .value
+        
+        return response.toStory()
+    }
 }
 
 // MARK: - Supabase Story Model
@@ -138,6 +156,21 @@ private struct SupabaseStory: Codable {
         // Примерная оценка: ~200 слов в минуту чтения
         let wordCount = content.split(separator: " ").count
         return max(1, wordCount / 200)
+    }
+    
+    static func fromStory(_ story: Story, userId: UUID) -> SupabaseStory {
+        let dateFormatter = ISO8601DateFormatter()
+        dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        
+        return SupabaseStory(
+            id: story.id,
+            title: story.title,
+            content: story.content,
+            childId: story.childId,
+            createdAt: dateFormatter.string(from: story.createdAt),
+            language: story.language,
+            rating: story.rating
+        )
     }
 }
 

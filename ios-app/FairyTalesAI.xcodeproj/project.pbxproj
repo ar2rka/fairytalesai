@@ -18,6 +18,11 @@
 		9A88A6E02F02EE2B009259D7 /* Services/StoriesService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A88A6DF2F02EE2B009259D7 /* Services/StoriesService.swift */; };
 		9A88A6E12F02EE2B009259D8 /* Services/ChildrenService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A88A6E22F02EE2B009259D8 /* Services/ChildrenService.swift */; };
 		9AAB74292F02E21D005C3BE7 /* Services/SupabaseConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AAB74272F02E21D005C3BE7 /* Services/SupabaseConfig.swift */; };
+		D9E2D6022EFD60A40082D3C4 /* Services/GuestDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D6032EFD60A40082D3C4 /* Services/GuestDataManager.swift */; };
+		D9E2D6042EFD60A40082D3C5 /* Services/DataMigrationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D6052EFD60A40082D3C5 /* Services/DataMigrationService.swift */; };
+		D9E2D6062EFD60A40082D3C6 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D6072EFD60A40082D3C6 /* SignUpView.swift */; };
+		D9E2D6082EFD60A40082D3C7 /* ExploreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D6092EFD60A40082D3C7 /* ExploreView.swift */; };
+		D9E2D60A2EFD60A40082D3C8 /* CustomTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D60B2EFD60A40082D3C8 /* CustomTabBar.swift */; };
 		A1000001 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000 /* App.swift */; };
 		A1000003 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000002 /* ContentView.swift */; };
 		A1000005 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000004 /* Assets.xcassets */; };
@@ -59,6 +64,11 @@
 		9A88A6E12F02FDD8009259D7 /* FairyTalesAIDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FairyTalesAIDebug.entitlements; sourceTree = "<group>"; };
 		9A88A6E22F02EE2B009259D8 /* Services/ChildrenService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/ChildrenService.swift; sourceTree = "<group>"; };
 		9AAB74272F02E21D005C3BE7 /* Services/SupabaseConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/SupabaseConfig.swift; sourceTree = "<group>"; };
+		D9E2D6032EFD60A40082D3C4 /* Services/GuestDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/GuestDataManager.swift; sourceTree = "<group>"; };
+		D9E2D6052EFD60A40082D3C5 /* Services/DataMigrationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/DataMigrationService.swift; sourceTree = "<group>"; };
+		D9E2D6072EFD60A40082D3C6 /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
+		D9E2D6092EFD60A40082D3C7 /* ExploreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreView.swift; sourceTree = "<group>"; };
+		D9E2D60B2EFD60A40082D3C8 /* CustomTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabBar.swift; sourceTree = "<group>"; };
 		A0FFFFFF /* FairyTalesAI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FairyTalesAI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1000000 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		A1000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -133,6 +143,8 @@
 				7A6F376FB37E4ECCA09E2FC9 /* Services/AuthService.swift */,
 				9A88A6DF2F02EE2B009259D7 /* Services/StoriesService.swift */,
 				9A88A6E22F02EE2B009259D8 /* Services/ChildrenService.swift */,
+				D9E2D6032EFD60A40082D3C4 /* Services/GuestDataManager.swift */,
+				D9E2D6052EFD60A40082D3C5 /* Services/DataMigrationService.swift */,
 			);
 			path = FairyTalesAI;
 			sourceTree = "<group>";
@@ -192,6 +204,9 @@
 				D9E2D5D82EFD60A40082D3B4 /* MainTabView.swift */,
 				D9E2D5D92EFD60A40082D3B4 /* SettingsView.swift */,
 				70E32FB058A04056809C1CBD /* LoginView.swift */,
+				D9E2D6072EFD60A40082D3C6 /* SignUpView.swift */,
+				D9E2D6092EFD60A40082D3C7 /* ExploreView.swift */,
+				D9E2D60B2EFD60A40082D3C8 /* CustomTabBar.swift */,
 				D9E2D5EB2EFD60A40082D3B7 /* OnboardingView.swift */,
 				D9E2D5ED2EFD60A40082D3B8 /* PaywallView.swift */,
 				D9E2D5EF2EFD60A40082D3B9 /* StoryResultView.swift */,
@@ -304,6 +319,9 @@
 				D9E2D5E72EFD60A40082D3B5 /* PremiumManager.swift in Sources */,
 				D9E2D5E92EFD60A40082D3B6 /* UserSettings.swift in Sources */,
 				926E6249870741DCB9C75C62 /* LoginView.swift in Sources */,
+				D9E2D6062EFD60A40082D3C6 /* SignUpView.swift in Sources */,
+				D9E2D6082EFD60A40082D3C7 /* ExploreView.swift in Sources */,
+				D9E2D60A2EFD60A40082D3C8 /* CustomTabBar.swift in Sources */,
 				D9E2D5EA2EFD60A40082D3B7 /* OnboardingView.swift in Sources */,
 				D9E2D5EC2EFD60A40082D3B8 /* PaywallView.swift in Sources */,
 				D9E2D5DE2EFD60A40082D3B4 /* AppTheme.swift in Sources */,
@@ -316,6 +334,8 @@
 				5C20FA9A3A924DB8BFF95BB8 /* Services/AuthService.swift in Sources */,
 				9A88A6E02F02EE2B009259D7 /* Services/StoriesService.swift in Sources */,
 				9A88A6E12F02EE2B009259D8 /* Services/ChildrenService.swift in Sources */,
+				D9E2D6022EFD60A40082D3C4 /* Services/GuestDataManager.swift in Sources */,
+				D9E2D6042EFD60A40082D3C5 /* Services/DataMigrationService.swift in Sources */,
 				D9E2D5E42EFD60A40082D3B4 /* SettingsView.swift in Sources */,
 				D9E2D5E52EFD60A40082D3B4 /* MainTabView.swift in Sources */,
 				D9E2D5E62EFD60A40082D3B4 /* Child.swift in Sources */,

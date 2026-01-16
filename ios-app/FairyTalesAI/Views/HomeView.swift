@@ -42,7 +42,7 @@ struct HomeView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Welcome")
                                 .font(.system(size: 16, weight: .medium))
-                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                                .foregroundColor(Color(white: 0.85)) // Lighter for better contrast
                             
                             Text("Create Magical Stories")
                                 .font(.system(size: 32, weight: .bold))
@@ -50,7 +50,7 @@ struct HomeView: View {
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal)
-                        .padding(.top)
+                        .padding(.top, 8)
                         
                         // Free Demo Stories Section
                         VStack(alignment: .leading, spacing: 16) {
@@ -72,32 +72,21 @@ struct HomeView: View {
                             }
                         }
                         
-                        // Main Feature Card
-                        if childrenStore.hasProfiles {
-                        NavigationLink(destination: GenerateStoryView()) {
-                            FeatureCard()
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                        .padding(.horizontal)
-                        } else {
-                            GetStartedCard()
-                                .padding(.horizontal)
-                        }
-                        
                         // Who is listening section
-                        if !childrenStore.children.isEmpty {
-                            VStack(alignment: .leading, spacing: 12) {
-                                HStack {
-                                    Text("Who is listening?")
-                                        .font(.system(size: 20, weight: .semibold))
-                                        .foregroundColor(AppTheme.textPrimary(for: colorScheme))
-                                    
-                                    Spacer()
-                                    
-                                    NavigationLink("Manage", destination: SettingsView())
-                                        .foregroundColor(AppTheme.primaryPurple)
-                                }
-                                .padding(.horizontal)
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack {
+                                Text("Who is listening?")
+                                    .font(.system(size: 20, weight: .semibold))
+                                    .foregroundColor(AppTheme.textPrimary(for: colorScheme))
+                                
+                                Spacer()
+                                
+                                NavigationLink("Manage", destination: NavigationView { SettingsView() })
+                                    .foregroundColor(AppTheme.primaryPurple)
+                            }
+                            .padding(.horizontal)
+                            
+                            if !childrenStore.children.isEmpty {
                                 
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     HStack(spacing: 16) {
@@ -122,6 +111,38 @@ struct HomeView: View {
                                     }
                                     .padding(.horizontal)
                                 }
+                            } else {
+                                // Empty state for children
+                                VStack(spacing: 16) {
+                                    Image(systemName: "person.fill.badge.plus")
+                                        .font(.system(size: 40))
+                                        .foregroundColor(AppTheme.primaryPurple.opacity(0.6))
+                                    
+                                    Text("Who is our hero today?")
+                                        .font(.system(size: 16, weight: .semibold))
+                                        .foregroundColor(AppTheme.textPrimary(for: colorScheme))
+                                    
+                                    Text("Add a profile to start the adventure.")
+                                        .font(.system(size: 14))
+                                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                                        .multilineTextAlignment(.center)
+                                    
+                                    NavigationLink(destination: AddChildView()) {
+                                        HStack {
+                                            Image(systemName: "plus")
+                                            Text("Add Profile")
+                                                .font(.system(size: 14, weight: .semibold))
+                                        }
+                                        .foregroundColor(.white)
+                                        .padding(.horizontal, 20)
+                                        .padding(.vertical, 10)
+                                        .background(AppTheme.primaryPurple)
+                                        .cornerRadius(AppTheme.cornerRadius)
+                                    }
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 30)
+                                .padding(.horizontal)
                             }
                         }
                         
@@ -172,7 +193,9 @@ struct HomeView: View {
                     Spacer(minLength: 50)
                 }
             }
+            .navigationTitle("Home")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
         }
     }
     
@@ -239,7 +262,7 @@ struct FreeDemoStoryCard: View {
                 
                 Text("\(story.duration) min • \(story.theme)")
                     .font(.system(size: 12))
-                    .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                    .foregroundColor(Color(white: 0.85)) // Lighter for better contrast
             }
         }
         .frame(width: 200)
@@ -279,13 +302,14 @@ struct FeatureCard: View {
 
 struct GetStartedCard: View {
     @EnvironmentObject var childrenStore: ChildrenStore
+    @Environment(\.colorScheme) var colorScheme
     @State private var showingAddChild = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Every story needs a hero. Add your child to start the magic!")
                 .font(.system(size: 18, weight: .semibold))
-                .foregroundColor(AppTheme.textPrimary)
+                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                 .multilineTextAlignment(.leading)
             
             Button(action: { showingAddChild = true }) {
@@ -308,7 +332,7 @@ struct GetStartedCard: View {
             }
         }
         .padding()
-        .background(AppTheme.cardBackground)
+        .background(AppTheme.cardBackground(for: colorScheme))
         .cornerRadius(AppTheme.cornerRadius)
         .sheet(isPresented: $showingAddChild) {
             AddChildView()
@@ -369,10 +393,11 @@ struct StoryCard: View {
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                 .lineLimit(2)
+                .frame(height: 40, alignment: .topLeading) // Fixed height for alignment
             
             Text("\(story.duration) min • \(story.theme)")
                 .font(.system(size: 12))
-                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                .foregroundColor(Color(white: 0.85)) // Lighter for better contrast
         }
         .frame(width: 150)
     }
@@ -381,32 +406,53 @@ struct StoryCard: View {
 struct ThemeButton: View {
     let theme: StoryTheme
     @Environment(\.colorScheme) var colorScheme
+    @State private var isSelected = false
+    @State private var bounceScale: CGFloat = 1.0
     
     private var themeColor: Color {
         switch theme.name.lowercased() {
         case "space":
-            return Color(red: 0.1, green: 0.2, blue: 0.4)
+            return Color(red: 1.0, green: 0.65, blue: 0.0) // Orange
         case "pirates":
-            return Color(red: 0.3, green: 0.2, blue: 0.1)
+            return Color(red: 0.8, green: 0.6, blue: 0.2) // Gold
         case "dinosaurs":
-            return Color(red: 0.4, green: 0.3, blue: 0.1)
+            return Color(red: 0.2, green: 0.8, blue: 0.2) // Green
         case "mermaids":
-            return Color(red: 0.1, green: 0.3, blue: 0.4)
+            return Color(red: 0.2, green: 0.6, blue: 1.0) // Blue
         case "animals":
-            return Color(red: 0.2, green: 0.4, blue: 0.2)
+            return Color(red: 0.4, green: 0.7, blue: 0.3) // Green
         case "mystery":
-            return Color(red: 0.3, green: 0.2, blue: 0.3)
+            return Color(red: 0.6, green: 0.3, blue: 0.8) // Purple
         case "magic school":
-            return Color(red: 0.4, green: 0.2, blue: 0.4)
+            return Color(red: 0.8, green: 0.3, blue: 0.8) // Magenta
         case "robots":
-            return Color(red: 0.3, green: 0.3, blue: 0.3)
+            return Color(red: 0.5, green: 0.5, blue: 0.5) // Gray
         default:
             return AppTheme.primaryPurple
         }
     }
     
     var body: some View {
-        Button(action: {}) {
+        Button(action: {
+            // Haptic feedback
+            let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+            impactFeedback.impactOccurred()
+            
+            // Toggle selection
+            isSelected.toggle()
+            
+            // Bounce animation
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) {
+                bounceScale = 1.2
+            }
+            
+            // Reset bounce
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) {
+                    bounceScale = 1.0
+                }
+            }
+        }) {
             VStack(spacing: 6) {
                 Text(theme.emoji)
                     .font(.system(size: 28))
@@ -422,9 +468,17 @@ struct ThemeButton: View {
             .background(themeColor.opacity(0.15))
             .overlay(
                 RoundedRectangle(cornerRadius: AppTheme.cornerRadius)
-                    .stroke(themeColor.opacity(0.3), lineWidth: 1)
+                    .stroke(
+                        isSelected ? themeColor : themeColor.opacity(0.3),
+                        lineWidth: isSelected ? 2 : 1
+                    )
+                    .shadow(
+                        color: isSelected ? themeColor.opacity(0.6) : .clear,
+                        radius: isSelected ? 8 : 0
+                    )
             )
             .cornerRadius(AppTheme.cornerRadius)
+            .scaleEffect(bounceScale)
         }
     }
 }

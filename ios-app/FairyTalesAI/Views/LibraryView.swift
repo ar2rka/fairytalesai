@@ -33,32 +33,40 @@ struct LibraryView: View {
             ZStack {
                 AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
                 
-                if storiesStore.isLoading {
-                    VStack(spacing: 24) {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.primaryPurple))
-                            .scaleEffect(1.5)
-                        
-                        Text("Loading stories...")
-                            .font(.system(size: 16))
-                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                    }
-                } else if storiesStore.stories.isEmpty {
-                    VStack(spacing: 24) {
-                        Image(systemName: "book.fill")
-                            .font(.system(size: 60))
-                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                        
-                        Text("No stories yet")
-                            .font(.system(size: 20, weight: .semibold))
-                            .foregroundColor(AppTheme.textPrimary(for: colorScheme))
-                        
-                        Text("Create your first magical story")
-                            .font(.system(size: 14))
-                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                    }
-                } else {
-                    VStack(spacing: 0) {
+                VStack(spacing: 0) {
+                    if storiesStore.isLoading {
+                        Spacer()
+                        VStack(spacing: 24) {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.primaryPurple))
+                                .scaleEffect(1.5)
+                            
+                            Text("Loading stories...")
+                                .font(.system(size: 16))
+                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                        }
+                        Spacer()
+                    } else if storiesStore.stories.isEmpty {
+                        // Empty State
+                        Spacer()
+                        VStack(spacing: 20) {
+                            AnimatedBookIcon()
+                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                            
+                            Text("No stories yet")
+                                .font(.system(size: 20, weight: .semibold))
+                                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
+                                .multilineTextAlignment(.center)
+                            
+                            Text("Create your first magical story")
+                                .font(.system(size: 14))
+                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                                .multilineTextAlignment(.center)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.horizontal)
+                        Spacer()
+                    } else {
                         // Search Bar
                         HStack {
                             Image(systemName: "magnifyingglass")
@@ -138,15 +146,8 @@ struct LibraryView: View {
                 }
             }
             .navigationTitle("My Library")
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {}) {
-                        Image(systemName: "sparkles")
-                            .foregroundColor(AppTheme.primaryPurple)
-                    }
-                }
-            }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
             .onAppear {
                 if let userId = authService.currentUser?.id {
                     Task {
@@ -313,6 +314,14 @@ struct StoryLibraryRow: View {
         } else {
             return "Long ago"
         }
+    }
+}
+
+struct AnimatedBookIcon: View {
+    var body: some View {
+        Image(systemName: "book.fill")
+            .font(.system(size: 60))
+            .frame(width: 80, height: 80) // Fixed frame to prevent layout shifts
     }
 }
 

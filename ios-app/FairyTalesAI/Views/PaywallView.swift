@@ -2,8 +2,10 @@ import SwiftUI
 
 struct PaywallView: View {
     @EnvironmentObject var userSettings: UserSettings
+    @EnvironmentObject var authService: AuthService
     @Environment(\.dismiss) var dismiss
     @State private var isPulsing = false
+    @State private var showingSignUp = false
     
     var body: some View {
         GeometryReader { geometry in
@@ -97,12 +99,17 @@ struct PaywallView: View {
                             let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
                             impactFeedback.impactOccurred()
                             
-                            // Start free trial
-                            userSettings.startFreeTrial()
-                            dismiss()
+                            // If guest, show sign up first
+                            if authService.isGuest {
+                                showingSignUp = true
+                            } else {
+                                // Start free trial
+                                userSettings.startFreeTrial()
+                                dismiss()
+                            }
                         }) {
                             HStack {
-                                Text("Start Your 7-Day Free Trial")
+                                Text(authService.isGuest ? "Create Account to Subscribe" : "Start Your 7-Day Free Trial")
                                     .font(.system(size: min(geometry.size.width * 0.045, 18), weight: .semibold))
                             }
                             .foregroundColor(.white)
@@ -164,6 +171,11 @@ struct PaywallView: View {
                         .foregroundColor(.white.opacity(0.7))
                 }
             }
+        }
+        .sheet(isPresented: $showingSignUp) {
+            SignUpView()
+                .environmentObject(authService)
+                .environmentObject(DataMigrationService.shared)
         }
     }
 }

@@ -29,11 +29,11 @@ struct AppTheme {
     static let pastelBlue = Color(red: 0.7, green: 0.85, blue: 1.0) // Soft Blue
     static let pastelPink = Color(red: 1.0, green: 0.8, blue: 0.9) // Soft Pink
     
-    // Dark Theme Colors
-    static let darkPurple = Color(red: 0.12, green: 0.12, blue: 0.2) // Dark background
-    static let darkCardBackground = Color(red: 0.18, green: 0.18, blue: 0.28) // Card background
+    // Dark Theme Colors - Bedtime-friendly deep purples and midnight blues
+    static let darkPurple = Color(red: 0.08, green: 0.08, blue: 0.15) // Deeper dark background
+    static let darkCardBackground = Color(red: 0.15, green: 0.15, blue: 0.25) // Card background
     static let darkTextPrimary = Color.white
-    static let darkTextSecondary = Color(white: 0.75)
+    static let darkTextSecondary = Color(white: 0.85) // Lighter for better contrast at low brightness
     
     // Light Theme Colors
     static let lightPurple = Color(red: 0.98, green: 0.97, blue: 1.0) // Light background

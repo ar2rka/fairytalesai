@@ -7,7 +7,12 @@ struct ChildSelectionButton: View {
     @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
-        Button(action: action) {
+        Button(action: {
+            // Haptic feedback
+            let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+            impactFeedback.impactOccurred()
+            action()
+        }) {
             VStack(spacing: 8) {
                 Text(child.name)
                     .font(.system(size: 16, weight: .semibold))
@@ -15,7 +20,7 @@ struct ChildSelectionButton: View {
                 
                 Text(child.ageCategory.shortName)
                     .font(.system(size: 12))
-                    .foregroundColor(isSelected ? .white.opacity(0.8) : AppTheme.textSecondary(for: colorScheme))
+                    .foregroundColor(isSelected ? .white.opacity(0.8) : Color(white: 0.85)) // Lighter for better contrast
             }
             .padding()
             .frame(width: 100)

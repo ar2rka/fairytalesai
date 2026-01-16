@@ -9,6 +9,7 @@ class ChildrenStore: ObservableObject {
     
     private let childrenService = ChildrenService.shared
     private let authService = AuthService.shared
+    private let guestDataManager = GuestDataManager.shared
     private var lastLoadTime: Date?
     private let cacheValidityDuration: TimeInterval = 300 // 5 минут
     
@@ -23,6 +24,12 @@ class ChildrenStore: ObservableObject {
     }
     
     func loadChildren() async {
+        // If in guest mode, load from local storage
+        if authService.isGuest {
+            children = guestDataManager.loadGuestChildren()
+            return
+        }
+        
         guard let userId = authService.currentUser?.id else {
             children = []
             return
@@ -68,6 +75,13 @@ class ChildrenStore: ObservableObject {
     }
     
     func addChild(_ child: Child) async throws -> Child {
+        // If in guest mode, save locally
+        if authService.isGuest {
+            children.append(child)
+            guestDataManager.saveGuestChildren(children)
+            return child
+        }
+        
         guard let userId = authService.currentUser?.id else {
             throw ChildrenError.userNotAuthenticated
         }
@@ -90,6 +104,15 @@ class ChildrenStore: ObservableObject {
     }
     
     func updateChild(_ child: Child) async throws {
+        // If in guest mode, save locally
+        if authService.isGuest {
+            if let index = children.firstIndex(where: { $0.id == child.id }) {
+                children[index] = child
+                guestDataManager.saveGuestChildren(children)
+            }
+            return
+        }
+        
         guard let userId = authService.currentUser?.id else {
             throw ChildrenError.userNotAuthenticated
         }
@@ -113,6 +136,13 @@ class ChildrenStore: ObservableObject {
     }
     
     func deleteChild(_ child: Child) async throws {
+        // If in guest mode, delete locally
+        if authService.isGuest {
+            children.removeAll { $0.id == child.id }
+            guestDataManager.saveGuestChildren(children)
+            return
+        }
+        
         isLoading = true
         errorMessage = nil
         

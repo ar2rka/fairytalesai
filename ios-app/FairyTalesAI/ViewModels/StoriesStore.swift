@@ -12,15 +12,25 @@ class StoriesStore: ObservableObject {
     
     private let storageKey = "saved_stories"
     private let storiesService = StoriesService.shared
+    private let guestDataManager = GuestDataManager.shared
+    private let authService = AuthService.shared
     private let pageSize = 10
     private var currentOffset = 0
     private var isLoadingPage = false
     
     init() {
-        // Не загружаем из UserDefaults, теперь загружаем из Supabase
+        // Load guest stories if in guest mode
+        if authService.isGuest {
+            stories = guestDataManager.loadGuestStories()
+        }
     }
     
     func loadStoriesFromSupabase(userId: UUID) async {
+        // If in guest mode, stories are already loaded from local storage in init
+        if authService.isGuest {
+            return
+        }
+        
         isLoading = true
         errorMessage = nil
         currentOffset = 0
@@ -87,7 +97,14 @@ class StoriesStore: ObservableObject {
         
         await MainActor.run {
             stories.insert(story, at: 0)
-            saveStories()
+            
+            // Save to appropriate location based on auth state
+            if authService.isGuest {
+                guestDataManager.saveGuestStories(stories)
+            } else {
+                saveStories()
+            }
+            
             isGenerating = false
         }
     }
@@ -112,7 +129,13 @@ class StoriesStore: ObservableObject {
     
     func deleteStory(_ story: Story) {
         stories.removeAll { $0.id == story.id }
-        saveStories()
+        
+        // Save to appropriate location based on auth state
+        if authService.isGuest {
+            guestDataManager.saveGuestStories(stories)
+        } else {
+            saveStories()
+        }
     }
     
     private func saveStories() {
