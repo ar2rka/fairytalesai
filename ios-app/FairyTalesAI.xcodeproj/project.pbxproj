@@ -52,6 +52,9 @@
 		D9E2D5F42EFD60A40082D3BC /* DashedButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5F52EFD60A40082D3BC /* DashedButton.swift */; };
 		D9E2D5F62EFD60A40082D3BD /* SettingsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5F72EFD60A40082D3BD /* SettingsRow.swift */; };
 		D9E2D5F82EFD60A40082D3BE /* ThemeSelectionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5F92EFD60A40082D3BE /* ThemeSelectionButton.swift */; };
+		D9E2D60C2EFD60A40082D3C9 /* MagicSegmentedSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D60D2EFD60A40082D3C9 /* MagicSegmentedSelector.swift */; };
+		D9E2D60E2EFD60A40082D3CA /* ProtagonistStyleSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D60F2EFD60A40082D3CA /* ProtagonistStyleSelector.swift */; };
+		D9E2D6102EFD60A40082D3CB /* AgeGroupGridSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D6112EFD60A40082D3CB /* AgeGroupGridSelector.swift */; };
 		D9E2D5FA2EFD60A40082D3BF /* LanguageSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5FB2EFD60A40082D3BF /* LanguageSelectionView.swift */; };
 		D9E2D5FC2EFD60A40082D3C0 /* SettingsPlaceholderViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5FD2EFD60A40082D3C0 /* SettingsPlaceholderViews.swift */; };
 		D9E2D5FE2EFD60A40082D3C1 /* ThemeSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5FF2EFD60A40082D3C1 /* ThemeSelectionView.swift */; };
@@ -96,6 +99,9 @@
 		D9E2D5F52EFD60A40082D3BC /* DashedButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashedButton.swift; sourceTree = "<group>"; };
 		D9E2D5F72EFD60A40082D3BD /* SettingsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRow.swift; sourceTree = "<group>"; };
 		D9E2D5F92EFD60A40082D3BE /* ThemeSelectionButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeSelectionButton.swift; sourceTree = "<group>"; };
+		D9E2D60D2EFD60A40082D3C9 /* MagicSegmentedSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MagicSegmentedSelector.swift; sourceTree = "<group>"; };
+		D9E2D60F2EFD60A40082D3CA /* ProtagonistStyleSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtagonistStyleSelector.swift; sourceTree = "<group>"; };
+		D9E2D6112EFD60A40082D3CB /* AgeGroupGridSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgeGroupGridSelector.swift; sourceTree = "<group>"; };
 		D9E2D5FB2EFD60A40082D3BF /* LanguageSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageSelectionView.swift; sourceTree = "<group>"; };
 		D9E2D5FD2EFD60A40082D3C0 /* SettingsPlaceholderViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPlaceholderViews.swift; sourceTree = "<group>"; };
 		D9E2D5FF2EFD60A40082D3C1 /* ThemeSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeSelectionView.swift; sourceTree = "<group>"; };
@@ -223,6 +229,9 @@
 				D9E2D5F52EFD60A40082D3BC /* DashedButton.swift */,
 				D9E2D5F72EFD60A40082D3BD /* SettingsRow.swift */,
 				D9E2D5F92EFD60A40082D3BE /* ThemeSelectionButton.swift */,
+				D9E2D60D2EFD60A40082D3C9 /* MagicSegmentedSelector.swift */,
+				D9E2D60F2EFD60A40082D3CA /* ProtagonistStyleSelector.swift */,
+				D9E2D6112EFD60A40082D3CB /* AgeGroupGridSelector.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -346,6 +355,9 @@
 				D9E2D5F42EFD60A40082D3BC /* DashedButton.swift in Sources */,
 				D9E2D5F62EFD60A40082D3BD /* SettingsRow.swift in Sources */,
 				D9E2D5F82EFD60A40082D3BE /* ThemeSelectionButton.swift in Sources */,
+				D9E2D60C2EFD60A40082D3C9 /* MagicSegmentedSelector.swift in Sources */,
+				D9E2D60E2EFD60A40082D3CA /* ProtagonistStyleSelector.swift in Sources */,
+				D9E2D6102EFD60A40082D3CB /* AgeGroupGridSelector.swift in Sources */,
 				D9E2D5FA2EFD60A40082D3BF /* LanguageSelectionView.swift in Sources */,
 				D9E2D5FC2EFD60A40082D3C0 /* SettingsPlaceholderViews.swift in Sources */,
 				D9E2D5FE2EFD60A40082D3C1 /* ThemeSelectionView.swift in Sources */,

@@ -29,11 +29,10 @@ struct LibraryView: View {
     }
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
-                
-                VStack(spacing: 0) {
+        ZStack {
+            AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
+
+            VStack(spacing: 0) {
                     if storiesStore.isLoading {
                         Spacer()
                         VStack(spacing: 24) {
@@ -155,7 +154,6 @@ struct LibraryView: View {
                     }
                 }
             }
-        }
     }
     
     private func childName(for childId: UUID?) -> String {

@@ -22,12 +22,16 @@ struct SettingsView: View {
             AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
             
             ScrollView {
-                VStack(spacing: 24) {
+                VStack(alignment: .leading, spacing: 20) {
                     // Guest Mode Banner
                     if authService.isGuest {
                         GuestModeBanner()
                             .padding(.horizontal)
-                            .padding(.top)
+                            .padding(.top, 10)
+                    } else {
+                        // Add small top padding when no banner
+                        Spacer()
+                            .frame(height: 10)
                     }
                     
                     // User Profile Section
@@ -81,7 +85,7 @@ struct SettingsView: View {
                     .background(AppTheme.cardBackground(for: colorScheme))
                     .cornerRadius(AppTheme.cornerRadius)
                     .padding(.horizontal)
-                    .padding(.top)
+                    .padding(.top, 4)
                     
                     // Children Section
                     childrenSection
@@ -110,7 +114,7 @@ struct SettingsView: View {
             }
         }
         .navigationTitle("Account")
-        .navigationBarTitleDisplayMode(.large)
+        .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showingShareSheet) {
             ShareSheet(activityItems: [
                 "Check out FairyTalesAI - Create magical personalized stories for your child! ✨",

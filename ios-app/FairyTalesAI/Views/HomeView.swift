@@ -32,12 +32,11 @@ struct HomeView: View {
     ]
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
-                
-                ScrollView {
-                    VStack(spacing: 24) {
+        ZStack {
+            AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
+
+            ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
                         // Welcome Header
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Welcome")
@@ -48,6 +47,7 @@ struct HomeView: View {
                                 .font(.system(size: 32, weight: .bold))
                                 .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                         }
+                        .padding(.top, 10)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal)
                         .padding(.top, 8)
@@ -196,7 +196,6 @@ struct HomeView: View {
             .navigationTitle("Home")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
-        }
     }
     
 }

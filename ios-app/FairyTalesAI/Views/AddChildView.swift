@@ -6,12 +6,12 @@ struct AddChildView: View {
     @Environment(\.colorScheme) var colorScheme
     
     @State private var name: String = ""
-    @State private var selectedGender: String = "boy"
+    @State private var selectedStoryStyle: StoryStyle = .hero
     @State private var selectedAgeCategory: AgeCategory = .threeFive
     @State private var selectedInterests: Set<String> = []
-    @State private var showingAgePicker = false
     @State private var isLoading = false
     @State private var errorMessage: String?
+    @State private var showStarAnimation = false
     
     let child: Child?
     
@@ -19,7 +19,23 @@ struct AddChildView: View {
         self.child = child
     }
     
-    private let genders = ["boy", "girl", "other"]
+    // Hero Creator Interests
+    private let heroInterests: [(name: String, emoji: String)] = [
+        ("Dinosaurs", "🦖"),
+        ("Space", "🚀"),
+        ("Unicorns", "🦄"),
+        ("Castles", "🏰"),
+        ("Mystery", "🕵️"),
+        ("Animals", "🦁")
+    ]
+    
+    // Age Group Options for Hero Creator
+    private let ageGroups: [(category: AgeCategory, label: String)] = [
+        (.twoThree, "Toddler (1-3)"),
+        (.threeFive, "Preschool (3-5)"),
+        (.fiveSeven, "Explorer (5-7)"),
+        (.eightPlus, "Big Kid (8+)")
+    ]
     
     var body: some View {
         NavigationView {
@@ -27,89 +43,64 @@ struct AddChildView: View {
                 AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
                 
                 ScrollView {
-                    VStack(spacing: 24) {
-                        // Child's Name
+                    VStack(spacing: 20) {
+                        // Hero Name Section
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("Child's Name")
-                                .font(.system(size: 16, weight: .semibold))
+                            Text("Name of the Hero")
+                                .font(.system(size: 18, weight: .semibold))
                                 .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                             
-                            HStack {
-                                TextField("e.g. Oliver", text: $name)
-                                    .textFieldStyle(CustomTextFieldStyle())
-                                
-                                Image(systemName: "pencil")
-                                    .foregroundColor(AppTheme.primaryPurple)
-                            }
+                            TextField("Enter hero's name", text: $name)
+                                .font(.system(size: 18))
+                                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
+                                .padding()
+                                .background(
+                                    RoundedRectangle(cornerRadius: AppTheme.cornerRadius)
+                                        .fill(AppTheme.primaryPurple.opacity(0.15))
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: AppTheme.cornerRadius)
+                                        .stroke(AppTheme.primaryPurple.opacity(0.3), lineWidth: 1)
+                                )
                         }
                         .padding(.horizontal)
-                        .padding(.top)
+                        .padding(.top, 8)
                         
-                        // Gender
+                        // Hero Type Section
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("Gender")
-                                .font(.system(size: 16, weight: .semibold))
+                            Text("Hero Type")
+                                .font(.system(size: 18, weight: .semibold))
                                 .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                             
-                            HStack(spacing: 12) {
-                                ForEach(genders, id: \.self) { gender in
-                                    Button(action: {
-                                        selectedGender = gender
-                                    }) {
-                                        Text(gender.capitalized)
-                                            .font(.system(size: 14, weight: .medium))
-                                            .foregroundColor(selectedGender == gender ? .white : AppTheme.textPrimary(for: colorScheme))
-                                            .frame(maxWidth: .infinity)
-                                            .padding()
-                                            .background(selectedGender == gender ? AppTheme.primaryPurple : AppTheme.cardBackground(for: colorScheme))
-                                            .cornerRadius(AppTheme.cornerRadius)
-                                    }
-                                }
-                            }
+                            ProtagonistStyleSelector(selectedStyle: $selectedStoryStyle)
                         }
                         .padding(.horizontal)
                         
-                        // Age Group
+                        // Age Group Section - Grid Selector
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Age Group")
-                                .font(.system(size: 16, weight: .semibold))
+                                .font(.system(size: 18, weight: .semibold))
                                 .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                             
-                            Button(action: { showingAgePicker = true }) {
-                                HStack {
-                                    Text(selectedAgeCategory.displayName)
-                                        .foregroundColor(AppTheme.textPrimary(for: colorScheme))
-                                    
-                                    Spacer()
-                                    
-                                    Image(systemName: "chevron.down")
-                                        .foregroundColor(AppTheme.primaryPurple)
-                                }
-                                .padding()
-                                .background(AppTheme.cardBackground(for: colorScheme))
-                                .cornerRadius(AppTheme.cornerRadius)
-                            }
+                            AgeGroupGridSelector(selectedCategory: $selectedAgeCategory)
                         }
                         .padding(.horizontal)
                         
-                        // Interests
+                        // Magic Ingredients - Interests
                         VStack(alignment: .leading, spacing: 12) {
-                            HStack {
-                                Text("Interests")
-                                    .font(.system(size: 16, weight: .semibold))
-                                    .foregroundColor(AppTheme.textPrimary(for: colorScheme))
-                                
-                                Spacer()
-                                
-                                Text("Pick at least 3")
-                                    .font(.system(size: 12))
-                                    .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                            }
+                            Text("The Magic Ingredients")
+                                .font(.system(size: 18, weight: .semibold))
+                                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
+                            
+                            Text("Select interests to personalize stories")
+                                .font(.system(size: 14))
+                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                             
                             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                                ForEach(Interest.allInterests) { interest in
-                                    InterestChip(
-                                        interest: interest,
+                                ForEach(heroInterests, id: \.name) { interest in
+                                    HeroInterestChip(
+                                        name: interest.name,
+                                        emoji: interest.emoji,
                                         isSelected: selectedInterests.contains(interest.name)
                                     ) {
                                         if selectedInterests.contains(interest.name) {
@@ -131,39 +122,19 @@ struct AddChildView: View {
                                 .padding(.horizontal)
                         }
                         
-                        // Create Profile Button
-                        Button(action: {
-                            Task {
-                                await saveChild()
-                            }
-                        }) {
-                            HStack {
-                                if isLoading {
-                                    ProgressView()
-                                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                                } else {
-                                    Text(child == nil ? "Create Profile" : "Update Profile")
-                                        .font(.system(size: 16, weight: .semibold))
-                                    Image(systemName: "arrow.right")
-                                }
-                            }
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(
-                                (selectedInterests.count >= 3 && !name.isEmpty && !isLoading) ?
-                                AppTheme.primaryPurple : AppTheme.primaryPurple.opacity(0.5)
-                            )
-                            .cornerRadius(AppTheme.cornerRadius)
-                        }
-                        .disabled(selectedInterests.count < 3 || name.isEmpty || isLoading)
-                        .padding(.horizontal)
-                        .padding(.top, 8)
+                        // Bottom spacing
+                        Spacer(minLength: 20)
                     }
-                    .padding(.bottom, 100)
+                    .padding(.bottom, 80)
+                }
+                
+                // Star Particle Animation
+                if showStarAnimation {
+                    StarParticleAnimation()
+                        .allowsHitTesting(false)
                 }
             }
-            .navigationTitle(child == nil ? "Add Profile" : "Edit Profile")
+            .navigationTitle("Create Hero")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -176,29 +147,52 @@ struct AddChildView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Save") {
                         Task {
-                            await saveChild()
+                            await saveChildWithAnimation()
                         }
                     }
-                    .foregroundColor(AppTheme.primaryPurple)
-                    .disabled(selectedInterests.count < 3 || name.isEmpty || isLoading)
+                    .foregroundColor(name.isEmpty ? AppTheme.textSecondary(for: colorScheme) : AppTheme.primaryPurple)
+                    .disabled(name.isEmpty || isLoading)
                 }
-            }
-            .sheet(isPresented: $showingAgePicker) {
-                AgePickerView(selectedAge: $selectedAgeCategory)
             }
             .onAppear {
                 if let child = child {
                     name = child.name
-                    selectedGender = child.gender
+                    // Map gender string to StoryStyle
+                    switch child.gender {
+                    case "boy":
+                        selectedStoryStyle = .boy
+                    case "girl":
+                        selectedStoryStyle = .girl
+                    default:
+                        selectedStoryStyle = .hero
+                    }
                     selectedAgeCategory = child.ageCategory
                     selectedInterests = Set(child.interests)
                 }
             }
         }
+        .preferredColorScheme(.dark)
+    }
+    
+    private func saveChildWithAnimation() async {
+        guard !name.isEmpty else { return }
+        
+        // Show star animation
+        withAnimation {
+            showStarAnimation = true
+        }
+        
+        // Wait a moment for animation
+        try? await Task.sleep(nanoseconds: 800_000_000) // 0.8 seconds
+        
+        await saveChild()
+        
+        // Dismiss after animation
+        dismiss()
     }
     
     private func saveChild() async {
-        guard selectedInterests.count >= 3 && !name.isEmpty else { return }
+        guard !name.isEmpty else { return }
         
         isLoading = true
         errorMessage = nil
@@ -208,12 +202,14 @@ struct AddChildView: View {
         let interestsArray = Array(selectedInterests)
         
         do {
+            // Map StoryStyle to gender string for backward compatibility
+            let genderString = selectedStoryStyle.genderString
+            
             if let existingChild = child {
-                // Обновление существующего ребёнка в Supabase
                 let updatedChild = Child(
                     id: existingChild.id,
                     name: name,
-                    gender: selectedGender,
+                    gender: genderString,
                     ageCategory: selectedAgeCategory,
                     interests: interestsArray,
                     userId: existingChild.userId,
@@ -221,114 +217,118 @@ struct AddChildView: View {
                     updatedAt: Date()
                 )
                 try await childrenStore.updateChild(updatedChild)
-                print("✅ Ребёнок успешно обновлён в Supabase: \(updatedChild.name)")
             } else {
-                // Создание нового ребёнка в Supabase
                 let newChild = Child(
                     name: name,
-                    gender: selectedGender,
+                    gender: genderString,
                     ageCategory: selectedAgeCategory,
                     interests: interestsArray
                 )
-                let createdChild = try await childrenStore.addChild(newChild)
-                print("✅ Ребёнок успешно создан в Supabase: \(createdChild.name) (ID: \(createdChild.id))")
+                _ = try await childrenStore.addChild(newChild)
             }
-            
-            // Закрываем экран только после успешного сохранения
-            dismiss()
         } catch {
             errorMessage = error.localizedDescription
-            print("❌ Ошибка при сохранении ребёнка в Supabase: \(error.localizedDescription)")
         }
     }
 }
 
-struct CustomTextFieldStyle: TextFieldStyle {
-    @Environment(\.colorScheme) var colorScheme
-    
-    func _body(configuration: TextField<Self._Label>) -> some View {
-        configuration
-            .padding()
-            .background(AppTheme.cardBackground(for: colorScheme))
-            .cornerRadius(AppTheme.cornerRadius)
-            .foregroundColor(AppTheme.textPrimary(for: colorScheme))
-    }
-}
-
-struct InterestChip: View {
-    let interest: Interest
+struct HeroInterestChip: View {
+    let name: String
+    let emoji: String
     let isSelected: Bool
-    var action: (() -> Void)? = nil
+    var action: () -> Void
     @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
-        Button(action: { action?() }) {
+        Button(action: {
+            // Haptic feedback
+            let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+            impactFeedback.impactOccurred()
+            action()
+        }) {
             VStack(spacing: 8) {
-                Text(interest.emoji)
+                Text(emoji)
                     .font(.system(size: 32))
                 
-                Text(interest.name)
-                    .font(.system(size: 14, weight: .medium))
+                Text(name)
+                    .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(isSelected ? .white : AppTheme.textPrimary(for: colorScheme))
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 12)
-            .background(isSelected ? AppTheme.primaryPurple : AppTheme.cardBackground(for: colorScheme))
+            .padding(.vertical, 16)
+            .background(
+                Group {
+                    if isSelected {
+                        LinearGradient(
+                            colors: [AppTheme.primaryPurple, AppTheme.accentPurple],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    } else {
+                        AppTheme.cardBackground(for: colorScheme)
+                    }
+                }
+            )
             .cornerRadius(AppTheme.cornerRadius)
             .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(isSelected ? AppTheme.primaryPurple : Color.clear, lineWidth: 2)
+                RoundedRectangle(cornerRadius: AppTheme.cornerRadius)
+                    .stroke(isSelected ? Color.clear : AppTheme.primaryPurple.opacity(0.2), lineWidth: 1)
             )
+            .scaleEffect(isSelected ? 1.05 : 1.0)
+            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isSelected)
         }
         .buttonStyle(PlainButtonStyle())
     }
 }
 
-struct AgePickerView: View {
-    @Binding var selectedAge: AgeCategory
-    @Environment(\.dismiss) var dismiss
-    @Environment(\.colorScheme) var colorScheme
+struct StarParticleAnimation: View {
+    @State private var particles: [Particle] = []
+    
+    struct Particle: Identifiable {
+        let id = UUID()
+        var position: CGPoint
+        var opacity: Double = 1.0
+    }
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
-                
-                List {
-                    ForEach(AgeCategory.allCases, id: \.self) { age in
-                        Button(action: {
-                            selectedAge = age
-                            dismiss()
-                        }) {
-                            HStack {
-                                Text(age.displayName)
-                                    .foregroundColor(AppTheme.textPrimary(for: colorScheme))
-                                
-                                Spacer()
-                                
-                                if selectedAge == age {
-                                    Image(systemName: "checkmark")
-                                        .foregroundColor(AppTheme.primaryPurple)
-                                }
-                            }
-                        }
-                        .listRowBackground(AppTheme.cardBackground(for: colorScheme))
-                    }
-                }
-                .scrollContentBackground(.hidden)
+        ZStack {
+            ForEach(particles) { particle in
+                Image(systemName: "sparkle")
+                    .font(.system(size: 20))
+                    .foregroundColor(.yellow)
+                    .opacity(particle.opacity)
+                    .position(particle.position)
             }
-            .navigationTitle("Select Age Range")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
-                        dismiss()
-                    }
-                    .foregroundColor(AppTheme.primaryPurple)
-                }
+        }
+        .onAppear {
+            createParticles()
+            animateParticles()
+        }
+    }
+    
+    private func createParticles() {
+        let centerX = UIScreen.main.bounds.width / 2
+        let centerY = UIScreen.main.bounds.height / 2
+        
+        particles = (0..<20).map { _ in
+            Particle(
+                position: CGPoint(
+                    x: centerX + CGFloat.random(in: -100...100),
+                    y: centerY + CGFloat.random(in: -100...100)
+                )
+            )
+        }
+    }
+    
+    private func animateParticles() {
+        withAnimation(.easeOut(duration: 1.5)) {
+            for i in particles.indices {
+                particles[i].position = CGPoint(
+                    x: particles[i].position.x + CGFloat.random(in: -150...150),
+                    y: particles[i].position.y + CGFloat.random(in: -150...150)
+                )
+                particles[i].opacity = 0
             }
         }
     }
 }
-
-

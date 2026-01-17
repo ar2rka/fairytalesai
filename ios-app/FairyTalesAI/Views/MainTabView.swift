@@ -15,15 +15,25 @@ struct MainTabView: View {
             // Content Views
             Group {
                 if selectedTab == 0 {
-                    HomeView()
+                    NavigationView {
+                        HomeView()
+                    }
+                    .id(0)
                 } else if selectedTab == 1 {
-                    LibraryView()
+                    NavigationView {
+                        LibraryView()
+                    }
+                    .id(1)
                 } else if selectedTab == 3 {
-                    ExploreView()
+                    NavigationView {
+                        ExploreView()
+                    }
+                    .id(3)
                 } else if selectedTab == 4 {
                     NavigationView {
                         SettingsView()
                     }
+                    .id(4)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)

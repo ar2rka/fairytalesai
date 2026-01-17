@@ -35,6 +35,7 @@ enum AgeCategory: String, Codable, CaseIterable {
     case twoThree = "2-3"
     case threeFive = "3-5"
     case fiveSeven = "5-7"
+    case eightPlus = "8+"
     
     var displayName: String {
         switch self {
@@ -44,11 +45,53 @@ enum AgeCategory: String, Codable, CaseIterable {
             return "3-5 years"
         case .fiveSeven:
             return "5-7 years"
+        case .eightPlus:
+            return "8+ years"
         }
     }
     
     var shortName: String {
         return self.rawValue
+    }
+}
+
+enum StoryStyle: String, Codable, CaseIterable {
+    case hero = "hero"
+    case boy = "boy"
+    case girl = "girl"
+    
+    var displayName: String {
+        switch self {
+        case .hero:
+            return "The Hero"
+        case .boy:
+            return "Boy"
+        case .girl:
+            return "Girl"
+        }
+    }
+    
+    var icon: String {
+        switch self {
+        case .hero:
+            return "✨"
+        case .boy:
+            return "👦"
+        case .girl:
+            return "👧"
+        }
+    }
+    
+    // Map to gender string for backward compatibility
+    var genderString: String {
+        switch self {
+        case .hero:
+            return "other"
+        case .boy:
+            return "boy"
+        case .girl:
+            return "girl"
+        }
     }
 }
 
