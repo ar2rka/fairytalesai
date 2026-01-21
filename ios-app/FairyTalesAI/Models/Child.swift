@@ -57,8 +57,8 @@ enum AgeCategory: String, Codable, CaseIterable {
 
 enum StoryStyle: String, Codable, CaseIterable {
     case hero = "hero"
-    case boy = "boy"
-    case girl = "girl"
+    case boy = "male"
+    case girl = "female"
     
     var displayName: String {
         switch self {
@@ -88,9 +88,9 @@ enum StoryStyle: String, Codable, CaseIterable {
         case .hero:
             return "other"
         case .boy:
-            return "boy"
+            return "male"
         case .girl:
-            return "girl"
+            return "female"
         }
     }
 }
