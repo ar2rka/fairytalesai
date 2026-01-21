@@ -7,15 +7,12 @@ class GenerateStoryViewModel: ObservableObject {
     @Published var selectedTheme: StoryTheme? = nil
     @Published var plot: String = ""
     @Published var showingStoryResult = false
-    @Published var showingPaywall = false
     @Published var showingAddChild = false
     @Published var generatedStory: Story? = nil
     
     func validateDuration(newValue: Double, isPremium: Bool) {
          if !isPremium && newValue > 5 {
-             // Show paywall immediately
-             showingPaywall = true
-             // Keep value at 5
+             // Limit free users to 5 minutes max, no paywall
              selectedDuration = 5
          } else {
              selectedDuration = newValue
@@ -35,14 +32,9 @@ class GenerateStoryViewModel: ObservableObject {
         
         let finalDuration = Int(selectedDuration)
         
-        // Check if user can generate this story
-        if !userSettings.canGenerateStory(duration: finalDuration) {
-            // Show paywall if they can't generate
-            showingPaywall = true
-            return
-        }
-        
-        // Use a free generation if not premium
+        // No paywall - allow generation for all users (including anonymous)
+        // Free users are limited to 5 minutes max duration (enforced by validateDuration)
+        // Use a free generation if not premium (optional - can be removed if unlimited)
         if !userSettings.isPremium {
             userSettings.useFreeGeneration()
         }
@@ -53,10 +45,17 @@ class GenerateStoryViewModel: ObservableObject {
                 length: finalDuration,
                 theme: theme.name,
                 plot: plot.isEmpty ? nil : plot,
-                children: childrenStore.children
+                children: childrenStore.children,
+                language: userSettings.languageCode
             )
             
-            if let latestStory = storiesStore.stories.first {
+            // Используем lastGeneratedStoryId для более надежного определения последней истории
+            if let storyId = storiesStore.lastGeneratedStoryId,
+               let latestStory = storiesStore.stories.first(where: { $0.id == storyId }) {
+                self.generatedStory = latestStory
+                self.showingStoryResult = true
+            } else if let latestStory = storiesStore.stories.first {
+                // Fallback на первую историю в списке
                 self.generatedStory = latestStory
                 self.showingStoryResult = true
             }

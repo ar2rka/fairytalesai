@@ -23,8 +23,8 @@ struct SettingsView: View {
             
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    // Guest Mode Banner
-                    if authService.isGuest {
+                    // Guest Mode Banner - show for anonymous users
+                    if authService.isAnonymousUser {
                         GuestModeBanner()
                             .padding(.horizontal)
                             .padding(.top, 10)
@@ -547,6 +547,7 @@ struct GuestModeBanner: View {
     @EnvironmentObject var authService: AuthService
     @Environment(\.colorScheme) var colorScheme
     @State private var showingSignUp = false
+    @State private var showingLogin = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -579,14 +580,26 @@ struct GuestModeBanner: View {
                 Spacer()
             }
             
-            Button(action: { showingSignUp = true }) {
-                Text("Create Account")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
-                    .background(Color.white.opacity(0.2))
-                    .cornerRadius(AppTheme.cornerRadius)
+            HStack(spacing: 12) {
+                Button(action: { showingLogin = true }) {
+                    Text("Sign In")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(Color.white.opacity(0.2))
+                        .cornerRadius(AppTheme.cornerRadius)
+                }
+                
+                Button(action: { showingSignUp = true }) {
+                    Text("Create Account")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(Color.white.opacity(0.3))
+                        .cornerRadius(AppTheme.cornerRadius)
+                }
             }
         }
         .padding()
@@ -601,7 +614,10 @@ struct GuestModeBanner: View {
         .sheet(isPresented: $showingSignUp) {
             SignUpView()
                 .environmentObject(authService)
-                .environmentObject(DataMigrationService.shared)
+        }
+        .sheet(isPresented: $showingLogin) {
+            LoginView()
+                .environmentObject(authService)
         }
     }
 }

@@ -99,8 +99,8 @@ struct PaywallView: View {
                             let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
                             impactFeedback.impactOccurred()
                             
-                            // If guest, show sign up first
-                            if authService.isGuest {
+                            // If anonymous user, show sign up first
+                            if authService.isAnonymousUser {
                                 showingSignUp = true
                             } else {
                                 // Start free trial
@@ -109,7 +109,7 @@ struct PaywallView: View {
                             }
                         }) {
                             HStack {
-                                Text(authService.isGuest ? "Create Account to Subscribe" : "Start Your 7-Day Free Trial")
+                                Text(authService.isAnonymousUser ? "Create Account to Subscribe" : "Start Your 7-Day Free Trial")
                                     .font(.system(size: min(geometry.size.width * 0.045, 18), weight: .semibold))
                             }
                             .foregroundColor(.white)
@@ -175,7 +175,6 @@ struct PaywallView: View {
         .sheet(isPresented: $showingSignUp) {
             SignUpView()
                 .environmentObject(authService)
-                .environmentObject(DataMigrationService.shared)
         }
     }
 }
