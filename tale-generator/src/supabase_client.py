@@ -1403,6 +1403,92 @@ class SupabaseClient:
             response = self.client.table("user_profiles").select("*").eq("id", user_id).execute()
             
             if not response.data:
+                # Profile doesn't exist - check if user is anonymous
+                try:
+                    # Check if user is anonymous using Supabase Auth Admin API
+                    # Use the client's auth.admin methods to get user info
+                    try:
+                        # Get user via Admin API
+                        user_response = self.client.auth.admin.get_user_by_id(user_id)
+                        
+                        if user_response and hasattr(user_response, 'user'):
+                            user = user_response.user
+                            # Check if user is anonymous
+                            # Anonymous users typically have is_anonymous flag or specific email pattern
+                            is_anonymous = getattr(user, 'is_anonymous', False)
+                            
+                            # Fallback: check email pattern for anonymous users
+                            if not is_anonymous and hasattr(user, 'email'):
+                                email = user.email or ''
+                                is_anonymous = (
+                                    not email or 
+                                    email == "" or 
+                                    "@anonymous" in email.lower() or
+                                    email.endswith("@supabase.co")
+                                )
+                            
+                            logger.debug(f"User {user_id} is_anonymous: {is_anonymous}")
+                        else:
+                            logger.debug(f"User {user_id} not found via Admin API")
+                            return None
+                    except Exception as admin_error:
+                        logger.debug(f"Could not get user via Admin API: {str(admin_error)}")
+                        # Fallback: try to access auth.users table directly
+                        try:
+                            from supabase import create_client as create_supabase_client
+                            from supabase.client import ClientOptions
+                            
+                            auth_client = create_supabase_client(
+                                self.supabase_url,
+                                self.supabase_key,
+                                options=ClientOptions(schema="auth")
+                            )
+                            
+                            auth_query = auth_client.table("users").select("is_anonymous").eq("id", user_id).limit(1).execute()
+                            
+                            if not auth_query.data or len(auth_query.data) == 0:
+                                logger.debug(f"User {user_id} not found in auth.users")
+                                return None
+                            
+                            is_anonymous = auth_query.data[0].get('is_anonymous', False)
+                            logger.debug(f"User {user_id} is_anonymous (via table): {is_anonymous}")
+                        except Exception as table_error:
+                            logger.debug(f"Could not access auth.users table: {str(table_error)}")
+                            return None
+                    
+                    if is_anonymous:
+                        logger.info(f"Creating profile with free subscription for anonymous user {user_id}")
+                        # Create profile with empty name and free subscription
+                        now = datetime.now()
+                        profile_data = {
+                            'id': user_id,
+                            'name': '',  # Empty name for anonymous users
+                            'subscription_plan': SubscriptionPlan.FREE.value,
+                            'subscription_status': SubscriptionStatus.ACTIVE.value,
+                            'subscription_start_date': now.isoformat(),
+                            'subscription_end_date': None,
+                            'monthly_story_count': 0,
+                            'last_reset_date': now.isoformat(),
+                            'created_at': now.isoformat(),
+                            'updated_at': now.isoformat()
+                        }
+                        
+                        try:
+                            self.client.table("user_profiles").insert(profile_data).execute()
+                            logger.info(f"Successfully created profile for anonymous user {user_id}")
+                            # Reload the profile
+                            response = self.client.table("user_profiles").select("*").eq("id", user_id).execute()
+                        except Exception as insert_error:
+                            logger.warning(f"Could not create profile for user {user_id}: {str(insert_error)}")
+                            return None
+                    else:
+                        # Not anonymous, return None
+                        return None
+                except Exception as check_error:
+                    logger.debug(f"Could not check if user is anonymous: {str(check_error)}")
+                    return None
+            
+            if not response.data:
                 return None
             
             profile = response.data[0]
