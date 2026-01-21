@@ -32,6 +32,28 @@ class UserSettings: ObservableObject {
         }
     }
     
+    @Published var selectedLanguage: String {
+        didSet {
+            UserDefaults.standard.set(selectedLanguage, forKey: "selectedLanguage")
+        }
+    }
+    
+    // Возвращает код языка для API (например, "en", "ru", "es", "fr")
+    var languageCode: String {
+        switch selectedLanguage.lowercased() {
+        case "english", "английский":
+            return "en"
+        case "russian", "русский":
+            return "ru"
+        case "spanish", "испанский":
+            return "es"
+        case "french", "французский":
+            return "fr"
+        default:
+            return "en"
+        }
+    }
+    
     init() {
         self.hasCompletedOnboarding = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
         self.onboardingComplete = UserDefaults.standard.bool(forKey: "onboardingComplete")
@@ -47,6 +69,12 @@ class UserSettings: ObservableObject {
             self.storyFontSize = 16.0
         } else {
             self.storyFontSize = CGFloat(UserDefaults.standard.double(forKey: "storyFontSize"))
+        }
+        // Initialize selected language (default "English")
+        if let language = UserDefaults.standard.string(forKey: "selectedLanguage") {
+            self.selectedLanguage = language
+        } else {
+            self.selectedLanguage = "English"
         }
     }
     

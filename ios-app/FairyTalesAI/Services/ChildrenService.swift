@@ -28,6 +28,9 @@ class ChildrenService: ObservableObject {
             options: SupabaseClientOptions(
                 db: .init(
                     schema: "tales"
+                ),
+                auth: .init(
+                    emitLocalSessionAsInitialSession: true
                 )
             )
         )
@@ -170,10 +173,21 @@ private struct SupabaseChild: Codable {
             fatalError("Invalid age category: \(ageCategory)")
         }
         
+        // Конвертируем старые значения пола для обратной совместимости
+        let normalizedGender: String
+        switch gender.lowercased() {
+        case "boy":
+            normalizedGender = "male"
+        case "girl":
+            normalizedGender = "female"
+        default:
+            normalizedGender = gender
+        }
+        
         return Child(
             id: id,
             name: name,
-            gender: gender,
+            gender: normalizedGender,
             ageCategory: ageCategory,
             interests: interests,
             userId: userId,

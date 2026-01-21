@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 @main
 struct FairyTalesAIApp: App {
@@ -13,51 +14,35 @@ struct FairyTalesAIApp: App {
         ThemeMode(rawValue: themeModeRaw) ?? .system
     }
     
+    // SwiftData ModelContainer для кеширования ежедневных историй
+    private let modelContainer: ModelContainer = {
+        let schema = Schema([DailyFreeStoriesCache.self, CachedStory.self])
+        let configuration = ModelConfiguration(schema: schema)
+        return try! ModelContainer(for: schema, configurations: [configuration])
+    }()
+    
     var body: some Scene {
         WindowGroup {
             Group {
-                // If authenticated, show main app
-                if authService.isAuthenticated {
-                    if userSettings.hasCompletedOnboarding && userSettings.onboardingComplete {
-                        MainTabView()
-                            .environmentObject(childrenStore)
-                            .environmentObject(storiesStore)
-                            .environmentObject(premiumManager)
-                            .environmentObject(userSettings)
-                            .environmentObject(authService)
-                            .preferredColorScheme(.dark) // Force dark mode for bedtime-friendly UI
-                            .onAppear {
-                                premiumManager.syncWithUserSettings(userSettings)
-                            }
-                    } else {
-                        OnboardingView()
-                            .environmentObject(userSettings)
-                            .environmentObject(authService)
-                            .preferredColorScheme(.dark)
-                    }
-                } else if authService.isGuest {
-                    // Guest mode - show main app without authentication
-                    if userSettings.hasCompletedOnboarding && userSettings.onboardingComplete {
-                        MainTabView()
-                            .environmentObject(childrenStore)
-                            .environmentObject(storiesStore)
-                            .environmentObject(premiumManager)
-                            .environmentObject(userSettings)
-                            .environmentObject(authService)
-                            .preferredColorScheme(.dark) // Force dark mode for bedtime-friendly UI
-                            .onAppear {
-                                premiumManager.syncWithUserSettings(userSettings)
-                            }
-                    } else {
-                        OnboardingView()
-                            .environmentObject(userSettings)
-                            .environmentObject(authService)
-                            .preferredColorScheme(.dark)
-                    }
-                } else {
-                    // Not authenticated and not in guest mode - show login
-                    LoginView()
+                // Always show main app - anonymous sign-in happens automatically in background
+                // No login screen at startup - users can sign up/login from Settings if needed
+                if userSettings.hasCompletedOnboarding && userSettings.onboardingComplete {
+                    MainTabView()
+                        .environmentObject(childrenStore)
+                        .environmentObject(storiesStore)
+                        .environmentObject(premiumManager)
+                        .environmentObject(userSettings)
                         .environmentObject(authService)
+                        .modelContainer(modelContainer)
+                        .preferredColorScheme(.dark) // Force dark mode for bedtime-friendly UI
+                        .onAppear {
+                            premiumManager.syncWithUserSettings(userSettings)
+                        }
+                } else {
+                    OnboardingView()
+                        .environmentObject(userSettings)
+                        .environmentObject(authService)
+                        .modelContainer(modelContainer)
                         .preferredColorScheme(.dark)
                 }
             }

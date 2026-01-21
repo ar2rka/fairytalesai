@@ -59,15 +59,16 @@ struct GenerateStoryView: View {
                         VStack(spacing: 32) {
                             childrenSelectionSection
                             
-                            if !userSettings.isPremium {
-                                creditsIndicator
-                            }
-                            
                             durationSection
                             
                             themeSelectionSection
                             
                             plotSection
+                            
+                            // Отображение ошибок
+                            if let errorMessage = storiesStore.errorMessage {
+                                errorAlertView(message: errorMessage)
+                            }
                             
                             generateButton
                         }
@@ -97,12 +98,6 @@ struct GenerateStoryView: View {
             .sheet(isPresented: $viewModel.showingStoryResult) {
                 if let story = viewModel.generatedStory {
                     StoryResultView(story: story)
-                }
-            }
-            .sheet(isPresented: $viewModel.showingPaywall) {
-                NavigationView {
-                    PaywallView()
-                        .environmentObject(userSettings)
                 }
             }
         }
@@ -171,18 +166,6 @@ struct GenerateStoryView: View {
                 }
             }
         }
-    }
-    
-    private var creditsIndicator: some View {
-        HStack {
-            Image(systemName: "sparkles")
-                .foregroundColor(AppTheme.primaryPurple)
-            Text("\(userSettings.freeGenerationsRemaining) free story\(userSettings.freeGenerationsRemaining == 1 ? "" : "ies") remaining")
-                .font(.system(size: 14, weight: .medium))
-                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-            Spacer()
-        }
-        .padding(.horizontal)
     }
     
     private var durationSection: some View {
@@ -300,6 +283,8 @@ struct GenerateStoryView: View {
     
     private var generateButton: some View {
         Button(action: {
+            // Очищаем предыдущую ошибку перед новой попыткой
+            storiesStore.errorMessage = nil
             viewModel.generateStory(
                 userSettings: userSettings,
                 storiesStore: storiesStore,
@@ -307,8 +292,13 @@ struct GenerateStoryView: View {
             )
         }) {
             HStack {
-                Image(systemName: "wand.and.stars")
-                Text("Generate Story")
+                if storiesStore.isGenerating {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                } else {
+                    Image(systemName: "wand.and.stars")
+                }
+                Text(storiesStore.isGenerating ? "Generating..." : "Generate Story")
                     .font(.system(size: 18, weight: .bold))
             }
             .foregroundColor(.white)
@@ -323,5 +313,32 @@ struct GenerateStoryView: View {
         .disabled(!viewModel.canGenerate || storiesStore.isGenerating)
         .padding(.horizontal)
         .padding(.bottom, 100)
+    }
+    
+    private func errorAlertView(message: String) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundColor(.orange)
+                .font(.system(size: 20))
+            
+            Text(message)
+                .font(.system(size: 14))
+                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
+                .multilineTextAlignment(.leading)
+            
+            Spacer()
+            
+            Button(action: {
+                storiesStore.errorMessage = nil
+            }) {
+                Image(systemName: "xmark.circle.fill")
+                    .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                    .font(.system(size: 20))
+            }
+        }
+        .padding()
+        .background(AppTheme.cardBackground(for: colorScheme))
+        .cornerRadius(12)
+        .padding(.horizontal)
     }
 }

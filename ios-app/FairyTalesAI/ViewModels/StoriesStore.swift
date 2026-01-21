@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import Supabase
 
 @MainActor
 class StoriesStore: ObservableObject {
@@ -9,6 +10,7 @@ class StoriesStore: ObservableObject {
     @Published var isLoadingMore: Bool = false
     @Published var errorMessage: String?
     @Published var hasMoreStories: Bool = true
+    @Published var lastGeneratedStoryId: UUID? = nil  // ID последней сгенерированной истории
     
     private let storageKey = "saved_stories"
     private let storiesService = StoriesService.shared
@@ -17,12 +19,48 @@ class StoriesStore: ObservableObject {
     private let pageSize = 10
     private var currentOffset = 0
     private var isLoadingPage = false
+    private var supabase: SupabaseClient?
     
     init() {
+        setupSupabase()
         // Load guest stories if in guest mode
         if authService.isGuest {
             stories = guestDataManager.loadGuestStories()
         }
+    }
+    
+    private func setupSupabase() {
+        guard SupabaseConfig.isConfigured else {
+            print("⚠️ Supabase не настроен. Заполните SupabaseConfig.swift")
+            return
+        }
+        
+        guard let url = URL(string: SupabaseConfig.supabaseURL) else {
+            print("⚠️ Неверный Supabase URL")
+            return
+        }
+        
+        supabase = SupabaseClient(
+            supabaseURL: url,
+            supabaseKey: SupabaseConfig.supabaseKey,
+            options: SupabaseClientOptions(
+                db: .init(
+                  schema: "tales"
+                ),
+                auth: .init(
+                    emitLocalSessionAsInitialSession: true
+                )
+              )
+        )
+    }
+    
+    private func getAccessToken() async throws -> String {
+        guard let supabase = supabase else {
+            throw StoriesServiceError.supabaseNotConfigured
+        }
+        
+        let session = try await supabase.auth.session
+        return session.accessToken
     }
     
     func loadStoriesFromSupabase(userId: UUID) async {
@@ -77,54 +115,85 @@ class StoriesStore: ObservableObject {
         }
     }
     
-    func generateStory(childId: UUID?, length: Int, theme: String, plot: String?, children: [Child] = []) async {
+    func generateStory(
+        childId: UUID?,
+        length: Int,
+        theme: String,
+        plot: String?,
+        children: [Child] = [],
+        language: String = "en"
+    ) async {
+        guard let childId = childId else {
+            errorMessage = "Please select a child"
+            return
+        }
+        
+        // Требуем авторизацию для генерации историй
+        guard !authService.isGuest else {
+            errorMessage = "Please sign in to generate stories"
+            return
+        }
+        
         isGenerating = true
+        errorMessage = nil
         
-        // Simulate API call - replace with actual API integration
-        try? await Task.sleep(nanoseconds: 2_000_000_000) // 2 seconds
-        
-        let child = childId != nil ? 
-            children.first(where: { $0.id == childId }) : nil
-        
-        let story = Story(
-            title: "\(child?.name ?? "The") and the \(theme) Adventure",
-            content: generateStoryContent(child: child, theme: theme, plot: plot, length: length),
-            childId: childId,
-            theme: theme,
-            duration: length,
-            plot: plot
-        )
-        
-        await MainActor.run {
-            stories.insert(story, at: 0)
-            
-            // Save to appropriate location based on auth state
-            if authService.isGuest {
-                guestDataManager.saveGuestStories(stories)
-            } else {
-                saveStories()
-            }
-            
+        defer {
             isGenerating = false
         }
-    }
-    
-    private func generateStoryContent(child: Child?, theme: String, plot: String?, length: Int) -> String {
-        let childName = child?.name ?? "the hero"
-        let interests = child?.interests.joined(separator: ", ") ?? "adventure"
         
-        var content = "Once upon a time, there was a child named \(childName) who loved \(interests).\n\n"
-        
-        if let plot = plot, !plot.isEmpty {
-            content += "\(plot)\n\n"
+        do {
+            // Получаем токен для авторизации
+            print("🔑 Получаем access token...")
+            let accessToken = try await getAccessToken()
+            print("✅ Access token получен")
+            
+            // Генерируем историю через API
+            print("📖 Начинаем генерацию истории через API...")
+            print("   - Child ID: \(childId)")
+            print("   - Theme: \(theme)")
+            print("   - Length: \(length)")
+            print("   - Language: \(language)")
+            let story = try await storiesService.generateStory(
+                childId: childId,
+                storyType: theme,
+                storyLength: length,
+                language: language,
+                moral: plot,
+                accessToken: accessToken
+            )
+            print("✅ История получена от API: \(story.title)")
+            
+            // Пытаемся загрузить полную историю по ID из базы данных
+            let finalStory: Story
+            if let userId = authService.currentUser?.id,
+               let fullStory = try? await storiesService.fetchStory(id: story.id) {
+                finalStory = fullStory
+                print("✅ История успешно сгенерирована: \(fullStory.title) (ID: \(fullStory.id))")
+            } else {
+                // Если не удалось загрузить из БД, используем то что вернул API
+                finalStory = story
+                print("✅ История успешно сгенерирована: \(story.title) (ID: \(story.id))")
+            }
+            
+            // Добавляем историю в список
+            stories.insert(finalStory, at: 0)
+            
+            // Сохраняем ID для автоматического открытия в Library
+            lastGeneratedStoryId = finalStory.id
+            
+            // Сохраняем в Supabase если пользователь авторизован
+            if let userId = authService.currentUser?.id {
+                _ = try? await storiesService.createStory(finalStory, userId: userId)
+            }
+        } catch {
+            // Обрабатываем различные типы ошибок
+            if let storiesError = error as? StoriesServiceError {
+                errorMessage = storiesError.errorDescription ?? error.localizedDescription
+            } else {
+                errorMessage = error.localizedDescription
+            }
+            print("❌ Ошибка генерации истории: \(errorMessage ?? "Unknown error")")
         }
-        
-        content += "In a magical world of \(theme), \(childName) embarked on an incredible journey. "
-        content += "The adventure lasted \(length) minutes of pure wonder and excitement.\n\n"
-        content += "Through courage and kindness, \(childName) discovered that the greatest magic of all was friendship and love.\n\n"
-        content += "And so, \(childName) returned home with a heart full of joy and memories that would last forever.\n\nThe End."
-        
-        return content
     }
     
     func deleteStory(_ story: Story) {

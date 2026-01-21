@@ -9,7 +9,7 @@ class AuthService: ObservableObject {
     
     @Published var currentUser: User?
     @Published var isAuthenticated = false
-    @Published var isGuestMode = true // Default to guest mode
+    @Published var isGuestMode = false // No longer using guest mode - we use anonymous auth instead
     @Published var isLoading = false
     @Published var errorMessage: String?
     
@@ -18,13 +18,21 @@ class AuthService: ObservableObject {
     }
     
     var isGuest: Bool {
-        return isGuestMode && !isAuthenticated
+        // Guest mode is false if we have any session (including anonymous)
+        return !isAuthenticated
+    }
+    
+    var isAnonymousUser: Bool {
+        // Check if current user is anonymous (has session but no email)
+        return currentUser?.isAnonymous ?? false
     }
     
     private var supabase: SupabaseClient?
     private var authStateTask: Task<Void, Never>?
+    private var isSigningInAnonymously = false // Защита от повторных вызовов
     
     init() {
+        print("🚀 AuthService: Инициализация...")
         setupSupabase()
         checkAuthState()
         observeAuthState()
@@ -33,12 +41,8 @@ class AuthService: ObservableObject {
     }
     
     private func checkPreviousAuthState() {
-        // If there's no authenticated user, ensure guest mode is enabled
-        if !isAuthenticated {
-            isGuestMode = true
-        } else {
-            isGuestMode = false
-        }
+        // No longer using guest mode - we use anonymous auth instead
+        isGuestMode = false
     }
     
     private func setupSupabase() {
@@ -58,6 +62,9 @@ class AuthService: ObservableObject {
             options: SupabaseClientOptions(
                 db: .init(
                   schema: "tales"
+                ),
+                auth: .init(
+                    emitLocalSessionAsInitialSession: true
                 )
               )
         )
@@ -65,27 +72,34 @@ class AuthService: ObservableObject {
     
     private func checkAuthState() {
         guard let supabase = supabase else {
-            // If Supabase is not configured, stay in guest mode
-            isGuestMode = true
+            // If Supabase is not configured, cannot authenticate
             isAuthenticated = false
+            currentUser = nil
+            isGuestMode = false
             return
         }
         
-        Task {
+        Task { @MainActor in
             do {
                 let session = try await supabase.auth.session
-                await MainActor.run {
+                // Проверяем, что сессия не истекла
+                if session.isExpired {
+                    // Сессия истекла - выполняем анонимный вход
+                    await signInAnonymouslyIfNeeded()
+                } else {
+                    // Есть активная сессия (анонимная или обычная)
                     currentUser = session.user
-                    isAuthenticated = !session.user.isAnonymous
-                    isGuestMode = !isAuthenticated
+                    isAuthenticated = true // Анонимные пользователи тоже считаются аутентифицированными
+                    isGuestMode = false
+                    print("👤 User ID from session: \(session.user.id.uuidString)")
+                    print("   Is anonymous: \(session.user.isAnonymous)")
+                    if let email = session.user.email {
+                        print("   Email: \(email)")
+                    }
                 }
             } catch {
-                // Нет активной сессии - это нормально, остаемся в guest mode
-                await MainActor.run {
-                    isAuthenticated = false
-                    currentUser = nil
-                    isGuestMode = true
-                }
+                // Нет активной сессии - выполняем анонимный вход
+                await signInAnonymouslyIfNeeded()
             }
         }
     }
@@ -94,14 +108,82 @@ class AuthService: ObservableObject {
         guard let supabase = supabase else { return }
         
         authStateTask?.cancel()
-        authStateTask = Task {
+        authStateTask = Task { @MainActor in
             for await state in await supabase.auth.authStateChanges {
-                await MainActor.run {
-                    currentUser = state.session?.user
-                    isAuthenticated = state.session?.user != nil
-                    isGuestMode = !isAuthenticated
+                // Проверяем, что сессия существует и не истекла
+                if let session = state.session, !session.isExpired {
+                    currentUser = session.user
+                    isAuthenticated = true // Анонимные пользователи тоже считаются аутентифицированными
+                    isGuestMode = false
+                    print("👤 User ID from auth state change: \(session.user.id.uuidString)")
+                    print("   Is anonymous: \(session.user.isAnonymous)")
+                } else {
+                    // Сессия отсутствует или истекла - выполняем анонимный вход
+                    await signInAnonymouslyIfNeeded()
                 }
             }
+        }
+    }
+    
+    /// Выполняет анонимный вход, если нет активной сессии
+    private func signInAnonymouslyIfNeeded() async {
+        // Защита от повторных одновременных вызовов
+        guard !isSigningInAnonymously else {
+            return
+        }
+        
+        guard let supabase = supabase else {
+            isAuthenticated = false
+            currentUser = nil
+            isGuestMode = false
+            return
+        }
+        
+        isSigningInAnonymously = true
+        defer { isSigningInAnonymously = false }
+        
+        // Проверяем, есть ли уже активная сессия
+        do {
+            let existingSession = try await supabase.auth.session
+            if !existingSession.isExpired {
+                // Сессия уже есть и не истекла
+                currentUser = existingSession.user
+                isAuthenticated = true
+                isGuestMode = false
+                print("👤 User ID from existing session: \(existingSession.user.id.uuidString)")
+                print("   Is anonymous: \(existingSession.user.isAnonymous)")
+                if let email = existingSession.user.email {
+                    print("   Email: \(email)")
+                }
+                return
+            }
+        } catch {
+            // Нет сессии, продолжаем с анонимным входом
+        }
+        
+        // Выполняем анонимный вход
+        do {
+            print("🔄 Начинаем анонимный вход...")
+            // В Supabase Swift SDK signInAnonymously может принимать опциональный captchaToken
+            let session = try await supabase.auth.signInAnonymously(captchaToken: nil)
+            // Поскольку класс @MainActor, можем напрямую обновлять свойства
+            currentUser = session.user
+            isAuthenticated = true
+            isGuestMode = false
+            print("✅ Анонимный вход выполнен успешно. User ID: \(session.user.id.uuidString)")
+        } catch {
+            let errorDescription = error.localizedDescription
+            print("❌ Ошибка анонимного входа: \(errorDescription)")
+            print("   Тип ошибки: \(type(of: error))")
+            
+            // Проверяем, может ли быть проблема с настройками Supabase
+            if errorDescription.contains("anonymous") || errorDescription.contains("disabled") {
+                print("⚠️ ВНИМАНИЕ: Возможно, анонимная регистрация не включена в настройках Supabase!")
+                print("   Проверьте: Authentication → Settings → Enable anonymous sign-ins")
+            }
+            
+            // Не устанавливаем isAuthenticated = false, чтобы не блокировать UI
+            // Попробуем еще раз при следующем запросе
         }
     }
     
@@ -122,7 +204,7 @@ class AuthService: ObservableObject {
             )
             
             currentUser = response.user
-            isAuthenticated = !response.user.isAnonymous
+            isAuthenticated = true
             isGuestMode = false
         } catch {
             errorMessage = error.localizedDescription
@@ -147,7 +229,7 @@ class AuthService: ObservableObject {
             // Sign in with Apple OAuth
             // This will open the system Apple Sign In flow
             // After successful authentication, Supabase will handle the callback
-            let url = try await supabase.auth.signInWithOAuth(
+            let _ = try await supabase.auth.signInWithOAuth(
                 provider: .apple,
                 redirectTo: URL(string: "fairytalesai://auth-callback")!
             )
@@ -180,7 +262,7 @@ class AuthService: ObservableObject {
             )
             
             currentUser = response.user
-            isAuthenticated = !response.user.isAnonymous
+            isAuthenticated = true
             isGuestMode = false
         } catch {
             errorMessage = error.localizedDescription
@@ -200,9 +282,12 @@ class AuthService: ObservableObject {
         
         do {
             try await supabase.auth.signOut()
+            // После выхода выполняем анонимный вход для продолжения работы
             currentUser = nil
             isAuthenticated = false
-            isGuestMode = true
+            isGuestMode = false
+            // Выполняем анонимный вход для продолжения работы
+            await signInAnonymouslyIfNeeded()
         } catch {
             errorMessage = error.localizedDescription
             throw error

@@ -2,6 +2,7 @@
 
 import logging
 import uuid
+import asyncio
 from fastapi import APIRouter, HTTPException, Depends
 from typing import Optional, List
 from datetime import datetime
@@ -17,7 +18,7 @@ from src.application.dto import (
 )
 from src.api.auth import get_current_user, AuthUser, get_optional_user
 from src.api.subscription_validator import SubscriptionValidator
-from src.domain.services.subscription_service import SubscriptionService
+from src.domain.services.subscription_service import SubscriptionService, SubscriptionPlan, SubscriptionStatus
 from src.domain.value_objects import Language, StoryLength
 
 # Import helpers
@@ -303,12 +304,79 @@ async def get_user_subscription(
         # Get subscription
         subscription = await supabase_client.get_user_subscription(user.user_id)
         
+        # If user is anonymous and has no subscription, create a free subscription
         if not subscription:
-            logger.warning(f"Subscription not found for user {user.user_id}")
-            raise HTTPException(
-                status_code=404,
-                detail="User subscription not found"
+            # Check if user is anonymous (email is empty, None, or contains "@anonymous")
+            is_anonymous = (
+                not user.email or 
+                user.email == "" or 
+                "@anonymous" in user.email.lower() or
+                user.email.endswith("@supabase.co")
             )
+            
+            if is_anonymous:
+                logger.info(f"Creating free subscription for anonymous user {user.user_id}")
+                # Create subscription with free plan using upsert
+                now = datetime.now()
+                subscription_data = {
+                    'id': user.user_id,
+                    'subscription_plan': SubscriptionPlan.FREE.value,
+                    'subscription_status': SubscriptionStatus.ACTIVE.value,
+                    'subscription_start_date': now.isoformat(),
+                    'subscription_end_date': None,
+                    'monthly_story_count': 5,
+                    'last_reset_date': now.isoformat()
+                }
+                
+                # Use upsert to create or update user profile with subscription
+                try:
+                    # First check if profile exists, if not create it
+                    def check_profile():
+                        return supabase_client.client.table("user_profiles").select("id").eq("id", user.user_id).execute()
+                    
+                    profile_response = await asyncio.to_thread(check_profile)
+                    
+                    if not profile_response.data:
+                        # Profile doesn't exist, create it with subscription data
+                        subscription_data['name'] = user.email or f"Anonymous User {user.user_id[:8]}"
+                        subscription_data['created_at'] = now.isoformat()
+                        subscription_data['updated_at'] = now.isoformat()
+                        
+                        def create_profile():
+                            return supabase_client.client.table("user_profiles").insert(subscription_data).execute()
+                        
+                        await asyncio.to_thread(create_profile)
+                    else:
+                        # Profile exists, update subscription fields
+                        update_data = {
+                            'subscription_plan': SubscriptionPlan.FREE.value,
+                            'subscription_status': SubscriptionStatus.ACTIVE.value,
+                            'subscription_start_date': now.isoformat(),
+                            'subscription_end_date': None,
+                            'monthly_story_count': 0,
+                            'last_reset_date': now.isoformat()
+                        }
+                        
+                        def update_profile():
+                            return supabase_client.client.table("user_profiles").update(update_data).eq("id", user.user_id).execute()
+                        
+                        await asyncio.to_thread(update_profile)
+                    
+                    # Reload subscription
+                    subscription = await supabase_client.get_user_subscription(user.user_id)
+                    logger.info(f"Successfully created free subscription for anonymous user {user.user_id}")
+                except Exception as e:
+                    logger.error(f"Error creating subscription for anonymous user: {str(e)}", exc_info=True)
+                    raise HTTPException(
+                        status_code=500,
+                        detail=f"Error creating subscription: {str(e)}"
+                    )
+            else:
+                logger.warning(f"Subscription not found for user {user.user_id}")
+                raise HTTPException(
+                    status_code=404,
+                    detail="User subscription not found"
+                )
         
         # Check if monthly reset is needed
         if subscription_service.needs_monthly_reset(subscription):

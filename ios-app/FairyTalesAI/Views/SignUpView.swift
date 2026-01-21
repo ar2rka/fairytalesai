@@ -3,7 +3,6 @@ import AuthenticationServices
 
 struct SignUpView: View {
     @EnvironmentObject var authService: AuthService
-    @EnvironmentObject var migrationService: DataMigrationService
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
     
@@ -11,8 +10,6 @@ struct SignUpView: View {
     @State private var password = ""
     @State private var confirmPassword = ""
     @State private var showPassword = false
-    @State private var isMigrating = false
-    @State private var showMigrationProgress = false
     
     var body: some View {
         NavigationView {
@@ -153,19 +150,6 @@ struct SignUpView: View {
                             .opacity((authService.isLoading || !isFormValid) ? 0.6 : 1.0)
                         }
                         .padding(.horizontal, 24)
-                        
-                        // Migration Progress
-                        if showMigrationProgress {
-                            VStack(spacing: 16) {
-                                ProgressView(value: migrationService.migrationProgress)
-                                    .progressViewStyle(LinearProgressViewStyle(tint: AppTheme.primaryPurple))
-                                
-                                Text("Migrating your data...")
-                                    .font(.system(size: 14))
-                                    .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                            }
-                            .padding(.horizontal, 24)
-                        }
                     }
                     .padding(.bottom, 40)
                 }
@@ -191,7 +175,7 @@ struct SignUpView: View {
     
     private func handleAppleSignIn(_ result: Result<ASAuthorization, Error>) {
         switch result {
-        case .success(let authorization):
+        case .success( _):
             Task {
                 do {
                     // For now, show a message that Apple Sign In requires OAuth setup
@@ -210,30 +194,10 @@ struct SignUpView: View {
         Task {
             do {
                 try await authService.signUp(email: email, password: password)
-                await handleSuccessfulSignUp()
+                dismiss()
             } catch {
                 // Error is handled by AuthService
             }
-        }
-    }
-    
-    private func handleSuccessfulSignUp() async {
-        // Check if there's guest data to migrate
-        let guestDataManager = GuestDataManager.shared
-        if guestDataManager.hasGuestData, let userId = authService.currentUser?.id {
-            showMigrationProgress = true
-            do {
-                try await migrationService.migrateGuestDataToCloud(userId: userId)
-                // Migration successful, dismiss after a short delay
-                try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
-                dismiss()
-            } catch {
-                // Migration failed, but user is still signed up
-                // Show error but allow them to continue
-                authService.errorMessage = "Account created, but data migration failed. Your data is still saved locally."
-            }
-        } else {
-            dismiss()
         }
     }
 }
@@ -241,5 +205,4 @@ struct SignUpView: View {
 #Preview {
     SignUpView()
         .environmentObject(AuthService.shared)
-        .environmentObject(DataMigrationService.shared)
 }

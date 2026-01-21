@@ -7,7 +7,12 @@ struct StoryResultView: View {
     @EnvironmentObject var storiesStore: StoriesStore
     @EnvironmentObject var premiumManager: PremiumManager
     @EnvironmentObject var userSettings: UserSettings
+    @AppStorage("selectedLanguage") private var selectedLanguage = "English"
     @State private var showingPaywall = false
+    
+    private var soonText: String {
+        selectedLanguage == "Russian" ? "Скоро" : "Soon"
+    }
     
     var body: some View {
         NavigationView {
@@ -29,10 +34,21 @@ struct StoryResultView: View {
                                 // In production, this would start the audio narration
                             }
                         }) {
-                            HStack {
+                            HStack(spacing: 12) {
                                 Image(systemName: userSettings.isPremium ? "play.circle.fill" : "lock.fill")
                                 Text(userSettings.isPremium ? "Listen" : "Listen (Premium)")
                                     .font(.system(size: 16, weight: .semibold))
+                                
+                                Spacer()
+                                
+                                // Soon badge
+                                Text(soonText)
+                                    .font(.system(size: 12, weight: .semibold))
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(Color.white.opacity(0.3))
+                                    .cornerRadius(8)
                             }
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)

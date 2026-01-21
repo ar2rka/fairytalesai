@@ -1,35 +1,22 @@
 import SwiftUI
 import UIKit
+import SwiftData
 
 struct HomeView: View {
     @EnvironmentObject var childrenStore: ChildrenStore
     @EnvironmentObject var storiesStore: StoriesStore
     @Environment(\.colorScheme) var colorScheme
+    @Environment(\.modelContext) private var modelContext
     
-    // Hardcoded Free Demo Stories
-    private let freeDemoStories: [Story] = [
-        Story(
-            title: "The Magic Forest Adventure",
-            content: "Once upon a time, in a magical forest filled with talking animals and sparkling trees, a brave little explorer discovered a hidden treasure that brought joy to all the creatures.",
-            theme: "Fairies",
-            duration: 5,
-            favoriteStatus: false
-        ),
-        Story(
-            title: "The Pirate's Treasure",
-            content: "In a faraway kingdom, a brave pirate captain sailed the seven seas, discovering hidden islands and making friends with sea creatures. Together, they found the greatest treasure of all: friendship.",
-            theme: "Pirates",
-            duration: 5,
-            favoriteStatus: false
-        ),
-        Story(
-            title: "The Space Explorer's Journey",
-            content: "A young astronaut traveled through the stars, meeting friendly aliens and discovering planets made of candy. The universe was full of wonder and friendship.",
-            theme: "Space",
-            duration: 5,
-            favoriteStatus: false
-        )
-    ]
+    @State private var freeDemoStories: [Story] = []
+    @State private var isLoadingFreeStories = false
+    
+    private let storiesService = StoriesService.shared
+    
+    // Фильтруем детей, оставляя только тех, у кого есть userId (из Supabase)
+    private var supabaseChildren: [Child] {
+        childrenStore.children.filter { $0.userId != nil }
+    }
     
     var body: some View {
         ZStack {
@@ -53,22 +40,34 @@ struct HomeView: View {
                         .padding(.top, 8)
                         
                         // Free Demo Stories Section
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("Free Demo Stories")
-                                .font(.system(size: 20, weight: .semibold))
-                                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
-                                .padding(.horizontal)
-                            
-                            ScrollView(.horizontal, showsIndicators: false) {
-                                HStack(alignment: .top, spacing: 16) {
-                                    ForEach(freeDemoStories) { story in
-                                        NavigationLink(destination: StoryReadingView(story: story)) {
-                                            FreeDemoStoryCard(story: story)
+                        if !freeDemoStories.isEmpty || isLoadingFreeStories {
+                            VStack(alignment: .leading, spacing: 16) {
+                                Text("Free Stories")
+                                    .font(.system(size: 20, weight: .semibold))
+                                    .foregroundColor(AppTheme.textPrimary(for: colorScheme))
+                                    .padding(.horizontal)
+                                
+                                if isLoadingFreeStories {
+                                    HStack {
+                                        Spacer()
+                                        ProgressView()
+                                            .padding()
+                                        Spacer()
+                                    }
+                                    .padding(.horizontal)
+                                } else {
+                                    ScrollView(.horizontal, showsIndicators: false) {
+                                        HStack(alignment: .top, spacing: 16) {
+                                            ForEach(freeDemoStories) { story in
+                                                NavigationLink(destination: StoryReadingView(story: story)) {
+                                                    FreeDemoStoryCard(story: story)
+                                                }
+                                                .buttonStyle(PlainButtonStyle())
+                                            }
                                         }
-                                        .buttonStyle(PlainButtonStyle())
+                                        .padding(.horizontal)
                                     }
                                 }
-                                .padding(.horizontal)
                             }
                         }
                         
@@ -86,11 +85,11 @@ struct HomeView: View {
                             }
                             .padding(.horizontal)
                             
-                            if !childrenStore.children.isEmpty {
+                            if !supabaseChildren.isEmpty {
                                 
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     HStack(spacing: 16) {
-                                        ForEach(childrenStore.children.prefix(3)) { child in
+                                        ForEach(supabaseChildren.prefix(3)) { child in
                                             ChildProfileCircle(child: child)
                                         }
                                         
@@ -196,6 +195,27 @@ struct HomeView: View {
             .navigationTitle("Home")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
+            .task {
+                await loadDailyFreeStories()
+            }
+    }
+    
+    private func loadDailyFreeStories() async {
+        isLoadingFreeStories = true
+        defer { isLoadingFreeStories = false }
+        
+        do {
+            let stories = try await storiesService.fetchDailyFreeStories(modelContext: modelContext)
+            freeDemoStories = stories
+        } catch {
+            print("❌ Ошибка загрузки ежедневных бесплатных историй: \(error.localizedDescription)")
+            // В случае ошибки пытаемся загрузить из кеша
+            if let cachedStories = DailyFreeStoriesCacheService.shared.getCachedStories(modelContext: modelContext) {
+                freeDemoStories = cachedStories
+            } else {
+                freeDemoStories = []
+            }
+        }
     }
     
 }
