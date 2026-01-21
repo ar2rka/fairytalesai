@@ -155,7 +155,7 @@ class StoriesStore: ObservableObject {
             print("   - Language: \(language)")
             let story = try await storiesService.generateStory(
                 childId: childId,
-                storyType: theme,
+                storyType: "child",
                 storyLength: length,
                 language: language,
                 moral: plot,
