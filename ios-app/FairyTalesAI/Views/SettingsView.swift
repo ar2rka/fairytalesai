@@ -93,9 +93,6 @@ struct SettingsView: View {
                     // App Experience Section
                     appExperienceSection
                     
-                    // Membership Section
-                    membershipSection
-                    
                     // Community Section
                     communitySection
                     
@@ -288,82 +285,6 @@ struct SettingsView: View {
                                     .font(.system(size: 12))
                                     .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                             }
-                        }
-                    )
-                }
-                .buttonStyle(PlainButtonStyle())
-            }
-            .background(AppTheme.cardBackground(for: colorScheme))
-            .cornerRadius(AppTheme.cornerRadius)
-            .padding(.horizontal)
-        }
-    }
-    
-    private var membershipSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text(LocalizationManager.shared.settingsMembership)
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundColor(AppTheme.primaryPurple)
-                .padding(.horizontal)
-            
-            VStack(spacing: 0) {
-                NavigationLink(destination: MembershipView()) {
-                    SettingsRow(
-                        icon: "star.fill",
-                        iconColor: Color.yellow,
-                        iconBackground: AppTheme.primaryPurple,
-                        title: LocalizationManager.shared.settingsStorytellerPro,
-                        subtitle: LocalizationManager.shared.settingsActivePlan,
-                        subtitleColor: Color.green,
-                        trailing: {
-                            HStack(spacing: 8) {
-                                Text("PRO")
-                                    .font(.system(size: 10, weight: .bold))
-                                    .foregroundColor(.white)
-                                    .padding(.horizontal, 8)
-                                    .padding(.vertical, 4)
-                                    .background(
-                                        LinearGradient(
-                                            colors: [Color(red: 1.0, green: 0.84, blue: 0.0), Color(red: 1.0, green: 0.65, blue: 0.0)],
-                                            startPoint: .leading,
-                                            endPoint: .trailing
-                                        )
-                                    )
-                                    .cornerRadius(8)
-                                
-                                Image(systemName: "chevron.right")
-                                    .font(.system(size: 12))
-                                    .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                            }
-                        }
-                    )
-                }
-                .buttonStyle(PlainButtonStyle())
-                .overlay(
-                    RoundedRectangle(cornerRadius: AppTheme.cornerRadius)
-                        .stroke(
-                            LinearGradient(
-                                colors: [Color.yellow, Color.orange],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 2
-                        )
-                )
-                
-                Divider()
-                    .background(AppTheme.textSecondary(for: colorScheme).opacity(0.3))
-                    .padding(.leading, 60)
-                
-                NavigationLink(destination: SubscriptionView()) {
-                    SettingsRow(
-                        icon: "creditcard.fill",
-                        iconColor: AppTheme.primaryPurple,
-                        title: LocalizationManager.shared.settingsManageSubscription,
-                        trailing: {
-                            Image(systemName: "chevron.right")
-                                .font(.system(size: 12))
-                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                         }
                     )
                 }

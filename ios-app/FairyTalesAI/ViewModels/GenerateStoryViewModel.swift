@@ -10,13 +10,15 @@ class GenerateStoryViewModel: ObservableObject {
     @Published var showingAddChild = false
     @Published var generatedStory: Story? = nil
     
-    func validateDuration(newValue: Double, isPremium: Bool) {
-         if !isPremium && newValue > 5 {
-             // Limit free users to 5 minutes max, no paywall
-             selectedDuration = 5
-         } else {
-             selectedDuration = newValue
-         }
+    func validateDuration(newValue: Double) {
+        // Limit duration to 5 minutes max
+        if newValue > 5 {
+            selectedDuration = 5
+        } else if newValue < 3 {
+            selectedDuration = 3
+        } else {
+            selectedDuration = newValue
+        }
     }
     
     var canGenerate: Bool {
@@ -32,9 +34,8 @@ class GenerateStoryViewModel: ObservableObject {
         
         let finalDuration = Int(selectedDuration)
         
-        // No paywall - allow generation for all users (including anonymous)
-        // Free users are limited to 5 minutes max duration (enforced by validateDuration)
-        // Use a free generation if not premium (optional - can be removed if unlimited)
+        // All users can generate stories (including anonymous)
+        // Duration is limited to 3-5 minutes for all users
         if !userSettings.isPremium {
             userSettings.useFreeGeneration()
         }

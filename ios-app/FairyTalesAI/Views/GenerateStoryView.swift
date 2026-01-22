@@ -185,25 +185,12 @@ struct GenerateStoryView: View {
                         .font(.system(size: 14, weight: .medium))
                         .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                 }
-                
-                if !userSettings.isPremium && viewModel.selectedDuration >= 5 {
-                    HStack(spacing: 4) {
-                        Image(systemName: "star.fill")
-                            .font(.system(size: 10))
-                        Text(LocalizationManager.shared.generateStoryPremium)
-                            .font(.system(size: 10, weight: .semibold))
-                    }
-                    .foregroundColor(.yellow)
-                }
             }
             
             VStack(spacing: 8) {
                 Slider(
-                    value: Binding(
-                        get: { viewModel.selectedDuration },
-                        set: { viewModel.validateDuration(newValue: $0, isPremium: userSettings.isPremium) }
-                    ),
-                    in: 3...30,
+                    value: $viewModel.selectedDuration,
+                    in: 3...5,
                     step: 1
                 ) {
                     Text(LocalizationManager.shared.generateStoryDuration)
@@ -212,25 +199,11 @@ struct GenerateStoryView: View {
                         .font(.system(size: 12))
                         .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                 } maximumValueLabel: {
-                    Text(userSettings.isPremium ? "30" : "30 🔒")
+                    Text("5")
                         .font(.system(size: 12))
                         .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                 }
                 .tint(AppTheme.primaryPurple)
-                
-                if !userSettings.isPremium {
-                    HStack {
-                        Text(LocalizationManager.shared.generateStoryFreeUpTo5)
-                            .font(.system(size: 12))
-                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                        
-                        Spacer()
-                        
-                        Text(LocalizationManager.shared.generateStoryPremiumUpTo30)
-                            .font(.system(size: 12))
-                            .foregroundColor(AppTheme.primaryPurple)
-                    }
-                }
             }
         }
         .padding(.horizontal)
