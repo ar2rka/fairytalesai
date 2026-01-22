@@ -20,22 +20,28 @@ struct AddChildView: View {
     }
     
     // Hero Creator Interests
-    private let heroInterests: [(name: String, emoji: String)] = [
-        ("Dinosaurs", "🦖"),
-        ("Space", "🚀"),
-        ("Unicorns", "🦄"),
-        ("Castles", "🏰"),
-        ("Mystery", "🕵️"),
-        ("Animals", "🦁")
-    ]
+    private var heroInterests: [(name: String, emoji: String)] {
+        let localizer = LocalizationManager.shared
+        return [
+            (localizer.interestDinosaurs, "🦖"),
+            (localizer.interestSpace, "🚀"),
+            (localizer.interestUnicorns, "🦄"),
+            (localizer.interestCastles, "🏰"),
+            (localizer.interestMystery, "🕵️"),
+            (localizer.interestAnimals, "🦁")
+        ]
+    }
     
     // Age Group Options for Hero Creator
-    private let ageGroups: [(category: AgeCategory, label: String)] = [
-        (.twoThree, "Toddler (1-3)"),
-        (.threeFive, "Preschool (3-5)"),
-        (.fiveSeven, "Explorer (5-7)"),
-        (.eightPlus, "Big Kid (8+)")
-    ]
+    private var ageGroups: [(category: AgeCategory, label: String)] {
+        let localizer = LocalizationManager.shared
+        return [
+            (.twoThree, "\(localizer.ageToddler) (1-3)"),
+            (.threeFive, "\(localizer.agePreschool) (3-5)"),
+            (.fiveSeven, "\(localizer.ageExplorer) (5-7)"),
+            (.eightPlus, "\(localizer.ageBigKid) (8+)")
+        ]
+    }
     
     var body: some View {
         NavigationView {
@@ -46,11 +52,11 @@ struct AddChildView: View {
                     VStack(spacing: 20) {
                         // Hero Name Section
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("Name of the Hero")
+                            Text(LocalizationManager.shared.addChildNameOfHero)
                                 .font(.system(size: 18, weight: .semibold))
                                 .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                             
-                            TextField("Enter hero's name", text: $name)
+                            TextField(LocalizationManager.shared.addChildEnterHeroName, text: $name)
                                 .font(.system(size: 18))
                                 .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                                 .padding()
@@ -68,7 +74,7 @@ struct AddChildView: View {
                         
                         // Hero Type Section
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("Hero Type")
+                            Text(LocalizationManager.shared.addChildHeroType)
                                 .font(.system(size: 18, weight: .semibold))
                                 .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                             
@@ -78,7 +84,7 @@ struct AddChildView: View {
                         
                         // Age Group Section - Grid Selector
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("Age Group")
+                            Text(LocalizationManager.shared.addChildAgeGroup)
                                 .font(.system(size: 18, weight: .semibold))
                                 .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                             
@@ -88,11 +94,11 @@ struct AddChildView: View {
                         
                         // Magic Ingredients - Interests
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("The Magic Ingredients")
+                            Text(LocalizationManager.shared.addChildMagicIngredients)
                                 .font(.system(size: 18, weight: .semibold))
                                 .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                             
-                            Text("Select interests to personalize stories")
+                            Text(LocalizationManager.shared.addChildSelectInterests)
                                 .font(.system(size: 14))
                                 .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                             
@@ -134,18 +140,18 @@ struct AddChildView: View {
                         .allowsHitTesting(false)
                 }
             }
-            .navigationTitle("Create Hero")
+            .navigationTitle(LocalizationManager.shared.addChildCreateHero)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
+                    Button(LocalizationManager.shared.addChildCancel) {
                         dismiss()
                     }
                     .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Save") {
+                    Button(LocalizationManager.shared.addChildSave) {
                         Task {
                             await saveChildWithAnimation()
                         }

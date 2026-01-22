@@ -55,6 +55,25 @@ struct StoryTheme: Identifiable, Hashable {
     let description: String
     let emoji: String
     
+    var localizedName: String {
+        LocalizationManager.shared.localizedThemeName(name)
+    }
+    
+    var localizedDescription: String {
+        let localizer = LocalizationManager.shared
+        switch name.lowercased() {
+        case "space": return localizer.themeSpaceDesc
+        case "pirates": return localizer.themePiratesDesc
+        case "dinosaurs": return localizer.themeDinosaursDesc
+        case "mermaids": return localizer.themeMermaidsDesc
+        case "animals": return localizer.themeAnimalsDesc
+        case "mystery": return localizer.themeMysteryDesc
+        case "magic school": return localizer.themeMagicSchoolDesc
+        case "robots": return localizer.themeRobotsDesc
+        default: return description
+        }
+    }
+    
     static let allThemes: [StoryTheme] = [
         StoryTheme(name: "Space", description: "Galaxies & Aliens", emoji: "🚀"),
         StoryTheme(name: "Pirates", description: "Treasure & Adventure", emoji: "🏴‍☠️"),

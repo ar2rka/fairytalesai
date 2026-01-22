@@ -1,4 +1,5 @@
 import SwiftUI
+import Foundation
 
 // Helper extension for rounded corners on specific sides
 extension View {
@@ -25,6 +26,11 @@ struct CustomTabBar: View {
     @Binding var selectedTab: Int
     var onCreateTapped: () -> Void = {}
     @Environment(\.colorScheme) var colorScheme
+    @AppStorage("selectedLanguage") private var selectedLanguage: String = "English"
+    
+    private var localizer: LocalizationManager {
+        LocalizationManager.shared
+    }
     
     var body: some View {
         ZStack(alignment: .top) {
@@ -48,7 +54,7 @@ struct CustomTabBar: View {
                 // Tab 0: Home
                 TabBarButton(
                     icon: "house.fill",
-                    label: "Home",
+                    label: localizer.tabHome,
                     isSelected: selectedTab == 0,
                     action: { selectedTab = 0 }
                 )
@@ -56,7 +62,7 @@ struct CustomTabBar: View {
                 // Tab 1: Library
                 TabBarButton(
                     icon: "book.closed.fill",
-                    label: "Library",
+                    label: localizer.tabLibrary,
                     isSelected: selectedTab == 1,
                     action: { selectedTab = 1 }
                 )
@@ -68,7 +74,7 @@ struct CustomTabBar: View {
                 // Tab 3: Explore
                 TabBarButton(
                     icon: "sparkles",
-                    label: "Explore",
+                    label: localizer.tabExplore,
                     isSelected: selectedTab == 3,
                     action: { selectedTab = 3 }
                 )
@@ -76,7 +82,7 @@ struct CustomTabBar: View {
                 // Tab 4: Profile
                 TabBarButton(
                     icon: "person.fill",
-                    label: "Profile",
+                    label: localizer.tabProfile,
                     isSelected: selectedTab == 4,
                     action: { selectedTab = 4 }
                 )
@@ -109,12 +115,16 @@ struct TabBarButton: View {
                 Image(systemName: icon)
                     .font(.system(size: 22, weight: isSelected ? .semibold : .regular))
                     .foregroundColor(isSelected ? AppTheme.primaryPurple : AppTheme.textSecondary(for: colorScheme))
+                    .frame(height: 22) // Fixed height for alignment
                 
                 Text(label)
                     .font(.system(size: 11, weight: isSelected ? .semibold : .regular))
                     .foregroundColor(isSelected ? AppTheme.primaryPurple : AppTheme.textSecondary(for: colorScheme))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
             .frame(maxWidth: .infinity)
+            .contentShape(Rectangle()) // Make entire area tappable
         }
     }
 }

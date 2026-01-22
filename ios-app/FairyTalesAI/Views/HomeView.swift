@@ -2,6 +2,14 @@ import SwiftUI
 import UIKit
 import SwiftData
 
+// MARK: - Instrumentation PreferenceKey (shared with ExploreView)
+struct ContentMinYPreferenceKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = min(value, nextValue())
+    }
+}
+
 struct HomeView: View {
     @EnvironmentObject var childrenStore: ChildrenStore
     @EnvironmentObject var storiesStore: StoriesStore
@@ -10,6 +18,9 @@ struct HomeView: View {
     
     @State private var freeDemoStories: [Story] = []
     @State private var isLoadingFreeStories = false
+    @State private var safeAreaTop: CGFloat = 0
+    @State private var viewHeight: CGFloat = 0
+    @State private var contentMinY: CGFloat = 0
     
     private let storiesService = StoriesService.shared
     
@@ -22,15 +33,16 @@ struct HomeView: View {
         ZStack {
             AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
 
-            ScrollView {
+            GeometryReader { proxy in
+                ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
                         // Welcome Header
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Welcome")
+                            Text(LocalizationManager.shared.homeWelcome)
                                 .font(.system(size: 16, weight: .medium))
                                 .foregroundColor(Color(white: 0.85)) // Lighter for better contrast
                             
-                            Text("Create Magical Stories")
+                            Text(LocalizationManager.shared.homeCreateMagicalStories)
                                 .font(.system(size: 32, weight: .bold))
                                 .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                         }
@@ -38,11 +50,29 @@ struct HomeView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal)
                         .padding(.top, 8)
+                        .background(
+                            GeometryReader { headerGeo in
+                                Color.clear.preference(
+                                    key: ContentMinYPreferenceKey.self,
+                                    value: headerGeo.frame(in: .named("scroll")).minY
+                                )
+                            }
+                        )
+                        .onAppear {
+                            safeAreaTop = proxy.safeAreaInsets.top
+                            viewHeight = proxy.size.height
+                        }
+                        .onChange(of: proxy.safeAreaInsets.top) { newValue in
+                            safeAreaTop = newValue
+                        }
+                        .onChange(of: proxy.size.height) { newValue in
+                            viewHeight = newValue
+                        }
                         
                         // Free Demo Stories Section
                         if !freeDemoStories.isEmpty || isLoadingFreeStories {
                             VStack(alignment: .leading, spacing: 16) {
-                                Text("Free Stories")
+                                Text(LocalizationManager.shared.homeFreeStories)
                                     .font(.system(size: 20, weight: .semibold))
                                     .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                                     .padding(.horizontal)
@@ -74,13 +104,13 @@ struct HomeView: View {
                         // Who is listening section
                         VStack(alignment: .leading, spacing: 12) {
                             HStack {
-                                Text("Who is listening?")
+                                Text(LocalizationManager.shared.homeWhoIsListening)
                                     .font(.system(size: 20, weight: .semibold))
                                     .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                                 
                                 Spacer()
                                 
-                                NavigationLink("Manage", destination: NavigationView { SettingsView() })
+                                NavigationLink(LocalizationManager.shared.homeManage, destination: NavigationView { SettingsView() })
                                     .foregroundColor(AppTheme.primaryPurple)
                             }
                             .padding(.horizontal)
@@ -102,7 +132,7 @@ struct HomeView: View {
                                                         Image(systemName: "plus")
                                                             .foregroundColor(AppTheme.primaryPurple)
                                                     )
-                                                Text("Add")
+                                                Text(LocalizationManager.shared.homeAdd)
                                                     .font(.system(size: 12))
                                                     .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                                             }
@@ -117,11 +147,11 @@ struct HomeView: View {
                                         .font(.system(size: 40))
                                         .foregroundColor(AppTheme.primaryPurple.opacity(0.6))
                                     
-                                    Text("Who is our hero today?")
+                                    Text(LocalizationManager.shared.homeWhoIsOurHero)
                                         .font(.system(size: 16, weight: .semibold))
                                         .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                                     
-                                    Text("Add a profile to start the adventure.")
+                                    Text(LocalizationManager.shared.homeAddProfileDescription)
                                         .font(.system(size: 14))
                                         .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                                         .multilineTextAlignment(.center)
@@ -129,7 +159,7 @@ struct HomeView: View {
                                     NavigationLink(destination: AddChildView()) {
                                         HStack {
                                             Image(systemName: "plus")
-                                            Text("Add Profile")
+                                            Text(LocalizationManager.shared.homeAddProfile)
                                                 .font(.system(size: 14, weight: .semibold))
                                         }
                                         .foregroundColor(.white)
@@ -149,13 +179,13 @@ struct HomeView: View {
                         if !storiesStore.stories.isEmpty {
                             VStack(alignment: .leading, spacing: 12) {
                                 HStack {
-                                    Text("Recent Magic")
+                                    Text(LocalizationManager.shared.homeRecentMagic)
                                         .font(.system(size: 20, weight: .semibold))
                                         .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                                     
                                     Spacer()
                                     
-                                    NavigationLink("View All", destination: LibraryView())
+                                    NavigationLink(LocalizationManager.shared.homeViewAll, destination: LibraryView())
                                         .foregroundColor(AppTheme.primaryPurple)
                                 }
                                 .padding(.horizontal)
@@ -173,7 +203,7 @@ struct HomeView: View {
                         
                         // Popular Themes
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("Popular Themes")
+                            Text(LocalizationManager.shared.homePopularThemes)
                                 .font(.system(size: 20, weight: .semibold))
                                 .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                                 .padding(.horizontal)
@@ -191,10 +221,34 @@ struct HomeView: View {
                     // Bottom spacing for TabBar
                     Spacer(minLength: 50)
                 }
+                .coordinateSpace(name: "scroll")
+                .onPreferenceChange(ContentMinYPreferenceKey.self) { value in
+                    contentMinY = value
+                }
             }
-            .navigationTitle("Home")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
+            
+            // Debug overlay
+            VStack {
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("HOME safeAreaTop: \(Int(safeAreaTop))")
+                        Text("HOME viewHeight: \(Int(viewHeight))")
+                        Text("HOME contentMinY: \(Int(contentMinY))")
+                    }
+                    .font(.system(size: 10, design: .monospaced))
+                    .foregroundColor(.white)
+                    .padding(8)
+                    .background(Color.black.opacity(0.7))
+                    .cornerRadius(4)
+                    Spacer()
+                }
+                .padding(.top, safeAreaTop + 44)
+                Spacer()
+            }
+        }
+        .navigationTitle(LocalizationManager.shared.tabHome)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
             .task {
                 await loadDailyFreeStories()
             }
@@ -293,7 +347,7 @@ struct FeatureCard: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Spark a New Adventure")
+            Text(LocalizationManager.shared.homeSparkNewAdventure)
                 .font(.system(size: 24, weight: .bold))
                 .foregroundColor(AppTheme.textPrimary(for: colorScheme))
             
@@ -303,7 +357,7 @@ struct FeatureCard: View {
             
             HStack {
                 Image(systemName: "sparkles")
-                Text("Create New Tale")
+                Text(LocalizationManager.shared.homeCreateNewTale)
                     .font(.system(size: 16, weight: .semibold))
                 Image(systemName: "sparkles")
             }
@@ -326,7 +380,7 @@ struct GetStartedCard: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Every story needs a hero. Add your child to start the magic!")
+            Text(LocalizationManager.shared.homeEveryStoryNeedsHero)
                 .font(.system(size: 18, weight: .semibold))
                 .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                 .multilineTextAlignment(.leading)
@@ -334,7 +388,7 @@ struct GetStartedCard: View {
             Button(action: { showingAddChild = true }) {
                 HStack {
                     Image(systemName: "person.fill.badge.plus")
-                    Text("Add Child Profile")
+                    Text(LocalizationManager.shared.homeAddChildProfile)
                         .font(.system(size: 16, weight: .semibold))
                 }
                 .foregroundColor(.white)
@@ -414,7 +468,7 @@ struct StoryCard: View {
                 .lineLimit(2)
                 .frame(height: 40, alignment: .topLeading) // Fixed height for alignment
             
-            Text("\(story.duration) min • \(story.theme)")
+            Text("\(story.duration) \(LocalizationManager.shared.generateStoryMin) • \(LocalizationManager.shared.localizedThemeName(story.theme))")
                 .font(.system(size: 12))
                 .foregroundColor(Color(white: 0.85)) // Lighter for better contrast
         }
@@ -476,7 +530,7 @@ struct ThemeButton: View {
                 Text(theme.emoji)
                     .font(.system(size: 28))
                 
-                Text(theme.name)
+                Text(theme.localizedName)
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                     .lineLimit(1)
@@ -550,11 +604,11 @@ struct StoryReadingView: View {
                             // In production, this would start the audio narration
                         }
                     }) {
-                        HStack {
-                            Image(systemName: userSettings.isPremium ? "play.circle.fill" : "lock.fill")
-                            Text(userSettings.isPremium ? "Listen" : "Listen (Premium)")
-                                .font(.system(size: 16, weight: .semibold))
-                        }
+                            HStack {
+                                Image(systemName: userSettings.isPremium ? "play.circle.fill" : "lock.fill")
+                                Text(userSettings.isPremium ? LocalizationManager.shared.storyReadingListen : LocalizationManager.shared.storyReadingListenPremium)
+                                    .font(.system(size: 16, weight: .semibold))
+                            }
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -572,7 +626,7 @@ struct StoryReadingView: View {
                 .padding()
             }
         }
-        .navigationTitle("Story")
+        .navigationTitle(LocalizationManager.shared.storyReadingStory)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {

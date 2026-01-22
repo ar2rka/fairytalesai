@@ -26,7 +26,7 @@ struct ProtagonistStyleSelector: View {
             }
             
             // Caption
-            Text("The Hero style focuses on your child's name for a classic story feel.")
+            Text(LocalizationManager.shared.styleSelectorCaption)
                 .font(.system(size: 11))
                 .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                 .padding(.top, 2)

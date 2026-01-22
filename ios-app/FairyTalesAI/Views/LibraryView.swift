@@ -9,7 +9,10 @@ struct LibraryView: View {
     @State private var searchText = ""
     @State private var selectedFilter = "All Stories"
     
-    let filters = ["All Stories", "Bedtime", "Adventure", "Fantasy"]
+    private var filters: [String] {
+        let localizer = LocalizationManager.shared
+        return [localizer.libraryAllStories, localizer.libraryBedtime, localizer.libraryAdventure, localizer.libraryFantasy]
+    }
     
     var filteredStories: [Story] {
         var stories = storiesStore.stories
@@ -21,8 +24,11 @@ struct LibraryView: View {
             }
         }
         
-        if selectedFilter != "All Stories" {
-            stories = stories.filter { $0.theme == selectedFilter }
+        let localizer = LocalizationManager.shared
+        if selectedFilter != localizer.libraryAllStories {
+            // Map localized filter back to English theme name for filtering
+            let englishFilter = mapLocalizedFilterToEnglish(selectedFilter)
+            stories = stories.filter { $0.theme.lowercased() == englishFilter.lowercased() }
         }
         
         return stories
@@ -40,7 +46,7 @@ struct LibraryView: View {
                                 .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.primaryPurple))
                                 .scaleEffect(1.5)
                             
-                            Text("Loading stories...")
+                            Text(LocalizationManager.shared.libraryLoadingStories)
                                 .font(.system(size: 16))
                                 .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                         }
@@ -52,12 +58,12 @@ struct LibraryView: View {
                             AnimatedBookIcon()
                                 .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                             
-                            Text("No stories yet")
+                            Text(LocalizationManager.shared.libraryNoStoriesYet)
                                 .font(.system(size: 20, weight: .semibold))
                                 .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                                 .multilineTextAlignment(.center)
                             
-                            Text("Create your first magical story")
+                            Text(LocalizationManager.shared.libraryCreateFirstStory)
                                 .font(.system(size: 14))
                                 .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                                 .multilineTextAlignment(.center)
@@ -71,7 +77,7 @@ struct LibraryView: View {
                             Image(systemName: "magnifyingglass")
                                 .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                             
-                            TextField("Search stories, characters...", text: $searchText)
+                            TextField(LocalizationManager.shared.librarySearchStories, text: $searchText)
                                 .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                         }
                         .padding()
@@ -104,7 +110,8 @@ struct LibraryView: View {
                                         .onAppear {
                                             // Загружаем следующую страницу когда показываем последние 5 элементов
                                             // Только если нет фильтров и поиска (работаем с полным списком)
-                                            if selectedFilter == "All Stories" && searchText.isEmpty {
+                                            let localizer = LocalizationManager.shared
+                                            if selectedFilter == localizer.libraryAllStories && searchText.isEmpty {
                                                 if let index = filteredStories.firstIndex(where: { $0.id == story.id }),
                                                    index >= max(0, filteredStories.count - 5),
                                                    !storiesStore.isLoadingMore,
@@ -120,7 +127,7 @@ struct LibraryView: View {
                                 }
                                 
                                 if filteredStories.isEmpty {
-                                    Text("No stories found")
+                                    Text(LocalizationManager.shared.libraryNoStoriesFound)
                                         .font(.system(size: 16))
                                         .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                                         .padding()
@@ -131,7 +138,7 @@ struct LibraryView: View {
                                     HStack {
                                         ProgressView()
                                             .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.primaryPurple))
-                                        Text("Loading more stories...")
+                                        Text(LocalizationManager.shared.libraryLoadingMore)
                                             .font(.system(size: 14))
                                             .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                                     }
@@ -144,7 +151,7 @@ struct LibraryView: View {
                     }
                 }
             }
-            .navigationTitle("My Library")
+            .navigationTitle(LocalizationManager.shared.libraryMyLibrary)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
             .onAppear {
@@ -159,9 +166,19 @@ struct LibraryView: View {
     private func childName(for childId: UUID?) -> String {
         guard let childId = childId,
               let child = childrenStore.children.first(where: { $0.id == childId }) else {
-            return "Unknown"
+            return LocalizationManager.shared.libraryUnknown
         }
         return child.name
+    }
+    
+    private func mapLocalizedFilterToEnglish(_ localizedFilter: String) -> String {
+        let localizer = LocalizationManager.shared
+        switch localizedFilter {
+        case localizer.libraryBedtime: return "Bedtime"
+        case localizer.libraryAdventure: return "Adventure"
+        case localizer.libraryFantasy: return "Fantasy"
+        default: return localizedFilter
+        }
     }
 }
 
@@ -295,22 +312,23 @@ struct StoryLibraryRow: View {
     }
     
     private func childName(for childId: UUID) -> String {
-        childrenStore.children.first(where: { $0.id == childId })?.name ?? "Unknown"
+        childrenStore.children.first(where: { $0.id == childId })?.name ?? LocalizationManager.shared.libraryUnknown
     }
     
     private func timeAgoString(from date: Date) -> String {
         let calendar = Calendar.current
         let now = Date()
         let components = calendar.dateComponents([.day, .weekOfYear, .month], from: date, to: now)
+        let localizer = LocalizationManager.shared
         
         if let days = components.day, days < 7 {
-            return days == 1 ? "1 day ago" : "\(days) days ago"
+            return days == 1 ? "1 \(localizer.libraryDayAgo)" : "\(days) \(localizer.libraryDaysAgo)"
         } else if let weeks = components.weekOfYear, weeks < 4 {
-            return weeks == 1 ? "1 week ago" : "\(weeks) weeks ago"
+            return weeks == 1 ? "1 \(localizer.libraryWeekAgo)" : "\(weeks) \(localizer.libraryWeeksAgo)"
         } else if let months = components.month {
-            return months == 1 ? "1 month ago" : "\(months) months ago"
+            return months == 1 ? "1 \(localizer.libraryMonthAgo)" : "\(months) \(localizer.libraryMonthsAgo)"
         } else {
-            return "Long ago"
+            return localizer.libraryLongAgo
         }
     }
 }
@@ -364,7 +382,7 @@ struct StoryContentView: View {
                             .foregroundColor(AppTheme.primaryPurple)
                         }
                         
-                        Text("\(story.duration) min read")
+                        Text("\(story.duration) \(LocalizationManager.shared.libraryMinRead)")
                             .font(.system(size: 12))
                             .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                     }
@@ -383,7 +401,7 @@ struct StoryContentView: View {
                     }) {
                         HStack {
                             Image(systemName: userSettings.isPremium ? "play.circle.fill" : "lock.fill")
-                            Text(userSettings.isPremium ? "Listen" : "Listen (Premium)")
+                            Text(userSettings.isPremium ? LocalizationManager.shared.storyReadingListen : LocalizationManager.shared.storyReadingListenPremium)
                                 .font(.system(size: 16, weight: .semibold))
                         }
                         .foregroundColor(.white)
@@ -402,7 +420,7 @@ struct StoryContentView: View {
                 .padding()
             }
         }
-        .navigationTitle("Story")
+        .navigationTitle(LocalizationManager.shared.storyReadingStory)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {

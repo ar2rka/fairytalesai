@@ -23,11 +23,11 @@ struct GenerateStoryView: View {
                             .foregroundColor(AppTheme.primaryPurple.opacity(0.6))
                             .symbolEffect(.pulse, options: .repeating)
                         
-                        Text("Who is the hero today?")
+                        Text(LocalizationManager.shared.generateStoryWhoIsHeroToday)
                             .font(.system(size: 28, weight: .bold))
                             .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                         
-                        Text("You need to add a child profile before we can craft a tale.")
+                        Text(LocalizationManager.shared.generateStoryNeedProfile)
                             .font(.system(size: 16))
                             .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                             .multilineTextAlignment(.center)
@@ -36,7 +36,7 @@ struct GenerateStoryView: View {
                         Button(action: { viewModel.showingAddChild = true }) {
                             HStack {
                                 Image(systemName: "person.fill.badge.plus")
-                                Text("Create a Profile")
+                                Text(LocalizationManager.shared.generateStoryCreateProfile)
                                     .font(.system(size: 18, weight: .semibold))
                             }
                             .foregroundColor(.white)
@@ -76,7 +76,7 @@ struct GenerateStoryView: View {
                     }
                 }
             }
-            .navigationTitle("Create Story")
+            .navigationTitle(LocalizationManager.shared.generateStoryCreateStory)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -107,7 +107,7 @@ struct GenerateStoryView: View {
     
     private var childrenSelectionSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Who is listening?")
+            Text(LocalizationManager.shared.generateStoryWhoIsListening)
                 .font(.system(size: 20, weight: .bold))
                 .foregroundColor(AppTheme.textPrimary(for: colorScheme))
             
@@ -126,7 +126,7 @@ struct GenerateStoryView: View {
         HStack {
             ProgressView()
                 .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.primaryPurple))
-            Text("Loading children...")
+            Text(LocalizationManager.shared.generateStoryLoadingChildren)
                 .font(.system(size: 14))
                 .foregroundColor(AppTheme.textSecondary(for: colorScheme))
         }
@@ -138,7 +138,7 @@ struct GenerateStoryView: View {
         NavigationLink(destination: AddChildView()) {
             HStack {
                 Image(systemName: "plus")
-                Text("Add a child first")
+                Text(LocalizationManager.shared.generateStoryAddChildFirst)
             }
             .font(.system(size: 14, weight: .medium))
             .foregroundColor(AppTheme.primaryPurple)
@@ -162,7 +162,7 @@ struct GenerateStoryView: View {
                 }
                 
                 NavigationLink(destination: AddChildView()) {
-                    DashedButton(text: "NEW")
+                    DashedButton(text: LocalizationManager.shared.generateStoryNew)
                 }
             }
         }
@@ -171,7 +171,7 @@ struct GenerateStoryView: View {
     private var durationSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
-                Text("Duration")
+                Text(LocalizationManager.shared.generateStoryDuration)
                     .font(.system(size: 20, weight: .bold))
                     .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                 
@@ -181,7 +181,7 @@ struct GenerateStoryView: View {
                     Text("\(Int(viewModel.selectedDuration))")
                         .font(.system(size: 18, weight: .bold))
                         .foregroundColor(AppTheme.primaryPurple)
-                    Text("min")
+                    Text(LocalizationManager.shared.generateStoryMin)
                         .font(.system(size: 14, weight: .medium))
                         .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                 }
@@ -190,7 +190,7 @@ struct GenerateStoryView: View {
                     HStack(spacing: 4) {
                         Image(systemName: "star.fill")
                             .font(.system(size: 10))
-                        Text("Premium")
+                        Text(LocalizationManager.shared.generateStoryPremium)
                             .font(.system(size: 10, weight: .semibold))
                     }
                     .foregroundColor(.yellow)
@@ -206,7 +206,7 @@ struct GenerateStoryView: View {
                     in: 3...30,
                     step: 1
                 ) {
-                    Text("Duration")
+                    Text(LocalizationManager.shared.generateStoryDuration)
                 } minimumValueLabel: {
                     Text("3")
                         .font(.system(size: 12))
@@ -220,13 +220,13 @@ struct GenerateStoryView: View {
                 
                 if !userSettings.isPremium {
                     HStack {
-                        Text("Free: up to 5 min")
+                        Text(LocalizationManager.shared.generateStoryFreeUpTo5)
                             .font(.system(size: 12))
                             .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                         
                         Spacer()
                         
-                        Text("Premium: up to 30 min")
+                        Text(LocalizationManager.shared.generateStoryPremiumUpTo30)
                             .font(.system(size: 12))
                             .foregroundColor(AppTheme.primaryPurple)
                     }
@@ -238,7 +238,7 @@ struct GenerateStoryView: View {
     
     private var themeSelectionSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Choose a Theme")
+            Text(LocalizationManager.shared.generateStoryChooseTheme)
                 .font(.system(size: 20, weight: .bold))
                 .foregroundColor(AppTheme.textPrimary(for: colorScheme))
             
@@ -258,13 +258,13 @@ struct GenerateStoryView: View {
     
     private var plotSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Brief Plot")
+            Text(LocalizationManager.shared.generateStoryBriefPlot)
                 .font(.system(size: 20, weight: .bold))
                 .foregroundColor(AppTheme.textPrimary(for: colorScheme))
             
             ZStack(alignment: .topLeading) {
                 if viewModel.plot.isEmpty {
-                    Text("Describe the story you want to create...")
+                    Text(LocalizationManager.shared.generateStoryDescribeStory)
                         .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                         .padding()
                 }
@@ -298,7 +298,7 @@ struct GenerateStoryView: View {
                 } else {
                     Image(systemName: "wand.and.stars")
                 }
-                Text(storiesStore.isGenerating ? "Generating..." : "Generate Story")
+                Text(storiesStore.isGenerating ? LocalizationManager.shared.generateStoryGenerating : LocalizationManager.shared.generateStoryGenerateStory)
                     .font(.system(size: 18, weight: .bold))
             }
             .foregroundColor(.white)

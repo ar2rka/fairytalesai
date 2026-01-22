@@ -46,11 +46,11 @@ struct ThemeSelectionButton: View {
                     .font(.system(size: 40))
                 
                 VStack(spacing: 4) {
-                    Text(theme.name)
+                    Text(theme.localizedName)
                         .font(.system(size: 16, weight: .bold))
                         .foregroundColor(isSelected ? .white : AppTheme.textPrimary(for: colorScheme))
                     
-                    Text(theme.description)
+                    Text(theme.localizedDescription)
                         .font(.system(size: 12))
                         .foregroundColor(isSelected ? .white.opacity(0.8) : Color(white: 0.85)) // Lighter for better contrast
                 }

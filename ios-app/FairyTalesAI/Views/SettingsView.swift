@@ -113,7 +113,7 @@ struct SettingsView: View {
                 }
             }
         }
-        .navigationTitle("Account")
+        .navigationTitle(LocalizationManager.shared.settingsAccount)
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showingShareSheet) {
             ShareSheet(activityItems: [
@@ -124,9 +124,9 @@ struct SettingsView: View {
         .sheet(isPresented: $showingAddChild) {
             AddChildView()
         }
-        .alert("Выйти из аккаунта?", isPresented: $showLogoutAlert) {
-            Button("Отмена", role: .cancel) { }
-            Button("Выйти", role: .destructive) {
+        .alert(LocalizationManager.shared.settingsLogOutAlert, isPresented: $showLogoutAlert) {
+            Button(LocalizationManager.shared.settingsCancel, role: .cancel) { }
+            Button(LocalizationManager.shared.settingsLogOutConfirm, role: .destructive) {
                 Task {
                     do {
                         try await authService.signOut()
@@ -143,7 +143,7 @@ struct SettingsView: View {
     
     private var childrenSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("CHILDREN")
+            Text(LocalizationManager.shared.settingsChildren)
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundColor(AppTheme.primaryPurple)
                 .padding(.horizontal)
@@ -154,11 +154,11 @@ struct SettingsView: View {
                         .font(.system(size: 50))
                         .foregroundColor(AppTheme.primaryPurple.opacity(0.6))
                     
-                    Text("Who is our hero today?")
+                    Text(LocalizationManager.shared.homeWhoIsOurHero)
                         .font(.system(size: 18, weight: .semibold))
                         .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                     
-                    Text("Add a profile to start the adventure.")
+                    Text(LocalizationManager.shared.homeAddProfileDescription)
                         .font(.system(size: 14))
                         .foregroundColor(Color(white: 0.85)) // Lighter for better contrast
                         .multilineTextAlignment(.center)
@@ -166,7 +166,7 @@ struct SettingsView: View {
                     Button(action: { showingAddChild = true }) {
                         HStack {
                             Image(systemName: "plus")
-                            Text("Add Profile")
+                            Text(LocalizationManager.shared.homeAddProfile)
                                 .font(.system(size: 16, weight: .semibold))
                         }
                         .foregroundColor(.white)
@@ -194,7 +194,7 @@ struct SettingsView: View {
                     Button(action: { showingAddChild = true }) {
                         HStack {
                             Image(systemName: "plus")
-                            Text("Add a new child")
+                            Text(LocalizationManager.shared.settingsAddNewChild)
                         }
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundColor(.white)
@@ -214,7 +214,7 @@ struct SettingsView: View {
     
     private var appExperienceSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("APP EXPERIENCE")
+            Text(LocalizationManager.shared.settingsAppExperience)
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundColor(AppTheme.primaryPurple)
                 .padding(.horizontal)
@@ -223,7 +223,7 @@ struct SettingsView: View {
                 SettingsRow(
                     icon: "bell.fill",
                     iconColor: AppTheme.primaryPurple,
-                    title: "Push Notifications",
+                    title: LocalizationManager.shared.settingsPushNotifications,
                     trailing: {
                         Toggle("", isOn: $pushNotificationsEnabled)
                             .tint(AppTheme.primaryPurple)
@@ -237,7 +237,7 @@ struct SettingsView: View {
                 SettingsRow(
                     icon: "music.note",
                     iconColor: Color.pink,
-                    title: "Sound Effects",
+                    title: LocalizationManager.shared.settingsSoundEffects,
                     trailing: {
                         Toggle("", isOn: $soundEffectsEnabled)
                             .tint(AppTheme.primaryPurple)
@@ -255,7 +255,7 @@ struct SettingsView: View {
                     SettingsRow(
                         icon: "paintbrush.fill",
                         iconColor: Color.orange,
-                        title: "Appearance",
+                        title: LocalizationManager.shared.settingsAppearance,
                         trailing: {
                             HStack {
                                 Text(themeMode.displayName)
@@ -278,10 +278,10 @@ struct SettingsView: View {
                     SettingsRow(
                         icon: "globe",
                         iconColor: Color.blue,
-                        title: "Language",
+                        title: LocalizationManager.shared.settingsLanguage,
                         trailing: {
                             HStack {
-                                Text(selectedLanguage)
+                                Text(selectedLanguage == "English" ? LocalizationManager.shared.languageEnglish : LocalizationManager.shared.languageRussian)
                                     .font(.system(size: 14))
                                     .foregroundColor(AppTheme.primaryPurple)
                                 Image(systemName: "chevron.right")
@@ -301,7 +301,7 @@ struct SettingsView: View {
     
     private var membershipSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("MEMBERSHIP")
+            Text(LocalizationManager.shared.settingsMembership)
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundColor(AppTheme.primaryPurple)
                 .padding(.horizontal)
@@ -312,8 +312,8 @@ struct SettingsView: View {
                         icon: "star.fill",
                         iconColor: Color.yellow,
                         iconBackground: AppTheme.primaryPurple,
-                        title: "Storyteller Pro",
-                        subtitle: "Active Plan",
+                        title: LocalizationManager.shared.settingsStorytellerPro,
+                        subtitle: LocalizationManager.shared.settingsActivePlan,
                         subtitleColor: Color.green,
                         trailing: {
                             HStack(spacing: 8) {
@@ -359,7 +359,7 @@ struct SettingsView: View {
                     SettingsRow(
                         icon: "creditcard.fill",
                         iconColor: AppTheme.primaryPurple,
-                        title: "Manage Subscription",
+                        title: LocalizationManager.shared.settingsManageSubscription,
                         trailing: {
                             Image(systemName: "chevron.right")
                                 .font(.system(size: 12))
@@ -377,7 +377,7 @@ struct SettingsView: View {
     
     private var communitySection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("SPREAD THE MAGIC")
+            Text(LocalizationManager.shared.settingsSpreadTheMagic)
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundColor(AppTheme.primaryPurple)
                 .padding(.horizontal)
@@ -387,8 +387,8 @@ struct SettingsView: View {
                     SettingsRow(
                         icon: "person.2.fill",
                         iconColor: .orange,
-                        title: "Invite a Parent Friend",
-                        subtitle: "Give magic, get credits",
+                        title: LocalizationManager.shared.settingsInviteParentFriend,
+                        subtitle: LocalizationManager.shared.settingsGiveMagicGetCredits,
                         trailing: {
                             Image(systemName: "chevron.right")
                                 .font(.system(size: 12))
@@ -406,7 +406,7 @@ struct SettingsView: View {
     
     private var supportLegalSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("SUPPORT & LEGAL")
+            Text(LocalizationManager.shared.settingsSupportLegal)
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundColor(AppTheme.primaryPurple)
                 .padding(.horizontal)
@@ -417,7 +417,7 @@ struct SettingsView: View {
                         icon: "questionmark.circle.fill",
                         iconColor: Color.green,
                         iconBackground: AppTheme.primaryPurple,
-                        title: "Help Center",
+                        title: LocalizationManager.shared.settingsHelpCenter,
                         trailing: {
                             Image(systemName: "chevron.right")
                                 .font(.system(size: 12))
@@ -436,7 +436,7 @@ struct SettingsView: View {
                         icon: "lock.fill",
                         iconColor: Color.gray,
                         iconBackground: AppTheme.primaryPurple,
-                        title: "Privacy Policy",
+                        title: LocalizationManager.shared.settingsPrivacyPolicy,
                         trailing: {
                             Image(systemName: "chevron.right")
                                 .font(.system(size: 12))
@@ -455,7 +455,7 @@ struct SettingsView: View {
                         icon: "doc.text.fill",
                         iconColor: Color.gray,
                         iconBackground: AppTheme.primaryPurple,
-                        title: "Terms of Service",
+                        title: LocalizationManager.shared.settingsTermsOfService,
                         trailing: {
                             Image(systemName: "chevron.right")
                                 .font(.system(size: 12))
@@ -478,7 +478,7 @@ struct SettingsView: View {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle(tint: .red))
                 } else {
-                    Text("Log Out")
+                    Text(LocalizationManager.shared.settingsLogOut)
                         .font(.system(size: 16, weight: .semibold))
                 }
             }
@@ -568,11 +568,11 @@ struct GuestModeBanner: View {
                     )
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("✨ Save the Magic Forever")
+                    Text(LocalizationManager.shared.settingsSaveMagicForever)
                         .font(.system(size: 16, weight: .bold))
                         .foregroundColor(.white)
                     
-                    Text("Sync profiles and stories across all your devices.")
+                    Text(LocalizationManager.shared.settingsSyncProfiles)
                         .font(.system(size: 13))
                         .foregroundColor(.white.opacity(0.9))
                 }
@@ -582,7 +582,7 @@ struct GuestModeBanner: View {
             
             HStack(spacing: 12) {
                 Button(action: { showingLogin = true }) {
-                    Text("Sign In")
+                    Text(LocalizationManager.shared.settingsSignIn)
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
@@ -592,7 +592,7 @@ struct GuestModeBanner: View {
                 }
                 
                 Button(action: { showingSignUp = true }) {
-                    Text("Create Account")
+                    Text(LocalizationManager.shared.settingsCreateAccount)
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)

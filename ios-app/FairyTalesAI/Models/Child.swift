@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 struct Child: Identifiable, Codable {
     var id: UUID
@@ -38,16 +39,21 @@ enum AgeCategory: String, Codable, CaseIterable {
     case eightPlus = "8+"
     
     var displayName: String {
+        let localizer = getLocalizer()
         switch self {
         case .twoThree:
-            return "2-3 years"
+            return "2-3 \(localizer.ageYears)"
         case .threeFive:
-            return "3-5 years"
+            return "3-5 \(localizer.ageYears)"
         case .fiveSeven:
-            return "5-7 years"
+            return "5-7 \(localizer.ageYears)"
         case .eightPlus:
-            return "8+ years"
+            return "8+ \(localizer.ageYears)"
         }
+    }
+    
+    private func getLocalizer() -> LocalizationManager {
+        return LocalizationManager.shared
     }
     
     var shortName: String {
@@ -61,14 +67,20 @@ enum StoryStyle: String, Codable, CaseIterable {
     case girl = "female"
     
     var displayName: String {
+        let localizer = getLocalizer()
         switch self {
         case .hero:
-            return "The Hero"
+            return localizer.styleHero
         case .boy:
-            return "Boy"
+            return localizer.styleBoy
         case .girl:
-            return "Girl"
+            return localizer.styleGirl
         }
+    }
+    
+    @inline(__always)
+    private func getLocalizer() -> LocalizationManager {
+        return LocalizationManager.shared
     }
     
     var icon: String {

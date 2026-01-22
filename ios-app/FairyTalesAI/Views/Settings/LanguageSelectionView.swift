@@ -10,13 +10,13 @@ struct LanguageSelectionView: View {
             AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
             
             List {
-                ForEach(["English", "Russian", "Spanish", "French"], id: \.self) { language in
+                ForEach(["English", "Russian"], id: \.self) { language in
                     Button(action: {
                         selectedLanguage = language
                         dismiss()
                     }) {
                         HStack {
-                            Text(language)
+                            Text(language == "English" ? LocalizationManager.shared.languageEnglish : LocalizationManager.shared.languageRussian)
                                 .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                             Spacer()
                             if selectedLanguage == language {
@@ -30,7 +30,7 @@ struct LanguageSelectionView: View {
             }
             .scrollContentBackground(.hidden)
         }
-        .navigationTitle("Language")
+        .navigationTitle(LocalizationManager.shared.languageSelectionTitle)
         .navigationBarTitleDisplayMode(.inline)
     }
 }

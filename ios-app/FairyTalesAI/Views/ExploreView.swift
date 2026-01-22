@@ -3,6 +3,9 @@ import SwiftUI
 struct ExploreView: View {
     @Environment(\.colorScheme) var colorScheme
     @State private var selectedCategory: String? = nil
+    @State private var safeAreaTop: CGFloat = 0
+    @State private var viewHeight: CGFloat = 0
+    @State private var contentMinY: CGFloat = 0
     
     // Featured content
     private let featuredPrompt = "A brave little astronaut discovers a friendly alien on a candy planet"
@@ -12,15 +15,36 @@ struct ExploreView: View {
         ZStack {
             AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
             
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    // Hero Feature Card
-                    FeaturedStoryIdeaCard(
-                        prompt: featuredPrompt,
-                        character: characterOfTheDay
-                    )
-                    .padding(.horizontal)
-                    .padding(.top, -50)
+            GeometryReader { proxy in
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        // Hero Feature Card
+                        FeaturedStoryIdeaCard(
+                            prompt: featuredPrompt,
+                            character: characterOfTheDay
+                        )
+                        .padding(.top, 10)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal)
+                        .padding(.top, 8)
+                        .background(
+                            GeometryReader { cardGeo in
+                                Color.clear.preference(
+                                    key: ContentMinYPreferenceKey.self,
+                                    value: cardGeo.frame(in: .named("scroll")).minY
+                                )
+                            }
+                        )
+                        .onAppear {
+                            safeAreaTop = proxy.safeAreaInsets.top
+                            viewHeight = proxy.size.height
+                        }
+                        .onChange(of: proxy.safeAreaInsets.top) { newValue in
+                            safeAreaTop = newValue
+                        }
+                        .onChange(of: proxy.size.height) { newValue in
+                            viewHeight = newValue
+                        }
                     
                     // New Characters - Horizontal Scroll
                     VStack(alignment: .leading, spacing: 12) {
@@ -73,11 +97,36 @@ struct ExploreView: View {
                         }
                     }
                     .padding(.bottom, 100) // Space for tab bar
+                    }
+                }
+                .coordinateSpace(name: "scroll")
+                .onPreferenceChange(ContentMinYPreferenceKey.self) { value in
+                    contentMinY = value
                 }
             }
+            
+            // Debug overlay
+            VStack {
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("safeAreaTop: \(Int(safeAreaTop))")
+                        Text("viewHeight: \(Int(viewHeight))")
+                        Text("contentMinY: \(Int(contentMinY))")
+                    }
+                    .font(.system(size: 10, design: .monospaced))
+                    .foregroundColor(.white)
+                    .padding(8)
+                    .background(Color.black.opacity(0.7))
+                    .cornerRadius(4)
+                    Spacer()
+                }
+                .padding(.top, safeAreaTop + 44)
+                Spacer()
+            }
         }
-        .navigationTitle("Explore")
+        .navigationTitle(LocalizationManager.shared.tabExplore)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
     }
 }
 

@@ -4,12 +4,15 @@ struct AgeGroupGridSelector: View {
     @Binding var selectedCategory: AgeCategory
     @State private var selectedIndex: Int = 0
     
-    private let ageOptions: [(category: AgeCategory, emoji: String, name: String, range: String)] = [
-        (.twoThree, "👶", "Toddler", "1-2 years"),
-        (.threeFive, "🎨", "Preschool", "3-5 years"),
-        (.fiveSeven, "🏫", "Explorer", "6-8 years"),
-        (.eightPlus, "📚", "Big Kid", "9+ years")
-    ]
+    private var ageOptions: [(category: AgeCategory, emoji: String, name: String, range: String)] {
+        let localizer = LocalizationManager.shared
+        return [
+            (.twoThree, "👶", localizer.ageToddler, localizer.ageToddlerRange),
+            (.threeFive, "🎨", localizer.agePreschool, localizer.agePreschoolRange),
+            (.fiveSeven, "🏫", localizer.ageExplorer, localizer.ageExplorerRange),
+            (.eightPlus, "📚", localizer.ageBigKid, localizer.ageBigKidRange)
+        ]
+    }
     
     var body: some View {
         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {

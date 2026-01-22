@@ -18,6 +18,7 @@
 		9A88A6E02F02EE2B009259D7 /* Services/StoriesService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A88A6DF2F02EE2B009259D7 /* Services/StoriesService.swift */; };
 		9A88A6E12F02EE2B009259D8 /* Services/ChildrenService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A88A6E22F02EE2B009259D8 /* Services/ChildrenService.swift */; };
 		9AA414D72F21442600CE76F7 /* DailyFreeStoriesCacheService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AA414D62F21442600CE76F7 /* DailyFreeStoriesCacheService.swift */; };
+		F1A2B3C4D5E6F7A8B9C0D1E2F3 /* Services/LocalizationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E6F7A8B9C0D1E2F4 /* Services/LocalizationManager.swift */; };
 		9AA414DC2F2144B800CE76F7 /* DailyFreeStoriesCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AA414DB2F2144B800CE76F7 /* DailyFreeStoriesCache.swift */; };
 		9AAB74292F02E21D005C3BE7 /* Services/SupabaseConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AAB74272F02E21D005C3BE7 /* Services/SupabaseConfig.swift */; };
 		A1000001 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000 /* App.swift */; };
@@ -64,6 +65,7 @@
 		9A88A6E12F02FDD8009259D7 /* FairyTalesAIDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FairyTalesAIDebug.entitlements; sourceTree = "<group>"; };
 		9A88A6E22F02EE2B009259D8 /* Services/ChildrenService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/ChildrenService.swift; sourceTree = "<group>"; };
 		9AA414D62F21442600CE76F7 /* DailyFreeStoriesCacheService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyFreeStoriesCacheService.swift; sourceTree = "<group>"; };
+		F1A2B3C4D5E6F7A8B9C0D1E2F4 /* Services/LocalizationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/LocalizationManager.swift; sourceTree = "<group>"; };
 		9AA414DB2F2144B800CE76F7 /* DailyFreeStoriesCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyFreeStoriesCache.swift; sourceTree = "<group>"; };
 		9AAB74272F02E21D005C3BE7 /* Services/SupabaseConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/SupabaseConfig.swift; sourceTree = "<group>"; };
 		A0FFFFFF /* FairyTalesAI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FairyTalesAI.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -148,6 +150,7 @@
 				7A6F376FB37E4ECCA09E2FC9 /* Services/AuthService.swift */,
 				9A88A6DF2F02EE2B009259D7 /* Services/StoriesService.swift */,
 				9A88A6E22F02EE2B009259D8 /* Services/ChildrenService.swift */,
+				F1A2B3C4D5E6F7A8B9C0D1E2F4 /* Services/LocalizationManager.swift */,
 				D9E2D6032EFD60A40082D3C4 /* Services/GuestDataManager.swift */,
 			);
 			path = FairyTalesAI;
@@ -344,6 +347,7 @@
 				9A88A6E02F02EE2B009259D7 /* Services/StoriesService.swift in Sources */,
 				9AA414D72F21442600CE76F7 /* DailyFreeStoriesCacheService.swift in Sources */,
 				9A88A6E12F02EE2B009259D8 /* Services/ChildrenService.swift in Sources */,
+				F1A2B3C4D5E6F7A8B9C0D1E2F3 /* Services/LocalizationManager.swift in Sources */,
 				D9E2D6022EFD60A40082D3C4 /* Services/GuestDataManager.swift in Sources */,
 				D9E2D5E42EFD60A40082D3B4 /* SettingsView.swift in Sources */,
 				D9E2D5E52EFD60A40082D3B4 /* MainTabView.swift in Sources */,
