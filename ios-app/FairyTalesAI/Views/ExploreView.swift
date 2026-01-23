@@ -1,11 +1,32 @@
 import SwiftUI
 
+private struct SectionHeader: View {
+    let title: String
+    @Environment(\.colorScheme) var colorScheme
+    var body: some View {
+        Text(title)
+            .font(.system(size: 13, weight: .semibold))
+            .foregroundColor(AppTheme.primaryPurple)
+            .textCase(nil)
+            .accessibilityAddTraits(.isHeader)
+    }
+}
+
+extension View {
+    /// Conditionally applies toolbar background visibility for iOS 18 and later.
+    @ViewBuilder
+    func ifAvailableIOS18ToolbarVisible() -> some View {
+        if #available(iOS 18.0, *) {
+            self.toolbarBackgroundVisibility(.visible, for: .navigationBar)
+        } else {
+            self
+        }
+    }
+}
+
 struct ExploreView: View {
     @Environment(\.colorScheme) var colorScheme
     @State private var selectedCategory: String? = nil
-    @State private var safeAreaTop: CGFloat = 0
-    @State private var viewHeight: CGFloat = 0
-    @State private var contentMinY: CGFloat = 0
     
     // Featured content
     private let featuredPrompt = "A brave little astronaut discovers a friendly alien on a candy planet"
@@ -13,120 +34,93 @@ struct ExploreView: View {
     
     var body: some View {
         ZStack {
-            AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
+            AppTheme.backgroundColor(for: colorScheme)
+                .ignoresSafeArea()
             
-            GeometryReader { proxy in
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 20) {
-                        // Hero Feature Card
-                        FeaturedStoryIdeaCard(
-                            prompt: featuredPrompt,
-                            character: characterOfTheDay
-                        )
-                        .padding(.top, 10)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal)
-                        .padding(.top, 8)
-                        .background(
-                            GeometryReader { cardGeo in
-                                Color.clear.preference(
-                                    key: ContentMinYPreferenceKey.self,
-                                    value: cardGeo.frame(in: .named("scroll")).minY
-                                )
-                            }
-                        )
-                        .onAppear {
-                            safeAreaTop = proxy.safeAreaInsets.top
-                            viewHeight = proxy.size.height
-                        }
-                        .onChange(of: proxy.safeAreaInsets.top) { newValue in
-                            safeAreaTop = newValue
-                        }
-                        .onChange(of: proxy.size.height) { newValue in
-                            viewHeight = newValue
-                        }
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
                     
-                    // New Characters - Horizontal Scroll
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("New Characters")
-                            .font(.system(size: 20, weight: .semibold))
-                            .foregroundColor(AppTheme.textPrimary(for: colorScheme))
-                            .padding(.horizontal)
-                        
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 16) {
-                                ForEach(["Alex the Brave", "Maya the Explorer", "Sam the Wizard", "Zoe the Pirate"], id: \.self) { character in
-                                    CharacterCard(name: character)
-                                }
-                            }
-                            .padding(.horizontal)
-                        }
-                    }
+                    // Hero Feature Card
+                    FeaturedStoryIdeaCard(
+                        prompt: featuredPrompt,
+                        character: characterOfTheDay
+                    )
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.vertical, 2)
                     
-                    // Trending Themes - Horizontal Scroll
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Trending Themes")
-                            .font(.system(size: 20, weight: .semibold))
-                            .foregroundColor(AppTheme.textPrimary(for: colorScheme))
-                            .padding(.horizontal)
-                        
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 16) {
-                                ForEach(StoryTheme.allThemes.prefix(6)) { theme in
-                                    ExploreThemeCard(theme: theme)
-                                }
-                            }
-                            .padding(.horizontal)
-                        }
-                    }
+                    // New Characters Section
+                    newCharactersSection
                     
-                    // Staff Picks - Horizontal Scroll
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Staff Picks")
-                            .font(.system(size: 20, weight: .semibold))
-                            .foregroundColor(AppTheme.textPrimary(for: colorScheme))
-                            .padding(.horizontal)
-                        
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 16) {
-                                ForEach(["The Enchanted Forest", "Dragon's Treasure", "Magic School Adventure"], id: \.self) { pick in
-                                    StaffPickCard(title: pick)
-                                }
-                            }
-                            .padding(.horizontal)
-                        }
-                    }
-                    .padding(.bottom, 100) // Space for tab bar
-                    }
-                }
-                .coordinateSpace(name: "scroll")
-                .onPreferenceChange(ContentMinYPreferenceKey.self) { value in
-                    contentMinY = value
-                }
-            }
-            
-            // Debug overlay
-            VStack {
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("safeAreaTop: \(Int(safeAreaTop))")
-                        Text("viewHeight: \(Int(viewHeight))")
-                        Text("contentMinY: \(Int(contentMinY))")
-                    }
-                    .font(.system(size: 10, design: .monospaced))
-                    .foregroundColor(.white)
-                    .padding(8)
-                    .background(Color.black.opacity(0.7))
-                    .cornerRadius(4)
+                    // Trending Themes Section
+                    trendingThemesSection
+                    
+                    // Staff Picks Section
+                    staffPicksSection
+                    
+                    // Bottom spacing for TabBar
                     Spacer()
+                        .frame(height: 100)
                 }
-                .padding(.top, safeAreaTop + 44)
-                Spacer()
+                .padding(.horizontal, 20)
+                .padding(.top, 8)
             }
+            .scrollContentBackground(.hidden)
         }
         .navigationTitle(LocalizationManager.shared.tabExplore)
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
+    }
+    
+    // MARK: - Sections
+    
+    private var newCharactersSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            SectionHeader(title: "New Characters")
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 16) {
+                    ForEach(["Alex the Brave", "Maya the Explorer", "Sam the Wizard", "Zoe the Pirate"], id: \.self) { character in
+                        CharacterCard(name: character)
+                    }
+                }
+                .padding(.vertical, 12)
+            }
+        }
+        .padding(14)
+        .background(AppTheme.cardBackground(for: colorScheme))
+        .cornerRadius(AppTheme.cornerRadius)
+    }
+    
+    private var trendingThemesSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            SectionHeader(title: "Trending Themes")
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 16) {
+                    ForEach(StoryTheme.allThemes.prefix(6)) { theme in
+                        ExploreThemeCard(theme: theme)
+                    }
+                }
+                .padding(.vertical, 12)
+            }
+        }
+        .padding(14)
+        .background(AppTheme.cardBackground(for: colorScheme))
+        .cornerRadius(AppTheme.cornerRadius)
+    }
+    
+    private var staffPicksSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            SectionHeader(title: "Staff Picks")
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 16) {
+                    ForEach(["The Enchanted Forest", "Dragon's Treasure", "Magic School Adventure"], id: \.self) { pick in
+                        StaffPickCard(title: pick)
+                    }
+                }
+                .padding(.vertical, 12)
+            }
+        }
+        .padding(14)
+        .background(AppTheme.cardBackground(for: colorScheme))
+        .cornerRadius(AppTheme.cornerRadius)
     }
 }
 
@@ -219,8 +213,7 @@ struct CharacterCard: View {
         .padding()
         .background(AppTheme.cardBackground(for: colorScheme))
         .cornerRadius(AppTheme.cornerRadius)
-        .frame(width: 130) // Fixed card width
-        .frame(width: 120)
+        .frame(width: 120) // Fixed card width
     }
 }
 

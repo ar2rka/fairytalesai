@@ -18,9 +18,6 @@ struct HomeView: View {
     
     @State private var freeDemoStories: [Story] = []
     @State private var isLoadingFreeStories = false
-    @State private var safeAreaTop: CGFloat = 0
-    @State private var viewHeight: CGFloat = 0
-    @State private var contentMinY: CGFloat = 0
     
     private let storiesService = StoriesService.shared
     
@@ -58,16 +55,6 @@ struct HomeView: View {
                                 )
                             }
                         )
-                        .onAppear {
-                            safeAreaTop = proxy.safeAreaInsets.top
-                            viewHeight = proxy.size.height
-                        }
-                        .onChange(of: proxy.safeAreaInsets.top) { newValue in
-                            safeAreaTop = newValue
-                        }
-                        .onChange(of: proxy.size.height) { newValue in
-                            viewHeight = newValue
-                        }
                         
                         // Free Demo Stories Section
                         if !freeDemoStories.isEmpty || isLoadingFreeStories {
@@ -222,28 +209,6 @@ struct HomeView: View {
                     Spacer(minLength: 50)
                 }
                 .coordinateSpace(name: "scroll")
-                .onPreferenceChange(ContentMinYPreferenceKey.self) { value in
-                    contentMinY = value
-                }
-            }
-            
-            // Debug overlay
-            VStack {
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("HOME safeAreaTop: \(Int(safeAreaTop))")
-                        Text("HOME viewHeight: \(Int(viewHeight))")
-                        Text("HOME contentMinY: \(Int(contentMinY))")
-                    }
-                    .font(.system(size: 10, design: .monospaced))
-                    .foregroundColor(.white)
-                    .padding(8)
-                    .background(Color.black.opacity(0.7))
-                    .cornerRadius(4)
-                    Spacer()
-                }
-                .padding(.top, safeAreaTop + 44)
-                Spacer()
             }
         }
         .navigationTitle(LocalizationManager.shared.tabHome)
