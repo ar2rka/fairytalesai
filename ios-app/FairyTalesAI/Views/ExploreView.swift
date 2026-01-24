@@ -24,6 +24,8 @@ extension View {
     }
 }
 
+
+
 struct ExploreView: View {
     @Environment(\.colorScheme) var colorScheme
     @State private var selectedCategory: String? = nil
@@ -39,6 +41,10 @@ struct ExploreView: View {
             
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
+                    
+                    // Add small top padding to match SettingsView
+                    Spacer()
+                        .frame(height: 10)
                     
                     // Hero Feature Card
                     FeaturedStoryIdeaCard(
@@ -62,9 +68,7 @@ struct ExploreView: View {
                         .frame(height: 100)
                 }
                 .padding(.horizontal, 20)
-                .padding(.top, 8)
             }
-            .scrollContentBackground(.hidden)
         }
         .navigationTitle(LocalizationManager.shared.tabExplore)
         .navigationBarTitleDisplayMode(.inline)

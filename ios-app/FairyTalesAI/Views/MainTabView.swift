@@ -25,7 +25,7 @@ struct MainTabView: View {
                     }
                     .id(1)
                 } else if selectedTab == 3 {
-                    NavigationView {
+                    NavigationStack {
                         ExploreView()
                     }
                     .id(3)
