@@ -109,7 +109,7 @@ class AuthService: ObservableObject {
         
         authStateTask?.cancel()
         authStateTask = Task { @MainActor in
-            for await state in await supabase.auth.authStateChanges {
+            for await state in supabase.auth.authStateChanges {
                 // Проверяем, что сессия существует и не истекла
                 if let session = state.session, !session.isExpired {
                     currentUser = session.user
