@@ -79,10 +79,10 @@ struct MagicSegmentedSelector: View {
                     selectedIndex = index
                 }
             }
-            .onChange(of: geometry.size.width) { newWidth in
+            .onChange(of: geometry.size.width) { _, newWidth in
                 containerWidth = newWidth
             }
-            .onChange(of: selectedCategory) { newValue in
+            .onChange(of: selectedCategory) { _, newValue in
                 if let index = ageOptions.firstIndex(where: { $0.category == newValue }) {
                     selectedIndex = index
                 }

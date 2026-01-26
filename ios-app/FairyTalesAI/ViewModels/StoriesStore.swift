@@ -165,7 +165,7 @@ class StoriesStore: ObservableObject {
             
             // Пытаемся загрузить полную историю по ID из базы данных
             let finalStory: Story
-            if let userId = authService.currentUser?.id,
+            if let _ = authService.currentUser?.id,
                let fullStory = try? await storiesService.fetchStory(id: story.id) {
                 finalStory = fullStory
                 print("✅ История успешно сгенерирована: \(fullStory.title) (ID: \(fullStory.id))")

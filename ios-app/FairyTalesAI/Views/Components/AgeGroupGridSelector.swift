@@ -38,7 +38,7 @@ struct AgeGroupGridSelector: View {
                 selectedIndex = index
             }
         }
-        .onChange(of: selectedCategory) { newValue in
+        .onChange(of: selectedCategory) { _, newValue in
             if let index = ageOptions.firstIndex(where: { $0.category == newValue }) {
                 selectedIndex = index
             }
