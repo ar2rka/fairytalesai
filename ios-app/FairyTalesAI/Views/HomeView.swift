@@ -289,6 +289,24 @@ struct FreeDemoStoryCard: View {
                 
                 Text(themeEmoji)
                     .font(.system(size: 60))
+                
+                // Age category badge in top-left corner
+                VStack {
+                    HStack {
+                        Text(story.ageCategory)
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(
+                                Capsule()
+                                    .fill(Color.black.opacity(0.4))
+                            )
+                        Spacer()
+                    }
+                    Spacer()
+                }
+                .padding(8)
             }
             
             VStack(alignment: .leading, spacing: 4) {

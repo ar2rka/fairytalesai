@@ -231,7 +231,8 @@ class StoriesService: ObservableObject {
             createdAt: createdAtDate,
             favoriteStatus: false,
             language: apiResponse.language,
-            rating: nil
+            rating: nil,
+            ageCategory: apiResponse.ageCategory
         )
     }
 }
@@ -245,6 +246,7 @@ private struct SupabaseStory: Codable {
     let createdAt: String
     let language: String?
     let rating: Int?
+    let ageCategory: String
     
     enum CodingKeys: String, CodingKey {
         case id
@@ -254,6 +256,7 @@ private struct SupabaseStory: Codable {
         case createdAt = "created_at"
         case language
         case rating
+        case ageCategory = "child_age_cat"
     }
     
     func toStory() -> Story {
@@ -283,7 +286,9 @@ private struct SupabaseStory: Codable {
             createdAt: createdAtDate,
             favoriteStatus: false,
             language: language ?? "en",
-            rating: rating
+            rating: rating,
+            ageCategory: ageCategory
+            
         )
     }
     
@@ -304,7 +309,8 @@ private struct SupabaseStory: Codable {
             childId: story.childId,
             createdAt: dateFormatter.string(from: story.createdAt),
             language: story.language,
-            rating: story.rating
+            rating: story.rating,
+            ageCategory: story.ageCategory
         )
     }
 }
@@ -316,7 +322,7 @@ private struct DailyFreeStory: Codable {
     let name: String
     let content: String
     let moral: String?
-    let ageCategory: String?
+    let ageCategory: String
     let language: String?
     let storyDate: String
     
@@ -350,7 +356,8 @@ private struct DailyFreeStory: Codable {
             createdAt: Date(),
             favoriteStatus: false,
             language: language ?? "en",
-            rating: nil
+            rating: nil,
+            ageCategory: ageCategory
         )
     }
     
@@ -386,6 +393,7 @@ private struct StoryAPIResponse: Codable {
     let storyType: String
     let storyLength: Int
     let createdAt: String
+    let ageCategory: String
     
     enum CodingKeys: String, CodingKey {
         case id
@@ -396,6 +404,7 @@ private struct StoryAPIResponse: Codable {
         case storyType = "story_type"
         case storyLength = "story_length"
         case createdAt = "created_at"
+        case ageCategory = "child_age_cat"
     }
 }
 
