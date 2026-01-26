@@ -21,8 +21,9 @@ final class CachedStory {
     var duration: Int
     var plot: String?
     var language: String?
+    var ageCategory: String
     
-    init(id: UUID, title: String, content: String, theme: String, duration: Int, plot: String?, language: String?) {
+    init(id: UUID, title: String, content: String, theme: String, duration: Int, plot: String?, language: String?, ageCategory: String) {
         self.id = id
         self.title = title
         self.content = content
@@ -30,6 +31,7 @@ final class CachedStory {
         self.duration = duration
         self.plot = plot
         self.language = language
+        self.ageCategory = ageCategory
     }
     
     func toStory() -> Story {
@@ -44,7 +46,8 @@ final class CachedStory {
             createdAt: Date(),
             favoriteStatus: false,
             language: language ?? "en",
-            rating: nil
+            rating: nil,
+            ageCategory: ageCategory
         )
     }
     
@@ -56,7 +59,8 @@ final class CachedStory {
             theme: story.theme,
             duration: story.duration,
             plot: story.plot,
-            language: story.language
+            language: story.language,
+            ageCategory: story.ageCategory
         )
     }
 }
