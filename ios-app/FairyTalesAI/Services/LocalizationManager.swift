@@ -23,7 +23,7 @@ class LocalizationManager: ObservableObject {
     // Tab Bar
     var tabHome: String { localized("Home", "Главная") }
     var tabLibrary: String { localized("Library", "Библиотека") }
-    var tabExplore: String { localized("Explore", "Исследовать") }
+    var tabCreate: String { localized("Create", "Создать") }
     var tabProfile: String { localized("Profile", "Профиль") }
     
     // Home View

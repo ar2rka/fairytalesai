@@ -5,16 +5,21 @@ struct SettingsView: View {
     @EnvironmentObject var childrenStore: ChildrenStore
     @EnvironmentObject var authService: AuthService
     @AppStorage("pushNotificationsEnabled") private var pushNotificationsEnabled = true
-    @AppStorage("soundEffectsEnabled") private var soundEffectsEnabled = true
     @AppStorage("selectedLanguage") private var selectedLanguage = "English"
     @AppStorage("themeMode") private var themeModeRaw = ThemeMode.system.rawValue
     @Environment(\.colorScheme) var colorScheme
     @State private var showingShareSheet = false
     @State private var showingAddChild = false
     @State private var showLogoutAlert = false
+    @State private var showingProfileEdit = false
     
     private var themeMode: ThemeMode {
         ThemeMode(rawValue: themeModeRaw) ?? .system
+    }
+    
+    // Check if user is logged in (has email, not anonymous)
+    private var isLoggedInUser: Bool {
+        return !authService.isAnonymousUser && authService.userEmail != nil
     }
     
     var body: some View {
@@ -23,69 +28,31 @@ struct SettingsView: View {
             
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    // Guest Mode Banner - show for anonymous users
+                    // Guest Mode Banner - show for anonymous users only
                     if authService.isAnonymousUser {
                         GuestModeBanner()
                             .padding(.horizontal)
                             .padding(.top, 10)
+                            .transition(.asymmetric(
+                                insertion: .opacity.combined(with: .move(edge: .top)),
+                                removal: .opacity.combined(with: .move(edge: .top))
+                            ))
                     } else {
                         // Add small top padding when no banner
                         Spacer()
                             .frame(height: 10)
                     }
                     
-                    // User Profile Section
-                    HStack(spacing: 16) {
-                        ZStack(alignment: .bottomTrailing) {
-                            Circle()
-                                .fill(
-                                    LinearGradient(
-                                        colors: [AppTheme.primaryPurple, AppTheme.accentPurple],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
-                                )
-                                .frame(width: 65, height: 65)
-                                .overlay(
-                                    Image(systemName: "person.fill")
-                                        .font(.system(size: 32))
-                                        .foregroundColor(.white)
-                                )
-                            
-                            Circle()
-                                .fill(AppTheme.primaryPurple)
-                                .frame(width: 22, height: 22)
-                                .overlay(
-                                    Image(systemName: "pencil")
-                                        .font(.system(size: 10))
-                                        .foregroundColor(.white)
-                                )
-                                .offset(x: 2, y: 2)
-                        }
-                        
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Sarah Anderson")
-                                .font(.system(size: 18, weight: .bold))
-                                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
-                            
-                            Text("sarah.anderson@example.com")
-                                .font(.system(size: 13))
-                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                        }
-                        
-                        Spacer()
-                        
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: 14))
-                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                    // Parent Profile Card - show only for logged-in users
+                    if isLoggedInUser {
+                        ParentProfileCard(showingProfileEdit: $showingProfileEdit)
+                            .padding(.horizontal)
+                            .padding(.top, authService.isAnonymousUser ? 0 : 4)
+                            .transition(.asymmetric(
+                                insertion: .opacity.combined(with: .move(edge: .top)),
+                                removal: .opacity.combined(with: .move(edge: .top))
+                            ))
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
-                    .frame(maxWidth: .infinity)
-                    .background(AppTheme.cardBackground(for: colorScheme))
-                    .cornerRadius(AppTheme.cornerRadius)
-                    .padding(.horizontal)
-                    .padding(.top, 4)
                     
                     // Children Section
                     childrenSection
@@ -108,6 +75,8 @@ struct SettingsView: View {
                         .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                         .padding(.bottom, 100)
                 }
+                .animation(.easeInOut(duration: 0.3), value: authService.isAnonymousUser)
+                .animation(.easeInOut(duration: 0.3), value: authService.userEmail)
             }
         }
         .navigationTitle(LocalizationManager.shared.settingsAccount)
@@ -133,6 +102,11 @@ struct SettingsView: View {
                     }
                 }
             }
+        }
+        .sheet(isPresented: $showingProfileEdit) {
+            // Placeholder for profile editing view
+            ProfileEditView()
+                .environmentObject(authService)
         }
     }
     
@@ -223,20 +197,6 @@ struct SettingsView: View {
                     title: LocalizationManager.shared.settingsPushNotifications,
                     trailing: {
                         Toggle("", isOn: $pushNotificationsEnabled)
-                            .tint(AppTheme.primaryPurple)
-                    }
-                )
-                
-                Divider()
-                    .background(AppTheme.textSecondary(for: colorScheme).opacity(0.3))
-                    .padding(.leading, 60)
-                
-                SettingsRow(
-                    icon: "music.note",
-                    iconColor: Color.pink,
-                    title: LocalizationManager.shared.settingsSoundEffects,
-                    trailing: {
-                        Toggle("", isOn: $soundEffectsEnabled)
                             .tint(AppTheme.primaryPurple)
                     }
                 )
@@ -414,6 +374,121 @@ struct SettingsView: View {
 }
 
 // MARK: - Helper Views
+
+struct ParentProfileCard: View {
+    @EnvironmentObject var authService: AuthService
+    @Environment(\.colorScheme) var colorScheme
+    @Binding var showingProfileEdit: Bool
+    
+    // Get user's display name from email or use default
+    private var displayName: String {
+        if let email = authService.userEmail {
+            return email.components(separatedBy: "@").first?.capitalized ?? "User"
+        }
+        return "User"
+    }
+    
+    var body: some View {
+        Button(action: {
+            showingProfileEdit = true
+        }) {
+            HStack(spacing: 16) {
+                ZStack(alignment: .bottomTrailing) {
+                    Circle()
+                        .fill(
+                            LinearGradient(
+                                colors: [AppTheme.primaryPurple, AppTheme.accentPurple],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 65, height: 65)
+                        .overlay(
+                            Image(systemName: "person.fill")
+                                .font(.system(size: 32))
+                                .foregroundColor(.white)
+                        )
+                    
+                    Circle()
+                        .fill(AppTheme.primaryPurple)
+                        .frame(width: 22, height: 22)
+                        .overlay(
+                            Image(systemName: "pencil")
+                                .font(.system(size: 10))
+                                .foregroundColor(.white)
+                        )
+                        .offset(x: 2, y: 2)
+                }
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(displayName)
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(AppTheme.textPrimary(for: colorScheme))
+                    
+                    if let email = authService.userEmail {
+                        Text(email)
+                            .font(.system(size: 13))
+                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                    }
+                }
+                
+                Spacer()
+                
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 14))
+                    .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .frame(maxWidth: .infinity)
+            .background(AppTheme.cardBackground(for: colorScheme))
+            .cornerRadius(AppTheme.cornerRadius)
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+}
+
+struct ProfileEditView: View {
+    @EnvironmentObject var authService: AuthService
+    @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
+    
+    var body: some View {
+        NavigationView {
+            ZStack {
+                AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
+                
+                VStack(spacing: 20) {
+                    Text("Profile Editing")
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundColor(AppTheme.textPrimary(for: colorScheme))
+                    
+                    Text("Profile editing functionality coming soon")
+                        .font(.system(size: 16))
+                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                    
+                    if let email = authService.userEmail {
+                        Text("Email: \(email)")
+                            .font(.system(size: 14))
+                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                    }
+                }
+            }
+            .navigationTitle("Edit Profile")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                    .foregroundColor(AppTheme.primaryPurple)
+                }
+            }
+        }
+    }
+}
 
 struct ChildCardView: View {
     let child: Child

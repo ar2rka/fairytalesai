@@ -12,7 +12,7 @@ struct MainTabView: View {
     
     var body: some View {
         ZStack {
-            // Content Views
+            // Content Views — 4 tabs: Home(0), Library(1), Create(2) opens sheet, Profile(3)
             Group {
                 if selectedTab == 0 {
                     NavigationView {
@@ -25,21 +25,16 @@ struct MainTabView: View {
                     }
                     .id(1)
                 } else if selectedTab == 3 {
-                    NavigationStack {
-                        ExploreView()
-                    }
-                    .id(3)
-                } else if selectedTab == 4 {
                     NavigationView {
                         SettingsView()
                     }
-                    .id(4)
+                    .id(3)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .padding(.bottom, 65) // Space for TabBar
-            
-            // Custom Tab Bar at the bottom
+            .padding(.bottom, 65) // Space for tab bar
+
+            // 4-tab liquid glass tab bar at the bottom
             VStack {
                 Spacer()
                 CustomTabBar(selectedTab: $selectedTab, onCreateTapped: {
@@ -58,15 +53,6 @@ struct MainTabView: View {
             .environmentObject(premiumManager)
             .environmentObject(userSettings)
             .environmentObject(authService)
-        }
-        .onChange(of: selectedTab) { newValue in
-            if newValue == 2 {
-                showingCreateStory = true
-                // Reset tab to previous after a moment
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    selectedTab = 0
-                }
-            }
         }
     }
 }
