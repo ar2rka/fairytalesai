@@ -1,5 +1,6 @@
 import SwiftUI
 import UIKit
+import AuthenticationServices
 
 struct SettingsView: View {
     @EnvironmentObject var childrenStore: ChildrenStore
@@ -542,8 +543,6 @@ struct EditChildView: View {
 struct GuestModeBanner: View {
     @EnvironmentObject var authService: AuthService
     @Environment(\.colorScheme) var colorScheme
-    @State private var showingSignUp = false
-    @State private var showingLogin = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -576,27 +575,15 @@ struct GuestModeBanner: View {
                 Spacer()
             }
             
-            HStack(spacing: 12) {
-                Button(action: { showingLogin = true }) {
-                    Text(LocalizationManager.shared.settingsSignIn)
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                        .background(Color.white.opacity(0.2))
-                        .cornerRadius(AppTheme.cornerRadius)
-                }
-                
-                Button(action: { showingSignUp = true }) {
-                    Text(LocalizationManager.shared.settingsCreateAccount)
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                        .background(Color.white.opacity(0.3))
-                        .cornerRadius(AppTheme.cornerRadius)
-                }
-            }
+            SignInWithAppleButton(
+                onRequest: { request in
+                    request.requestedScopes = [.fullName, .email]
+                },
+                onCompletion: handleAppleSignIn
+            )
+            .signInWithAppleButtonStyle(.white)
+            .frame(height: 50)
+            .cornerRadius(AppTheme.cornerRadius)
         }
         .padding()
         .background(
@@ -607,13 +594,25 @@ struct GuestModeBanner: View {
             )
         )
         .cornerRadius(AppTheme.cornerRadius)
-        .sheet(isPresented: $showingSignUp) {
-            SignUpView()
-                .environmentObject(authService)
-        }
-        .sheet(isPresented: $showingLogin) {
-            LoginView()
-                .environmentObject(authService)
+    }
+    
+    private func handleAppleSignIn(_ result: Result<ASAuthorization, Error>) {
+        switch result {
+        case .success(let authorization):
+            guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential else {
+                authService.errorMessage = "Failed to get Apple ID credential"
+                return
+            }
+            
+            Task {
+                do {
+                    try await authService.signInWithApple(credential: appleIDCredential)
+                } catch {
+                    // Error is handled by AuthService
+                }
+            }
+        case .failure(let error):
+            authService.errorMessage = error.localizedDescription
         }
     }
 }

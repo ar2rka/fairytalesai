@@ -212,10 +212,8 @@ class AuthService: ObservableObject {
         }
     }
     
-    /// Sign in with Apple using OAuth
-    /// Note: This requires proper OAuth setup in Supabase dashboard
-    /// You need to configure Apple as an OAuth provider in Supabase
-    func signInWithApple() async throws {
+    /// Sign in with Apple using native SignInWithAppleButton credential
+    func signInWithApple(credential: ASAuthorizationAppleIDCredential) async throws {
         guard let supabase = supabase else {
             throw AuthError.supabaseNotConfigured
         }
@@ -226,21 +224,60 @@ class AuthService: ObservableObject {
         defer { isLoading = false }
         
         do {
-            // Sign in with Apple OAuth
-            // This will open the system Apple Sign In flow
-            // After successful authentication, Supabase will handle the callback
-            let _ = try await supabase.auth.signInWithOAuth(
-                provider: .apple,
-                redirectTo: URL(string: "fairytalesai://auth-callback")!
+            // Get the identity token from Apple credential
+            guard let identityTokenData = credential.identityToken,
+                  let identityTokenString = String(data: identityTokenData, encoding: .utf8) else {
+                print("❌ Apple Sign In: Failed to get identity token")
+                throw AuthError.appleSignInFailed
+            }
+            
+            print("🔄 Apple Sign In: Attempting to sign in with Supabase...")
+            
+            // Sign in with Supabase using Apple identity token
+            let session = try await supabase.auth.signInWithIdToken(
+                credentials: .init(
+                    provider: .apple,
+                    idToken: identityTokenString
+                )
             )
             
-            // Open the OAuth URL in Safari/WebView
-            // In a real implementation, you'd use ASWebAuthenticationSession
-            // For now, we'll throw an error indicating OAuth setup is needed
-            // In production, implement proper OAuth flow with URL handling
-            throw AuthError.appleSignInFailed
+            print("✅ Apple Sign In: Successfully authenticated")
+            print("   User ID: \(session.user.id.uuidString)")
+            if let email = session.user.email {
+                print("   Email: \(email)")
+            }
+            
+            // Handle full name if provided (Apple only provides this on first sign-in)
+            // Note: We'll update user metadata if full name is available
+            if let fullName = credential.fullName {
+                let givenName = fullName.givenName ?? ""
+                let familyName = fullName.familyName ?? ""
+                let displayName = "\(givenName) \(familyName)".trimmingCharacters(in: .whitespaces)
+                
+                if !displayName.isEmpty {
+                    print("📝 Apple Sign In: Full name received: \(displayName)")
+                    // Store in user metadata if needed - this is optional
+                    // The name can be accessed from credential.fullName on first sign-in
+                }
+            }
+            
+            currentUser = session.user
+            isAuthenticated = true
+            isGuestMode = false
         } catch {
-            errorMessage = "Sign in with Apple requires OAuth configuration. Please use email sign up for now."
+            let errorDescription = error.localizedDescription
+            print("❌ Apple Sign In Error: \(errorDescription)")
+            print("   Error type: \(type(of: error))")
+            
+            // Provide more helpful error messages
+            if errorDescription.contains("invalid") || errorDescription.contains("token") {
+                errorMessage = "Apple Sign In failed. Please try again."
+            } else if errorDescription.contains("provider") || errorDescription.contains("Apple") {
+                errorMessage = "Apple Sign In is not configured. Please contact support."
+            } else {
+                errorMessage = errorDescription
+            }
+            
             throw error
         }
     }

@@ -1,192 +1,94 @@
 import SwiftUI
+import AuthenticationServices
 
 struct LoginView: View {
     @StateObject private var authService = AuthService.shared
+    @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
-    @State private var email = ""
-    @State private var password = ""
-    @State private var confirmPassword = ""
-    @State private var isSignUpMode = false
-    @State private var showPassword = false
-    @State private var showResetPassword = false
     
     var body: some View {
-        ZStack {
-            AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
-            
-            ScrollView {
-                VStack(spacing: 32) {
-                    // Logo and Title
-                    VStack(spacing: 16) {
-                        ZStack {
-                            Circle()
-                                .fill(AppTheme.purpleGradient)
-                                .frame(width: 100, height: 100)
-                            
-                            Image(systemName: "book.fill")
-                                .font(.system(size: 50))
-                                .foregroundColor(.white)
-                        }
-                        
-                        Text("Fairy Tales AI")
-                            .font(.system(size: 32, weight: .bold))
-                            .foregroundColor(AppTheme.textPrimary(for: colorScheme))
-                        
-                        Text(isSignUpMode ? "Создайте аккаунт" : "Добро пожаловать")
-                            .font(.system(size: 18))
-                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                    }
-                    .padding(.top, 40)
-                    
-                    // Form
-                    VStack(spacing: 20) {
-                        // Email Field
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Email")
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                            
-                            TextField("your.email@example.com", text: $email)
-                                .textFieldStyle(LoginTextFieldStyle())
-                                .keyboardType(.emailAddress)
-                                .autocapitalization(.none)
-                        }
-                        
-                        // Password Field
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Пароль")
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                            
-                            HStack {
-                                if showPassword {
-                                    TextField("Введите пароль", text: $password)
-                                        .autocapitalization(.none)
-                                } else {
-                                    SecureField("Введите пароль", text: $password)
-                                }
+        NavigationView {
+            ZStack {
+                AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(spacing: 32) {
+                        // Logo and Title
+                        VStack(spacing: 16) {
+                            ZStack {
+                                Circle()
+                                    .fill(AppTheme.purpleGradient)
+                                    .frame(width: 100, height: 100)
                                 
-                                Button(action: { showPassword.toggle() }) {
-                                    Image(systemName: showPassword ? "eye.slash.fill" : "eye.fill")
-                                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                                }
+                                Image(systemName: "book.fill")
+                                    .font(.system(size: 50))
+                                    .foregroundColor(.white)
                             }
-                            .textFieldStyle(LoginTextFieldStyle())
+                            
+                            Text("Fairy Tales AI")
+                                .font(.system(size: 32, weight: .bold))
+                                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
+                            
+                            Text("Sign in to continue")
+                                .font(.system(size: 18))
+                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                         }
+                        .padding(.top, 40)
                         
-                        // Confirm Password (only for sign up)
-                        if isSignUpMode {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("Подтвердите пароль")
-                                    .font(.system(size: 14, weight: .medium))
-                                    .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                                
-                                HStack {
-                                    if showPassword {
-                                        TextField("Подтвердите пароль", text: $confirmPassword)
-                                            .autocapitalization(.none)
-                                    } else {
-                                        SecureField("Подтвердите пароль", text: $confirmPassword)
-                                    }
-                                }
-                                .textFieldStyle(LoginTextFieldStyle())
-                            }
-                        }
+                        // Sign in with Apple Button
+                        SignInWithAppleButton(
+                            onRequest: { request in
+                                request.requestedScopes = [.fullName, .email]
+                            },
+                            onCompletion: handleAppleSignIn
+                        )
+                        .signInWithAppleButtonStyle(.black)
+                        .frame(height: 50)
+                        .cornerRadius(AppTheme.cornerRadius)
+                        .padding(.horizontal, 24)
                         
-                        // Error Message
                         if let errorMessage = authService.errorMessage {
                             Text(errorMessage)
                                 .font(.system(size: 14))
                                 .foregroundColor(.red)
-                                .padding(.horizontal)
+                                .padding(.horizontal, 24)
+                                .multilineTextAlignment(.center)
                         }
-                        
-                        // Submit Button
-                        Button(action: handleSubmit) {
-                            HStack {
-                                if authService.isLoading {
-                                    ProgressView()
-                                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                                } else {
-                                    Text(isSignUpMode ? "Зарегистрироваться" : "Войти")
-                                        .font(.system(size: 18, weight: .semibold))
-                                }
-                            }
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(
-                                AppTheme.purpleGradient
-                                    .cornerRadius(AppTheme.cornerRadius)
-                            )
-                        }
-                        .disabled(authService.isLoading || !isFormValid)
-                        .opacity((authService.isLoading || !isFormValid) ? 0.6 : 1.0)
-                        
-                        // Reset Password (only for sign in)
-                        if !isSignUpMode {
-                            Button(action: { showResetPassword = true }) {
-                                Text("Забыли пароль?")
-                                    .font(.system(size: 14))
-                                    .foregroundColor(AppTheme.primaryPurple)
-                            }
-                        }
-                        
-                        // Toggle Sign Up / Sign In
-                        HStack {
-                            Text(isSignUpMode ? "Уже есть аккаунт?" : "Нет аккаунта?")
-                                .font(.system(size: 14))
-                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                            
-                            Button(action: {
-                                isSignUpMode.toggle()
-                                authService.errorMessage = nil
-                                password = ""
-                                confirmPassword = ""
-                            }) {
-                                Text(isSignUpMode ? "Войти" : "Зарегистрироваться")
-                                    .font(.system(size: 14, weight: .semibold))
-                                    .foregroundColor(AppTheme.primaryPurple)
-                            }
-                        }
-                        .padding(.top, 8)
                     }
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 32)
-                    .background(AppTheme.cardBackground(for: colorScheme))
-                    .cornerRadius(AppTheme.cornerRadius)
-                    .padding(.horizontal, 24)
+                    .padding(.bottom, 40)
                 }
-                .padding(.bottom, 40)
             }
-        }
-        .sheet(isPresented: $showResetPassword) {
-            ResetPasswordView()
+            .navigationTitle("Sign In")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                    .foregroundColor(AppTheme.primaryPurple)
+                }
+            }
         }
     }
     
-    private var isFormValid: Bool {
-        guard !email.isEmpty, !password.isEmpty else { return false }
-        guard email.contains("@") else { return false }
-        
-        if isSignUpMode {
-            return password.count >= 6 && password == confirmPassword
-        } else {
-            return password.count >= 6
-        }
-    }
-    
-    private func handleSubmit() {
-        Task {
-            do {
-                if isSignUpMode {
-                    try await authService.signUp(email: email, password: password)
-                } else {
-                    try await authService.signIn(email: email, password: password)
-                }
-            } catch {
-                // Error is handled by AuthService
+    private func handleAppleSignIn(_ result: Result<ASAuthorization, Error>) {
+        switch result {
+        case .success(let authorization):
+            guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential else {
+                authService.errorMessage = "Failed to get Apple ID credential"
+                return
             }
+            
+            Task {
+                do {
+                    try await authService.signInWithApple(credential: appleIDCredential)
+                    dismiss()
+                } catch {
+                    // Error is handled by AuthService
+                }
+            }
+        case .failure(let error):
+            authService.errorMessage = error.localizedDescription
         }
     }
 }
