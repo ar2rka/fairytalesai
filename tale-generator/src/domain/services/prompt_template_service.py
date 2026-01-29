@@ -1,12 +1,11 @@
 """Service for rendering prompt templates using Jinja2."""
 
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Protocol
 from jinja2 import Environment, Template
 from jinja2.sandbox import SandboxedEnvironment
 from src.domain.value_objects import Language
 from src.prompts.character_types.base import BaseCharacter
 from src.infrastructure.persistence.models import StoryDB, PromptDB
-from src.infrastructure.persistence.prompt_repository import PromptRepository
 from src.utils.jinja_helpers import register_jinja_filters
 from src.core.logging import get_logger
 from src.core.constants import READING_SPEED_WPM
@@ -14,16 +13,25 @@ from src.core.constants import READING_SPEED_WPM
 logger = get_logger("domain.prompt_template_service")
 
 
+class PromptLoader(Protocol):
+    """Protocol for loading prompt parts (file or DB)."""
+
+    def get_prompts(
+        self, language: Language, story_type: Optional[str] = None
+    ) -> list:
+        ...
+
+
 class PromptTemplateService:
-    """Service for rendering prompt templates from Supabase using Jinja2."""
-    
-    def __init__(self, prompt_repository: PromptRepository):
+    """Service for rendering prompt templates using Jinja2 (from files or DB)."""
+
+    def __init__(self, prompt_loader: PromptLoader):
         """Initialize prompt template service.
-        
+
         Args:
-            prompt_repository: Repository for loading prompts from Supabase
+            prompt_loader: Loader with get_prompts(language, story_type) -> List[PromptDB]
         """
-        self._repository = prompt_repository
+        self._loader = prompt_loader
         # Use SandboxedEnvironment for security
         self._jinja_env = SandboxedEnvironment(
             autoescape=False,  # We're not rendering HTML
@@ -33,7 +41,7 @@ class PromptTemplateService:
         # Register custom filters
         register_jinja_filters(self._jinja_env)
         logger.info("PromptTemplateService initialized")
-    
+
     def render_prompt(
         self,
         character: BaseCharacter,
@@ -41,7 +49,8 @@ class PromptTemplateService:
         language: Language,
         story_length: int,
         story_type: str,
-        parent_story: Optional[StoryDB] = None
+        parent_story: Optional[StoryDB] = None,
+        theme: Optional[str] = None
     ) -> str:
         """Render complete prompt from templates.
         
@@ -55,32 +64,19 @@ class PromptTemplateService:
             story_length: Story length in minutes
             story_type: Story type ('child', 'hero', 'combined')
             parent_story: Optional parent story for continuation narratives
+            theme: Optional story theme / type (e.g. adventure, space, fantasy)
             
         Returns:
             Complete rendered prompt string
         """
-        # Load prompt parts from repository
-        logger.info(f"Loading prompts from repository: language={language.value}, story_type={story_type}")
-        prompt_parts = self._repository.get_prompts(language, story_type)
-        logger.info(f"Loaded {len(prompt_parts)} prompt parts for language={language.value}, story_type={story_type}")
-        
+        # Load prompt parts from loader (files or DB)
+        logger.info(f"Loading prompts: language={language.value}, story_type={story_type}")
+        prompt_parts = self._loader.get_prompts(language, story_type)
+
         if not prompt_parts:
-            logger.warning(
-                f"No prompts found for language={language.value}, story_type={story_type}. "
-                f"Trying universal prompts..."
-            )
-            # Try universal prompts (story_type = None)
-            prompt_parts = self._repository.get_prompts(language, None)
-            logger.info(f"Loaded {len(prompt_parts)} universal prompt parts for language={language.value}")
-        
-        if not prompt_parts:
-            logger.error(
-                f"No prompts found in database for language={language.value}, story_type={story_type}. "
-                f"Please check that prompts are configured in Supabase."
-            )
             raise ValueError(
                 f"No prompts found for language={language.value}, story_type={story_type}. "
-                f"Please ensure prompts are configured in the Supabase 'prompts' table."
+                f"Add template e.g. src/prompts/templates/{story_type}_{language.value}.md"
             )
         
         # Calculate word count
@@ -94,7 +90,8 @@ class PromptTemplateService:
             story_length=story_length,
             word_count=word_count,
             story_type=story_type,
-            parent_story=parent_story
+            parent_story=parent_story,
+            theme=theme
         )
         
         # Render each prompt part
@@ -133,7 +130,8 @@ class PromptTemplateService:
         story_length: int,
         word_count: int,
         story_type: str,
-        parent_story: Optional[StoryDB]
+        parent_story: Optional[StoryDB],
+        theme: Optional[str] = None
     ) -> Dict[str, Any]:
         """Build context dictionary for Jinja templates.
         
@@ -145,6 +143,7 @@ class PromptTemplateService:
             word_count: Word count
             story_type: Story type
             parent_story: Optional parent story
+            theme: Optional story theme (e.g. adventure, space)
             
         Returns:
             Context dictionary for Jinja rendering
@@ -156,6 +155,7 @@ class PromptTemplateService:
             "word_count": word_count,
             "story_type": story_type,
             "parent_story": parent_story,
+            "theme": theme or "adventure",  # API sends English; templates use translate_theme(language)
         }
         
         # Add character data based on type

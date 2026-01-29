@@ -726,6 +726,7 @@ class OpenRouterClient:
         language: Optional[str] = "en",
         story_length_minutes: Optional[int] = 5,
         user_id: str = "",
+        theme: Optional[str] = None,
         quality_threshold: Optional[int] = None,
         max_generation_attempts: Optional[int] = None
     ) -> StoryGenerationResult:
@@ -745,6 +746,7 @@ class OpenRouterClient:
             language: Story language "en" or "ru" (default: "en")
             story_length_minutes: Story length in minutes (default: 5)
             user_id: Optional user ID for tracking
+            theme: Optional story theme (e.g. adventure, space)
             quality_threshold: Minimum quality score to accept (default: from settings)
             max_generation_attempts: Maximum generation attempts in workflow (default: from settings)
             
@@ -833,7 +835,8 @@ class OpenRouterClient:
                 generation_id=generation_id,
                 hero_id=None,
                 hero_name=None,
-                hero_description=None
+                hero_description=None,
+                theme=theme
             )
             
             # Create prompt service (needed for workflow)

@@ -123,6 +123,7 @@ class WorkflowState(TypedDict, total=False):
     story_type: str  # 'child', 'hero', 'combined'
     language: str  # 'en', 'ru'
     moral: str
+    theme: Optional[str]  # story theme / type (e.g. adventure, space)
     story_length: int  # in minutes
     expected_word_count: int
     user_id: str
@@ -181,6 +182,7 @@ def create_initial_state(
     hero_id: Optional[str] = None,
     hero_name: Optional[str] = None,
     hero_description: Optional[str] = None,
+    theme: Optional[str] = None,
 ) -> WorkflowState:
     """Create initial workflow state with input parameters.
     
@@ -200,6 +202,7 @@ def create_initial_state(
         hero_id: Optional hero UUID
         hero_name: Optional hero name
         hero_description: Optional hero description
+        theme: Optional story theme (e.g. adventure, space)
         
     Returns:
         Initial workflow state
@@ -220,6 +223,7 @@ def create_initial_state(
         "story_type": story_type,
         "language": language,
         "moral": moral,
+        "theme": theme,
         "story_length": story_length,
         "expected_word_count": expected_word_count,
         "user_id": user_id,

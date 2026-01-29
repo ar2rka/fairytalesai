@@ -43,6 +43,38 @@ GENDER_TRANSLATIONS = {
     }
 }
 
+# Theme translations (API sends English key; we translate to target language for prompt)
+THEME_TRANSLATIONS = {
+    Language.ENGLISH: {
+        "adventure": "adventure",
+        "space": "space",
+        "fantasy": "fantasy",
+        "pirates": "pirates",
+        "dinosaurs": "dinosaurs",
+        "magic": "magic",
+        "ocean": "ocean",
+        "forest": "forest",
+        "robots": "robots",
+        "fairies": "fairies",
+        "knights": "knights",
+        "animals": "animals",
+    },
+    Language.RUSSIAN: {
+        "adventure": "приключения",
+        "space": "космос",
+        "fantasy": "фэнтези",
+        "pirates": "пираты",
+        "dinosaurs": "динозавры",
+        "magic": "магия",
+        "ocean": "океан",
+        "forest": "лес",
+        "robots": "роботы",
+        "fairies": "феи",
+        "knights": "рыцари",
+        "animals": "животные",
+    }
+}
+
 # Interest translations
 INTEREST_TRANSLATIONS = {
     Language.RUSSIAN: {
@@ -75,6 +107,26 @@ def translate_moral(moral: str, language: Language) -> str:
     moral_lower = moral.lower()
     translations = MORAL_TRANSLATIONS.get(language, {})
     return translations.get(moral_lower, moral)
+
+
+def translate_theme(theme: str, language: Language) -> str:
+    """Translate story theme to target language.
+    
+    API sends theme in English; this returns the theme in the language of the prompt.
+    
+    Args:
+        theme: Theme key in English (e.g. 'adventure', 'space')
+        language: Target language
+        
+    Returns:
+        Theme in target language
+    """
+    if not theme or not theme.strip():
+        # Default: adventure (en) / приключения (ru)
+        return THEME_TRANSLATIONS.get(language, {}).get("adventure", "adventure")
+    theme_lower = theme.lower().strip()
+    translations = THEME_TRANSLATIONS.get(language, {})
+    return translations.get(theme_lower, theme)
 
 
 def translate_gender(gender: str, language: Language) -> str:
@@ -158,6 +210,7 @@ def register_jinja_filters(environment):
         environment: Jinja2 Environment instance
     """
     environment.filters['translate_moral'] = translate_moral
+    environment.filters['translate_theme'] = translate_theme
     environment.filters['translate_gender'] = translate_gender
     environment.filters['translate_interests'] = translate_interests
     environment.filters['format_age_category'] = format_age_category

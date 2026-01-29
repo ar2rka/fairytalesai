@@ -36,30 +36,20 @@ def generate_prompt(
     language: Language,
     story_length: StoryLength,
     prompt_service: PromptService,
-    parent_story: Optional[StoryDB] = None
+    parent_story: Optional[StoryDB] = None,
+    theme: Optional[str] = None
 ) -> str:
     """Generate appropriate prompt based on story type."""
-    # Log prompt service status
-    if prompt_service._template_service:
-        logger.info(f"✅ PromptService has PromptTemplateService - will use prompts from Supabase")
-    else:
-        logger.warning(f"⚠️ PromptService does NOT have PromptTemplateService - will use built-in methods (includes 'IMPORTANT: Start directly...' text)")
-    
     if story_type == "child":
         logger.info(f"Generating child story for {child.name}")
-        prompt = prompt_service.generate_child_prompt(child, moral, language, story_length, parent_story)
+        prompt = prompt_service.generate_child_prompt(child, moral, language, story_length, parent_story, theme)
     elif story_type == "hero":
         logger.info(f"Generating hero story for {hero.name}")
-        prompt = prompt_service.generate_hero_prompt(hero, moral, story_length, parent_story)
+        prompt = prompt_service.generate_hero_prompt(hero, moral, story_length, parent_story, theme)
     else:  # combined
         logger.info(f"Generating combined story for {child.name} and {hero.name}")
-        prompt = prompt_service.generate_combined_prompt(child, hero, moral, language, story_length, parent_story)
-    
-    # Check if prompt contains fallback text
-    if "IMPORTANT: Start directly with the story" in prompt:
-        logger.error(f"❌ ERROR: Generated prompt contains 'IMPORTANT: Start directly...' - this means fallback methods were used instead of Supabase prompts!")
-        logger.error(f"PromptService._template_service is None: {prompt_service._template_service is None}")
-    
+        prompt = prompt_service.generate_combined_prompt(child, hero, moral, language, story_length, parent_story, theme)
+
     return prompt
 
 
@@ -184,7 +174,8 @@ async def generate_story_content(
     child: Child,
     language: Language,
     openrouter_client: OpenRouterClient,
-    supabase_client: AsyncSupabaseClient
+    supabase_client: AsyncSupabaseClient,
+    theme: Optional[str] = None
 ) -> StoryGenerationResult:
     """Generate story content using LangGraph workflow with retry and tracking."""
     
@@ -200,7 +191,8 @@ async def generate_story_content(
             moral=moral,
             language=language.value,
             story_length_minutes=story_length,
-            user_id=user_id
+            user_id=user_id,
+            theme=theme
         )
         
         # Update with success

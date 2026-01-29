@@ -67,22 +67,11 @@ router = APIRouter()
 openrouter_client = initialize_openrouter_client()
 supabase_client = initialize_supabase_client()
 
-# Log Supabase client status
 if supabase_client is None:
-    logger.error("❌ CRITICAL: Supabase client is None - prompts will NOT be loaded from database!")
-    logger.error("⚠️ Check SUPABASE_URL and SUPABASE_KEY environment variables")
-else:
-    logger.info(f"✅ Supabase client initialized: {type(supabase_client)}")
+    logger.warning("Supabase client is None - some features may be limited")
 
 voice_service = initialize_voice_service()
-prompt_service = initialize_prompt_service(supabase_client)
-
-# Log prompt service status
-if prompt_service._template_service is None:
-    logger.error("❌ CRITICAL: PromptService does NOT have PromptTemplateService!")
-    logger.error("⚠️ Prompts will use built-in methods instead of Supabase database")
-else:
-    logger.info("✅ PromptService successfully initialized with Supabase prompts")
+prompt_service = initialize_prompt_service()
 
 
 # ============================================================================
@@ -149,7 +138,8 @@ async def generate_story(
             language,
             story_length,
             prompt_service,
-            parent_story
+            parent_story,
+            request.theme
         )
         
         # Generate story content
@@ -178,7 +168,8 @@ async def generate_story(
             child=child,
             language=language,
             openrouter_client=openrouter_client,
-            supabase_client=supabase_client
+            supabase_client=supabase_client,
+            theme=request.theme
         )
         
         # Clean the content to remove formatting markers
