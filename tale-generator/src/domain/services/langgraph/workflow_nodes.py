@@ -248,6 +248,7 @@ async def generate_story_node(
         
         story_length = StoryLength(minutes=state["story_length"])
         moral = state["moral"]
+        theme = state.get("theme")
         
         # Get previous quality feedback if this is a retry
         previous_feedback = None
@@ -268,11 +269,11 @@ async def generate_story_node(
         
         # Generate prompt with feedback if available
         if state["story_type"] == "child":
-            prompt = prompt_service.generate_child_prompt(child, moral, language, story_length)
+            prompt = prompt_service.generate_child_prompt(child, moral, language, story_length, theme=theme)
         elif state["story_type"] == "hero":
-            prompt = prompt_service.generate_hero_prompt(hero, moral, language, story_length)
+            prompt = prompt_service.generate_hero_prompt(hero, moral, story_length, theme=theme)
         else:  # combined
-            prompt = prompt_service.generate_combined_prompt(child, hero, moral, language, story_length)
+            prompt = prompt_service.generate_combined_prompt(child, hero, moral, language, story_length, theme=theme)
         
         # Add feedback for regeneration attempts
         if previous_feedback:

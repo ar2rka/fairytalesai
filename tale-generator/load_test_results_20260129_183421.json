@@ -1,0 +1,381 @@
+{
+  "test_config": {
+    "base_url": "https://fairytalesai-production-6704.up.railway.app",
+    "story_type": "child",
+    "language": "en",
+    "story_length": 4,
+    "concurrent": 5,
+    "total_requests": 50
+  },
+  "stats": {
+    "total_requests": 50,
+    "successful_requests": 40,
+    "failed_requests": 10,
+    "success_rate": 80.0,
+    "duration": 125.1520779132843,
+    "requests_per_second": 0.39951394202694845,
+    "avg_response_time": 12.091020250320435,
+    "median_response_time": 12.596028447151184,
+    "min_response_time": 0.06822991371154785,
+    "max_response_time": 32.43004369735718,
+    "p95_response_time": 15.567281246185303,
+    "p99_response_time": 32.43004369735718,
+    "status_codes": {
+      "404": 4,
+      "0": 6,
+      "200": 40
+    }
+  },
+  "results": [
+    {
+      "success": false,
+      "status_code": 404,
+      "response_time": 15.386094093322754,
+      "error": "Application not found",
+      "story_id": null
+    },
+    {
+      "success": false,
+      "status_code": 404,
+      "response_time": 15.388604879379272,
+      "error": "Application not found",
+      "story_id": null
+    },
+    {
+      "success": false,
+      "status_code": 0,
+      "response_time": 15.567281246185303,
+      "error": "HTTP Error: ",
+      "story_id": null
+    },
+    {
+      "success": false,
+      "status_code": 404,
+      "response_time": 16.255642890930176,
+      "error": "Application not found",
+      "story_id": null
+    },
+    {
+      "success": false,
+      "status_code": 0,
+      "response_time": 0.06822991371154785,
+      "error": "HTTP Error: ",
+      "story_id": null
+    },
+    {
+      "success": false,
+      "status_code": 404,
+      "response_time": 2.301975965499878,
+      "error": "Application not found",
+      "story_id": null
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 13.590232133865356,
+      "error": null,
+      "story_id": "d97a8f7c-710e-4135-93cc-aa0f54c128eb"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 14.176759004592896,
+      "error": null,
+      "story_id": "f11fa8ae-7813-498f-af2c-b4a03fa9d58d"
+    },
+    {
+      "success": false,
+      "status_code": 0,
+      "response_time": 0.07411885261535645,
+      "error": "HTTP Error: ",
+      "story_id": null
+    },
+    {
+      "success": false,
+      "status_code": 0,
+      "response_time": 15.376719236373901,
+      "error": "HTTP Error: ",
+      "story_id": null
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 32.43004369735718,
+      "error": null,
+      "story_id": "ff32d16c-10be-4a0a-87f9-6256861daf73"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 14.786229133605957,
+      "error": null,
+      "story_id": "4c39a528-2261-4800-8d4f-fbe752a0b729"
+    },
+    {
+      "success": false,
+      "status_code": 0,
+      "response_time": 0.07452797889709473,
+      "error": "HTTP Error: ",
+      "story_id": null
+    },
+    {
+      "success": false,
+      "status_code": 0,
+      "response_time": 0.07083606719970703,
+      "error": "HTTP Error: ",
+      "story_id": null
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 11.973015069961548,
+      "error": null,
+      "story_id": "dd9755ea-7d44-444a-98bf-14827e97893b"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 11.983475923538208,
+      "error": null,
+      "story_id": "0be3c4bc-3bda-4aee-9dbc-f6ffdd680503"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 12.993100881576538,
+      "error": null,
+      "story_id": "921fb530-a583-49f8-940f-23d485b184b7"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 11.683895111083984,
+      "error": null,
+      "story_id": "5ee43307-b99e-4ccf-91c8-be90621087d3"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 14.222173929214478,
+      "error": null,
+      "story_id": "4b4c0fe6-b3a9-43f1-bc66-a3556f9559f9"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 12.98248291015625,
+      "error": null,
+      "story_id": "c0312f5a-0727-41d2-8f65-ffe59a0322b6"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 10.881285190582275,
+      "error": null,
+      "story_id": "dbf1f4aa-5f2b-4515-adac-23f614a090f7"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 12.836813926696777,
+      "error": null,
+      "story_id": "60033a87-90b7-4293-939e-43b7aa0f63ea"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 13.103666305541992,
+      "error": null,
+      "story_id": "eac0a699-7fca-4dbe-a439-f1767badd929"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 10.824949979782104,
+      "error": null,
+      "story_id": "ae7c8cfe-4345-4529-a21d-811a430e4d27"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 10.954698085784912,
+      "error": null,
+      "story_id": "73def5b8-37d5-4e34-be89-8a38cd31546d"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 12.14773178100586,
+      "error": null,
+      "story_id": "0dce8aea-2756-4119-abe0-c679000e2c78"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 13.210364818572998,
+      "error": null,
+      "story_id": "3299749d-e05a-442d-95b9-708ed3d28e08"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 12.848765850067139,
+      "error": null,
+      "story_id": "be69011a-615f-477d-bafb-2ec63a5fcce0"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 14.014978170394897,
+      "error": null,
+      "story_id": "0f445d27-6b91-49c2-99e7-8d110e0327e9"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 13.671951055526733,
+      "error": null,
+      "story_id": "3459d66a-0429-4b90-a7d3-5a6495a86659"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 14.171624183654785,
+      "error": null,
+      "story_id": "c05b9216-e021-42f0-b27b-e3bdc647daf7"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 14.02592396736145,
+      "error": null,
+      "story_id": "0d38a0c3-ca5e-4090-9a79-ebc1a3af6eea"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 11.644022941589355,
+      "error": null,
+      "story_id": "c0a1a9c8-539c-4e22-a8ea-31ba2241dc7f"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 13.93550992012024,
+      "error": null,
+      "story_id": "bbd60b42-5185-4836-82f1-6cffc72d8aef"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 11.869513988494873,
+      "error": null,
+      "story_id": "f2e4298e-7e64-44ba-9b72-6d1676201afc"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 10.423712015151978,
+      "error": null,
+      "story_id": "0fb838f7-ff0c-466d-9f09-8431d3e1309d"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 12.604095935821533,
+      "error": null,
+      "story_id": "618df0fa-a395-4090-911a-00269c0e77de"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 12.680930137634277,
+      "error": null,
+      "story_id": "0bb0462a-47ee-44d6-b49d-563754f6528d"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 11.978983163833618,
+      "error": null,
+      "story_id": "fd04d53d-0888-4265-8806-3796feca13a7"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 10.507354021072388,
+      "error": null,
+      "story_id": "a4f657c0-305f-4fba-b571-6ebd4f76d32b"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 13.291184186935425,
+      "error": null,
+      "story_id": "7f33441f-0915-4526-b2f1-2dec255d299f"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 12.229176998138428,
+      "error": null,
+      "story_id": "d1cec04a-87d4-4633-a4a5-7117a556ff3e"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 12.428493976593018,
+      "error": null,
+      "story_id": "dfed2c3e-c315-4b3e-aa3e-5bad4bac3586"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 12.168792009353638,
+      "error": null,
+      "story_id": "d5bf679c-0bc9-4b60-9d08-ed0eddd57efe"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 12.55120587348938,
+      "error": null,
+      "story_id": "0b82bf3e-202f-4d16-b153-57f769eddcaf"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 12.579839944839478,
+      "error": null,
+      "story_id": "4b27a492-aaf8-4bf6-8209-3cc2bdc4b749"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 12.587960958480835,
+      "error": null,
+      "story_id": "8d8b122b-2036-4a6c-bbdb-2aaef4e20970"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 13.151610136032104,
+      "error": null,
+      "story_id": "555ed665-cb42-42b0-8b0f-df3e11ce80bf"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 12.493803024291992,
+      "error": null,
+      "story_id": "233fcb5f-8b3c-46a5-aa08-3a4151c64817"
+    },
+    {
+      "success": true,
+      "status_code": 200,
+      "response_time": 11.346631050109863,
+      "error": null,
+      "story_id": "01c3882b-a302-49a5-848f-d2397c7ebdef"
+    }
+  ]
+}

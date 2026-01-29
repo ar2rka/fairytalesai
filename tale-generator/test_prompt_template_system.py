@@ -196,7 +196,6 @@ def test_prompt_template_service_child_english():
         age_category="5-7",
         gender="female",
         interests=["unicorns", "fairies", "dancing"],
-        age=6,
         description=None
     )
     logger.info(f"✓ ChildCharacter created: name={child_character.name}, age_category={child_character.age_category}, interests={child_character.interests}")
@@ -295,7 +294,6 @@ def test_prompt_template_service_child_russian():
         age_category="3-5",
         gender="female",
         interests=["котята", "цветы"],
-        age=4,
         description=None
     )
     
@@ -367,7 +365,7 @@ def test_prompt_template_service_with_parent_story():
         age_category="5-7",
         gender="female",
         interests=["unicorns"],
-        age=6
+        description=None
     )
     
     parent_story = StoryDB(
@@ -525,7 +523,7 @@ def test_prompt_template_service_combined():
         age_category="5-7",
         gender="female",
         interests=["unicorns"],
-        age=6
+        description=None
     )
     
     hero_character = HeroCharacter(
@@ -668,8 +666,7 @@ def test_prompt_service_fallback():
         name="Emma",
         age_category="5-7",
         gender=Gender.FEMALE,
-        interests=["unicorns"],
-        age=6
+        interests=["unicorns"]
     )
     logger.info(f"✓ Child entity created: {child.name}")
     

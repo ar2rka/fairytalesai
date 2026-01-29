@@ -7,36 +7,45 @@ from src.core.logging import get_logger
 from src.utils.age_category_utils import get_age_category_for_prompt
 from src.infrastructure.persistence.models import StoryDB
 from src.prompts.character_types import ChildCharacter, HeroCharacter, CombinedCharacter
-from src.infrastructure.persistence.prompt_repository import PromptRepository
 from src.domain.services.prompt_template_service import PromptTemplateService
 
 logger = get_logger("domain.prompt_service")
 
 
 class PromptService:
-    """Service for generating language-specific story prompts."""
-    
-    def __init__(self, supabase_client=None):
+    """Service for generating language-specific story prompts from templates (files) or built-in."""
+
+    def __init__(
+        self,
+        prompt_loader=None,
+        supabase_client=None,
+    ):
         """Initialize prompt service.
-        
+
         Args:
-            supabase_client: Optional Supabase client for loading prompts from database.
-                           If None, will use built-in prompt generation methods.
+            prompt_loader: Loader with get_prompts(language, story_type). If set, templates are loaded from it (e.g. files).
+            supabase_client: Optional; used only if prompt_loader is None (legacy DB prompts).
         """
-        self._supabase_client = supabase_client
         self._template_service: Optional[PromptTemplateService] = None
-        
-        if supabase_client:
+
+        if prompt_loader is not None:
             try:
-                logger.info(f"Initializing PromptTemplateService with supabase_client: {type(supabase_client)}")
+                self._template_service = PromptTemplateService(prompt_loader)
+                logger.info("PromptTemplateService initialized with file/loader prompts")
+            except Exception as e:
+                logger.error(f"Failed to init PromptTemplateService: {e}. Using built-in.", exc_info=True)
+                self._template_service = None
+        elif supabase_client is not None:
+            try:
+                from src.infrastructure.persistence.prompt_repository import PromptRepository
                 repository = PromptRepository(supabase_client)
                 self._template_service = PromptTemplateService(repository)
-                logger.info("✅ PromptTemplateService initialized with Supabase - prompts will be loaded from database")
+                logger.info("PromptTemplateService initialized with Supabase prompts")
             except Exception as e:
-                logger.error(f"❌ Failed to initialize PromptTemplateService: {e}. Using built-in methods.", exc_info=True)
+                logger.error(f"Failed to init PromptTemplateService from Supabase: {e}. Using built-in.", exc_info=True)
                 self._template_service = None
         else:
-            logger.warning("⚠️ No Supabase client provided. Using built-in prompt generation methods (will include 'IMPORTANT: Start directly...' text).")
+            logger.warning("No prompt_loader or Supabase client. Using built-in prompt methods.")
     
     def generate_child_prompt(
         self,
@@ -44,7 +53,8 @@ class PromptService:
         moral: str,
         language: Language,
         story_length: StoryLength,
-        parent_story: Optional[StoryDB] = None
+        parent_story: Optional[StoryDB] = None,
+        theme: Optional[str] = None
     ) -> str:
         """Generate a story prompt based on child profile.
         
@@ -54,6 +64,7 @@ class PromptService:
             language: Language for the story
             story_length: Desired story length
             parent_story: Optional parent story for continuation narratives
+            theme: Optional story theme (e.g. adventure, space, fantasy)
             
         Returns:
             Generated prompt string
@@ -79,11 +90,10 @@ class PromptService:
                     language=language,
                     story_length=story_length.minutes,
                     story_type="child",
-                    parent_story=parent_story
+                    parent_story=parent_story,
+                    theme=theme
                 )
-                logger.info(f"✅ Successfully generated prompt using PromptTemplateService (length={len(prompt)} chars)")
-                if "IMPORTANT: Start directly" in prompt:
-                    logger.error("❌ ERROR: Prompt from Supabase contains 'IMPORTANT: Start directly' - this should NOT happen!")
+                logger.debug(f"Generated prompt via template (length={len(prompt)} chars)")
                 return prompt
             except Exception as e:
                 logger.error(f"❌ Template service failed, falling back to built-in methods: {e}", exc_info=True)
@@ -101,7 +111,8 @@ class PromptService:
         hero: Hero,
         moral: str,
         story_length: StoryLength,
-        parent_story: Optional[StoryDB] = None
+        parent_story: Optional[StoryDB] = None,
+        theme: Optional[str] = None
     ) -> str:
         """Generate a story prompt based on hero profile.
         
@@ -110,6 +121,7 @@ class PromptService:
             moral: Moral value for the story
             story_length: Desired story length
             parent_story: Optional parent story for continuation narratives
+            theme: Optional story theme (e.g. adventure, space, fantasy)
             
         Returns:
             Generated prompt string
@@ -139,7 +151,8 @@ class PromptService:
                     language=hero.language,
                     story_length=story_length.minutes,
                     story_type="hero",
-                    parent_story=parent_story
+                    parent_story=parent_story,
+                    theme=theme
                 )
                 logger.info(f"Successfully generated prompt using PromptTemplateService (length={len(prompt)} chars)")
                 return prompt
@@ -159,7 +172,8 @@ class PromptService:
         moral: str,
         language: Language,
         story_length: StoryLength,
-        parent_story: Optional[StoryDB] = None
+        parent_story: Optional[StoryDB] = None,
+        theme: Optional[str] = None
     ) -> str:
         """Generate a story prompt for combined child + hero story.
         
@@ -170,6 +184,7 @@ class PromptService:
             language: Language for the story
             story_length: Desired story length
             parent_story: Optional parent story for continuation narratives
+            theme: Optional story theme (e.g. adventure, space, fantasy)
             
         Returns:
             Generated prompt string
@@ -219,7 +234,8 @@ class PromptService:
                     language=language,
                     story_length=story_length.minutes,
                     story_type="combined",
-                    parent_story=parent_story
+                    parent_story=parent_story,
+                    theme=theme
                 )
                 logger.info(f"Successfully generated prompt using PromptTemplateService (length={len(prompt)} chars)")
                 return prompt

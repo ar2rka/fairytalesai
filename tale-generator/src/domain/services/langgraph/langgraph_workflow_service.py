@@ -108,7 +108,8 @@ class LangGraphWorkflowService:
         story_length: StoryLength,
         story_type: str = "child",
         hero: Optional[Hero] = None,
-        user_id: str = ""
+        user_id: str = "",
+        theme: Optional[str] = None
     ) -> LangGraphWorkflowResult:
         """Execute LangGraph workflow for story generation.
         
@@ -120,6 +121,7 @@ class LangGraphWorkflowService:
             story_type: Type of story (child/hero/combined)
             hero: Optional hero entity
             user_id: User ID for tracking
+            theme: Optional story theme (e.g. adventure, space)
             
         Returns:
             LangGraphWorkflowResult with generated story or error
@@ -149,15 +151,15 @@ class LangGraphWorkflowService:
             # Generate initial prompt
             if story_type == "child":
                 prompt = self.prompt_service.generate_child_prompt(
-                    child, moral, language, story_length
+                    child, moral, language, story_length, theme=theme
                 )
             elif story_type == "hero":
                 prompt = self.prompt_service.generate_hero_prompt(
-                    hero, moral, language, story_length
+                    hero, moral, language, story_length, theme=theme
                 )
             else:  # combined
                 prompt = self.prompt_service.generate_combined_prompt(
-                    child, hero, moral, language, story_length
+                    child, hero, moral, language, story_length, theme=theme
                 )
             
             # Calculate expected word count
@@ -212,7 +214,8 @@ class LangGraphWorkflowService:
                 generation_id=generation_id,
                 hero_id=str(hero.id) if hero and hero.id else None,
                 hero_name=hero.name if hero else None,
-                hero_description=hero.description if hero else None
+                hero_description=hero.description if hero else None,
+                theme=theme
             )
             
             # Create workflow

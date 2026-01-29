@@ -58,33 +58,17 @@ def initialize_voice_service():
         return None
 
 
-def initialize_prompt_service(supabase_client: Optional[AsyncSupabaseClient]) -> PromptService:
-    """Initialize prompt service with Supabase client if available.
-    
-    Note: PromptRepository needs sync client, so we get it from async client.
-    """
-    _sync_supabase_client = None
-    
-    if supabase_client is None:
-        logger.error("❌ supabase_client is None - cannot initialize PromptTemplateService")
-        logger.error("⚠️ Check SUPABASE_URL and SUPABASE_KEY environment variables")
-    elif not hasattr(supabase_client, '_sync_client'):
-        logger.error(f"❌ supabase_client does not have _sync_client attribute: {type(supabase_client)}")
-    else:
-        _sync_supabase_client = supabase_client._sync_client
-        if _sync_supabase_client is None:
-            logger.error("❌ _sync_client is None inside AsyncSupabaseClient")
-        else:
-            logger.info(f"✅ Extracted sync Supabase client from async client: {type(_sync_supabase_client)}")
-    
-    prompt_service = PromptService(_sync_supabase_client)
-    
+def initialize_prompt_service(_supabase_client: Optional[AsyncSupabaseClient] = None) -> PromptService:
+    """Initialize prompt service. Uses file-based templates from src/prompts/templates/ by default."""
+    from src.prompts.loader import FilePromptLoader
+
+    loader = FilePromptLoader()
+    prompt_service = PromptService(prompt_loader=loader)
+
     if prompt_service._template_service:
-        logger.info("✅ Prompt service initialized with PromptTemplateService (prompts will be loaded from Supabase)")
+        logger.info("Prompt service initialized with file-based templates")
     else:
-        logger.error("❌ Prompt service initialized WITHOUT PromptTemplateService")
-        logger.error("⚠️ Will use built-in prompt generation methods (includes 'IMPORTANT: Start directly...' text)")
-        logger.error("⚠️ This means prompts are NOT being loaded from Supabase database")
-    
+        logger.warning("Prompt service fell back to built-in methods (check templates in src/prompts/templates/)")
+
     return prompt_service
 
