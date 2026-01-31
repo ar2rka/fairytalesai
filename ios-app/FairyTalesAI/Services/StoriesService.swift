@@ -256,7 +256,7 @@ private struct SupabaseStory: Codable {
         case createdAt = "created_at"
         case language
         case rating
-        case ageCategory = "child_age_cat"
+        case ageCategory = "age_category"
     }
     
     func toStory() -> Story {
@@ -404,7 +404,7 @@ private struct StoryAPIResponse: Codable {
         case storyType = "story_type"
         case storyLength = "story_length"
         case createdAt = "created_at"
-        case ageCategory = "child_age_cat"
+        case ageCategory = "age_category"
     }
 }
 
