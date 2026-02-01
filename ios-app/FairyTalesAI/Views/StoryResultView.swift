@@ -69,10 +69,34 @@ struct StoryResultView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
-                        dismiss()
+                    HStack(spacing: 16) {
+                        // Decrease font size button
+                        Button(action: {
+                            if userSettings.storyFontSize > 12 {
+                                userSettings.storyFontSize -= 2
+                            }
+                        }) {
+                            Image(systemName: "textformat.size.smaller")
+                                .foregroundColor(userSettings.storyFontSize > 12 ? AppTheme.primaryPurple : AppTheme.textSecondary(for: colorScheme))
+                        }
+                        .disabled(userSettings.storyFontSize <= 12)
+                        
+                        // Increase font size button
+                        Button(action: {
+                            if userSettings.storyFontSize < 24 {
+                                userSettings.storyFontSize += 2
+                            }
+                        }) {
+                            Image(systemName: "textformat.size.larger")
+                                .foregroundColor(userSettings.storyFontSize < 24 ? AppTheme.primaryPurple : AppTheme.textSecondary(for: colorScheme))
+                        }
+                        .disabled(userSettings.storyFontSize >= 24)
+                        
+                        Button("Done") {
+                            dismiss()
+                        }
+                        .foregroundColor(AppTheme.primaryPurple)
                     }
-                    .foregroundColor(AppTheme.primaryPurple)
                 }
             }
             .sheet(isPresented: $showingPaywall) {
