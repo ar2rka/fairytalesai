@@ -37,6 +37,7 @@ class StoriesService: ObservableObject {
         )
     }
     
+    /// Загружает истории пользователя; исключает записи с status = "archived". В таблице stories должна быть колонка status (например default 'active').
     func fetchStories(userId: UUID) async throws -> [Story] {
         guard let supabase = supabase else {
             throw StoriesServiceError.supabaseNotConfigured
@@ -46,6 +47,7 @@ class StoriesService: ObservableObject {
             .from("stories")
             .select()
             .eq("user_id", value: userId.uuidString)
+            .neq("status", value: "archived")
             .order("created_at", ascending: false)
             .execute()
             .value
@@ -62,6 +64,7 @@ class StoriesService: ObservableObject {
             .from("stories")
             .select()
             .eq("user_id", value: userId.uuidString)
+            .neq("status", value: "archived")
             .order("created_at", ascending: false)
             .range(from: offset, to: offset + limit - 1)
             .execute()
@@ -102,6 +105,18 @@ class StoriesService: ObservableObject {
             .value
         
         return response.toStory()
+    }
+    
+    /// Мягкое удаление: проставляет status = "archived" в Supabase (запись не удаляется физически).
+    func softDeleteStory(id: UUID) async throws {
+        guard let supabase = supabase else {
+            throw StoriesServiceError.supabaseNotConfigured
+        }
+        try await supabase
+            .from("stories")
+            .update(["status": "archived"])
+            .eq("id", value: id)
+            .execute()
     }
     
     func fetchDailyFreeStories(modelContext: ModelContext? = nil) async throws -> [Story] {
@@ -181,6 +196,10 @@ class StoriesService: ObservableObject {
         
         let session = URLSession(configuration: configuration)
         let (data, response) = try await session.data(for: request)
+        if let jsonString = String(data: data, encoding: .utf8) {
+            print("🔍 JSON: \(jsonString)")
+        }
+        print("🔍 Response: \(response)")
         
         guard let httpResponse = response as? HTTPURLResponse else {
             throw StoriesServiceError.invalidResponse
@@ -384,7 +403,7 @@ private struct DailyFreeStory: Codable {
 }
 
 // MARK: - API Response Models
-private struct StoryAPIResponse: Codable {
+private struct StoryAPIResponse: Decodable {
     let id: String  // UUID as string from API
     let title: String
     let content: String
@@ -393,9 +412,10 @@ private struct StoryAPIResponse: Codable {
     let storyType: String
     let storyLength: Int
     let createdAt: String
+    /// API может отдавать age_category в корне или внутри child
     let ageCategory: String
     
-    enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey {
         case id
         case title
         case content
@@ -404,6 +424,35 @@ private struct StoryAPIResponse: Codable {
         case storyType = "story_type"
         case storyLength = "story_length"
         case createdAt = "created_at"
+        case ageCategory = "age_category"
+        case child
+    }
+    
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(String.self, forKey: .id)
+        title = try c.decode(String.self, forKey: .title)
+        content = try c.decode(String.self, forKey: .content)
+        moral = try c.decodeIfPresent(String.self, forKey: .moral)
+        language = try c.decode(String.self, forKey: .language)
+        storyType = try c.decode(String.self, forKey: .storyType)
+        storyLength = try c.decode(Int.self, forKey: .storyLength)
+        createdAt = try c.decode(String.self, forKey: .createdAt)
+        // age_category может быть в корне или внутри child
+        if let atRoot = try c.decodeIfPresent(String.self, forKey: .ageCategory) {
+            ageCategory = atRoot
+        } else if let child = try c.decodeIfPresent(StoryAPIResponseChild.self, forKey: .child) {
+            ageCategory = child.ageCategory
+        } else {
+            ageCategory = "3-5" // fallback
+        }
+    }
+}
+
+private struct StoryAPIResponseChild: Decodable {
+    let ageCategory: String
+    
+    enum CodingKeys: String, CodingKey {
         case ageCategory = "age_category"
     }
 }
