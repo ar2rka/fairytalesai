@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct LanguageSelectionView: View {
-    @AppStorage("selectedLanguage") private var selectedLanguage = "English"
+    @EnvironmentObject var userSettings: UserSettings
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
     
@@ -12,14 +12,14 @@ struct LanguageSelectionView: View {
             List {
                 ForEach(["English", "Russian"], id: \.self) { language in
                     Button(action: {
-                        selectedLanguage = language
+                        userSettings.selectedLanguage = language
                         dismiss()
                     }) {
                         HStack {
                             Text(language == "English" ? LocalizationManager.shared.languageEnglish : LocalizationManager.shared.languageRussian)
                                 .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                             Spacer()
-                            if selectedLanguage == language {
+                            if userSettings.selectedLanguage == language {
                                 Image(systemName: "checkmark")
                                     .foregroundColor(AppTheme.primaryPurple)
                             }

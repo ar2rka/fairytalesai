@@ -166,7 +166,7 @@ class PromptTemplateService:
             context["child"] = character
             # Also add direct access to child properties for convenience
             context["child_name"] = char_data.get("name")
-            context["child_age_category"] = char_data.get("age_category")
+            context["age_category"] = char_data.get("age_category")
             context["child_gender"] = char_data.get("gender")
             context["child_interests"] = char_data.get("interests", [])
             context["child_description"] = char_data.get("description")
@@ -186,7 +186,7 @@ class PromptTemplateService:
             child_data = char_data.get("child", {})
             hero_data = char_data.get("hero", {})
             context["child_name"] = child_data.get("name")
-            context["child_age_category"] = child_data.get("age_category")
+            context["age_category"] = child_data.get("age_category")
             context["child_gender"] = child_data.get("gender")
             context["child_interests"] = child_data.get("interests", [])
             context["hero_name"] = hero_data.get("name")

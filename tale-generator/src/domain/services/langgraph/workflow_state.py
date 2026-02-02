@@ -112,7 +112,7 @@ class WorkflowState(TypedDict, total=False):
     original_prompt: str
     child_id: str
     child_name: str
-    child_age_category: str  # Age category as string interval (e.g., '2-3', '4-5', '6-7', '2-3 года')
+    age_category: str  # Age category as string interval (e.g., '2-3', '4-5', '6-7', '2-3 года')
     child_gender: str
     child_interests: List[str]
     
@@ -169,7 +169,7 @@ def create_initial_state(
     original_prompt: str,
     child_id: str,
     child_name: str,
-    child_age_category: str,
+    age_category: str,
     child_gender: str,
     child_interests: List[str],
     story_type: str,
@@ -190,7 +190,7 @@ def create_initial_state(
         original_prompt: The story generation prompt
         child_id: Child UUID
         child_name: Child's name
-        child_age_category: Child's age category as string interval (e.g., '2-3', '4-5', '6-7', '2-3 года')
+        age_category: Child's age category as string interval (e.g., '2-3', '4-5', '6-7', '2-3 года')
         child_gender: Child's gender
         child_interests: List of child's interests
         story_type: Type of story (child/hero/combined)
@@ -214,7 +214,7 @@ def create_initial_state(
         "original_prompt": original_prompt,
         "child_id": child_id,
         "child_name": child_name,
-        "child_age_category": child_age_category,
+        "age_category": age_category,
         "child_gender": child_gender,
         "child_interests": child_interests,
         "hero_id": hero_id,

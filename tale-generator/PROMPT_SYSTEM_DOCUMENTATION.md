@@ -220,7 +220,7 @@ combined = CombinedCharacter(
 |------------|-----|----------|
 | `child` | ChildCharacter | Объект персонажа-ребёнка |
 | `child_name` | str | Имя ребёнка |
-| `child_age_category` | str | Возрастная категория |
+| `age_category` | str | Возрастная категория |
 | `child_gender` | str | Пол ребёнка |
 | `child_interests` | List[str] | Интересы ребёнка |
 | `child_description` | str \| None | Описание ребёнка |
@@ -301,7 +301,7 @@ combined = CombinedCharacter(
 
 **Пример:**
 ```jinja
-Возраст: {{ child_age_category | format_age_category(language) }}
+Возраст: {{ age_category | format_age_category(language) }}
 ```
 
 ### `join`
@@ -337,7 +337,7 @@ combined = CombinedCharacter(
 ```jinja
 Создай детскую сказку на ночь со следующими характеристиками:
 - Имя: {{ child_name }}
-- Возраст: {{ child_age_category | format_age_category(language) }}
+- Возраст: {{ age_category | format_age_category(language) }}
 - Пол: {{ child_gender | translate_gender(language) }}
 - Интересы: {{ child_interests | translate_interests(language) | join(", ") }}
 
@@ -345,7 +345,7 @@ combined = CombinedCharacter(
 Дополнительная информация: {{ child_description }}
 {% endif %}
 
-Сказка должна содержать нравственный урок о "{{ moral | translate_moral(language) }}" и быть подходящей для детей в возрасте {{ child_age_category | format_age_category(language) }}.
+Сказка должна содержать нравственный урок о "{{ moral | translate_moral(language) }}" и быть подходящей для детей в возрасте {{ age_category | format_age_category(language) }}.
 Сделай сказку увлекательной, воображаемой и приблизительно {{ word_count }} слов длинной.
 Включи имя ребенка как главного героя сказки.
 Закончи сказку четким сообщением о нравственном уроке.
@@ -382,7 +382,7 @@ Create a bedtime story featuring both a child and a hero together:
 
 Child Character:
 - Name: {{ child_name }}
-- Age: {{ child_age_category | format_age_category(language) }}
+- Age: {{ age_category | format_age_category(language) }}
 - Gender: {{ child_gender | translate_gender(language) }}
 - Interests: {{ child_interests | translate_interests(language) | join(", ") }}
 
@@ -396,7 +396,7 @@ Hero Character:
 
 Relationship: {{ relationship }}
 
-The story should focus on the moral value of "{{ moral | translate_moral(language) }}" and be appropriate for children aged {{ child_age_category | format_age_category(language) }}.
+The story should focus on the moral value of "{{ moral | translate_moral(language) }}" and be appropriate for children aged {{ age_category | format_age_category(language) }}.
 Make the story engaging, imaginative, and approximately {{ word_count }} words long.
 Include both characters' names throughout the story and show how they work together.
 End the story with a clear message about the moral value.

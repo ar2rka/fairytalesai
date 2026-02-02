@@ -37,7 +37,7 @@ class QualityAssessorService:
         self,
         story_content: str,
         title: str,
-        child_age_category: str,
+        age_category: str,
         moral: str,
         language: str,
         expected_word_count: int,
@@ -48,7 +48,7 @@ class QualityAssessorService:
         Args:
             story_content: Generated story content
             title: Story title
-            child_age_category: Target child's age category ('2-3', '3-5', or '5-7')
+            age_category: Target child's age category ('2-3', '3-5', or '5-7')
             moral: Expected moral value
             language: Story language (en/ru)
             expected_word_count: Expected word count
@@ -61,7 +61,7 @@ class QualityAssessorService:
         
         # Build assessment prompt for LLM
         assessment_prompt = self._build_assessment_prompt(
-            story_content, title, child_age_category, moral, language, expected_word_count
+            story_content, title, age_category, moral, language, expected_word_count
         )
         
         try:
@@ -122,7 +122,7 @@ class QualityAssessorService:
         self,
         story_content: str,
         title: str,
-        child_age_category: str,
+        age_category: str,
         moral: str,
         language: str,
         expected_word_count: int
@@ -132,7 +132,7 @@ class QualityAssessorService:
         Args:
             story_content: Story to assess
             title: Story title
-            child_age_category: Target age category ('2-3', '3-5', or '5-7')
+            age_category: Target age category ('2-3', '3-5', or '5-7')
             moral: Expected moral
             language: Language (en/ru)
             expected_word_count: Expected word count
@@ -145,7 +145,7 @@ class QualityAssessorService:
         
         lang_enum = Language.ENGLISH if language == "en" else Language.RUSSIAN
         lang_name = "English" if language == "en" else "Russian"
-        age_display = get_age_category_for_prompt(child_age_category, lang_enum)
+        age_display = get_age_category_for_prompt(age_category, lang_enum)
         
         return f"""You are a children's story quality evaluator. Assess the provided story across multiple dimensions.
 

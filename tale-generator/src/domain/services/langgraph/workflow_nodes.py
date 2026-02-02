@@ -41,9 +41,9 @@ async def validate_prompt_node(
     """
     logger.info("="*80)
     logger.info("Node: VALIDATE_PROMPT - Starting validation")
-    logger.info(f"Child: name='{state['child_name']}', age_category={state.get('child_age_category', 'N/A')}, interests={state['child_interests']}")
-    if state['child_name'] == "Child" and state.get('child_age_category') == "3-5":
-        logger.warning(f"⚠️ Using default values in state! child_name='{state['child_name']}', child_age_category={state.get('child_age_category')} - this might indicate missing data")
+    logger.info(f"Child: name='{state['child_name']}', age_category={state.get('age_category', 'N/A')}, interests={state['child_interests']}")
+    if state['child_name'] == "Child" and state.get('age_category') == "3-5":
+        logger.warning(f"⚠️ Using default values in state! child_name='{state['child_name']}', age_category={state.get('age_category')} - this might indicate missing data")
     logger.info(f"Story Type: {state['story_type']}, Language: {state['language']}, Length: {state['story_length']} min")
     logger.info(f"Validation Model: {config.get('validation_model', 'openai/gpt-4o-mini')}")
     logger.info(f"Prompt length: {len(state['original_prompt'])} chars")
@@ -56,7 +56,7 @@ async def validate_prompt_node(
         validation_result = await validator_service.validate_prompt(
             prompt=state["original_prompt"],
             child_name=state["child_name"],
-            child_age_category=state.get("child_age_category", "3-5"),  # Default for backward compatibility
+            age_category=state.get("age_category", "3-5"),  # Default for backward compatibility
             child_interests=state["child_interests"],
             model=config.get("validation_model", "openai/gpt-4o-mini")
         )
@@ -213,7 +213,7 @@ async def generate_story_node(
     if attempt_number > max_attempts:
         logger.warning(f"⚠️ Attempt {attempt_number} exceeds max ({max_attempts}), but proceeding anyway")
     logger.info(f"Story Type: {state['story_type']}")
-    logger.info(f"Child: {state['child_name']}, Age Category: {state.get('child_age_category', 'N/A')}")
+    logger.info(f"Child: {state['child_name']}, Age Category: {state.get('age_category', 'N/A')}")
     logger.info(f"Language: {state['language']}, Moral: {state['moral']}")
     logger.info(f"Expected word count: {state.get('expected_word_count', 'N/A')}")
     
@@ -221,7 +221,7 @@ async def generate_story_node(
         # Create child entity for prompt generation
         child = Child(
             name=state["child_name"],
-            age_category=state.get("child_age_category", "3-5"),  # Default for backward compatibility
+            age_category=state.get("age_category", "3-5"),  # Default for backward compatibility
             gender=Gender(state["child_gender"]),
             interests=state["child_interests"]
         )
@@ -516,7 +516,7 @@ async def assess_quality_node(
         quality_assessment = await quality_assessor.assess_quality(
             story_content=current_gen["content"],
             title=current_gen["title"],
-            child_age_category=state.get("child_age_category", "3-5"),  # Default for backward compatibility
+            age_category=state.get("age_category", "3-5"),  # Default for backward compatibility
             moral=state["moral"],
             language=state["language"],
             expected_word_count=state["expected_word_count"],

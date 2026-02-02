@@ -60,7 +60,7 @@ class PromptValidatorService:
         self,
         prompt: str,
         child_name: str,
-        child_age_category: str,
+        age_category: str,
         child_interests: List[str],
         model: str = "openai/gpt-4o-mini"
     ) -> ValidationResult:
@@ -69,24 +69,24 @@ class PromptValidatorService:
         Args:
             prompt: The story generation prompt to validate
             child_name: Child's name
-            child_age_category: Child's age category ('2-3', '3-5', or '5-7')
+            age_category: Child's age category ('2-3', '3-5', or '5-7')
             child_interests: List of child's interests
             model: LLM model to use for validation
             
         Returns:
             ValidationResult with validation outcome
         """
-        logger.info(f"Validating prompt for child_name='{child_name}', child_age_category={child_age_category}, child_interests={child_interests}")
+        logger.info(f"Validating prompt for child_name='{child_name}', age_category={age_category}, child_interests={child_interests}")
         # Normalize age category for comparison
         from src.utils.age_category_utils import normalize_age_category
         try:
-            normalized_age_category = normalize_age_category(child_age_category)
+            normalized_age_category = normalize_age_category(age_category)
             if child_name == "Child" and normalized_age_category == "3-5":
-                logger.warning(f"⚠️ Using default values! child_name='{child_name}', child_age_category={normalized_age_category} - this might indicate missing data")
+                logger.warning(f"⚠️ Using default values! child_name='{child_name}', age_category={normalized_age_category} - this might indicate missing data")
         except (ValueError, AttributeError):
             # If normalization fails, just log the original value
             if child_name == "Child":
-                logger.warning(f"⚠️ Using default values! child_name='{child_name}', child_age_category={child_age_category} - this might indicate missing data")
+                logger.warning(f"⚠️ Using default values! child_name='{child_name}', age_category={age_category} - this might indicate missing data")
         
         # First, quick keyword-based check for licensed characters
         # Exclude child's name from the prompt for checking to avoid false positives
@@ -104,7 +104,7 @@ class PromptValidatorService:
         
         # Build validation prompt for LLM
         validation_prompt = self._build_validation_prompt(
-            prompt, child_name, child_age_category, child_interests
+            prompt, child_name, age_category, child_interests
         )
         
         try:
@@ -232,7 +232,7 @@ class PromptValidatorService:
         self,
         prompt: str,
         child_name: str,
-        child_age_category: str,
+        age_category: str,
         child_interests: List[str]
     ) -> str:
         """Build validation prompt for LLM.
@@ -240,7 +240,7 @@ class PromptValidatorService:
         Args:
             prompt: Story prompt to validate
             child_name: Child's name
-            child_age_category: Child's age category ('2-3', '3-5', or '5-7')
+            age_category: Child's age category ('2-3', '3-5', or '5-7')
             child_interests: Child's interests
             
         Returns:
@@ -250,7 +250,7 @@ class PromptValidatorService:
         from src.domain.value_objects import Language
         
         interests_str = ", ".join(child_interests) if child_interests else "none specified"
-        age_display = get_age_category_for_prompt(child_age_category, Language.ENGLISH)
+        age_display = get_age_category_for_prompt(age_category, Language.ENGLISH)
         
         return f"""You are a content safety validator for children's stories. Analyze the provided story prompt for safety concerns.
 

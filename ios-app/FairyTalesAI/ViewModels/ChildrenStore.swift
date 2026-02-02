@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import Combine
 
 @MainActor
 class ChildrenStore: ObservableObject {
@@ -11,15 +12,28 @@ class ChildrenStore: ObservableObject {
     private let authService = AuthService.shared
     private var lastLoadTime: Date?
     private let cacheValidityDuration: TimeInterval = 300 // 5 минут
+    private var authCancellable: AnyCancellable?
     
     var hasProfiles: Bool {
         !children.isEmpty
     }
     
     init() {
-        Task {
-            await loadChildren()
-        }
+        // Подписываемся на смену пользователя: при появлении — загружаем детей,
+        // при выходе — очищаем. Решает гонку: при старте AuthService ставит currentUser
+        // асинхронно, а loadChildren() в init() вызывался раньше и видел nil.
+        authCancellable = authService.$currentUser
+            .receive(on: RunLoop.main)
+            .sink { [weak self] user in
+                guard let self = self else { return }
+                Task { @MainActor in
+                    if user != nil {
+                        await self.loadChildren()
+                    } else {
+                        self.children = []
+                    }
+                }
+            }
     }
     
     func loadChildren() async {
