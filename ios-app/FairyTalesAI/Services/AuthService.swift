@@ -9,17 +9,11 @@ class AuthService: ObservableObject {
     
     @Published var currentUser: User?
     @Published var isAuthenticated = false
-    @Published var isGuestMode = false // No longer using guest mode - we use anonymous auth instead
     @Published var isLoading = false
     @Published var errorMessage: String?
     
     var userEmail: String? {
         return currentUser?.email
-    }
-    
-    var isGuest: Bool {
-        // Guest mode is false if we have any session (including anonymous)
-        return !isAuthenticated
     }
     
     var isAnonymousUser: Bool {
@@ -36,13 +30,6 @@ class AuthService: ObservableObject {
         setupSupabase()
         checkAuthState()
         observeAuthState()
-        // Check if user was previously authenticated
-        checkPreviousAuthState()
-    }
-    
-    private func checkPreviousAuthState() {
-        // No longer using guest mode - we use anonymous auth instead
-        isGuestMode = false
     }
     
     private func setupSupabase() {
@@ -75,7 +62,6 @@ class AuthService: ObservableObject {
             // If Supabase is not configured, cannot authenticate
             isAuthenticated = false
             currentUser = nil
-            isGuestMode = false
             return
         }
         
@@ -90,7 +76,6 @@ class AuthService: ObservableObject {
                     // Есть активная сессия (анонимная или обычная)
                     currentUser = session.user
                     isAuthenticated = true // Анонимные пользователи тоже считаются аутентифицированными
-                    isGuestMode = false
                     print("👤 User ID from session: \(session.user.id.uuidString)")
                     print("   Is anonymous: \(session.user.isAnonymous)")
                     if let email = session.user.email {
@@ -114,7 +99,6 @@ class AuthService: ObservableObject {
                 if let session = state.session, !session.isExpired {
                     currentUser = session.user
                     isAuthenticated = true // Анонимные пользователи тоже считаются аутентифицированными
-                    isGuestMode = false
                     print("👤 User ID from auth state change: \(session.user.id.uuidString)")
                     print("   Is anonymous: \(session.user.isAnonymous)")
                 } else {
@@ -135,7 +119,6 @@ class AuthService: ObservableObject {
         guard let supabase = supabase else {
             isAuthenticated = false
             currentUser = nil
-            isGuestMode = false
             return
         }
         
@@ -149,7 +132,6 @@ class AuthService: ObservableObject {
                 // Сессия уже есть и не истекла
                 currentUser = existingSession.user
                 isAuthenticated = true
-                isGuestMode = false
                 print("👤 User ID from existing session: \(existingSession.user.id.uuidString)")
                 print("   Is anonymous: \(existingSession.user.isAnonymous)")
                 if let email = existingSession.user.email {
@@ -169,7 +151,6 @@ class AuthService: ObservableObject {
             // Поскольку класс @MainActor, можем напрямую обновлять свойства
             currentUser = session.user
             isAuthenticated = true
-            isGuestMode = false
             print("✅ Анонимный вход выполнен успешно. User ID: \(session.user.id.uuidString)")
         } catch {
             let errorDescription = error.localizedDescription
@@ -205,7 +186,6 @@ class AuthService: ObservableObject {
             
             currentUser = response.user
             isAuthenticated = true
-            isGuestMode = false
         } catch {
             errorMessage = error.localizedDescription
             throw error
@@ -263,7 +243,6 @@ class AuthService: ObservableObject {
             
             currentUser = session.user
             isAuthenticated = true
-            isGuestMode = false
         } catch {
             let errorDescription = error.localizedDescription
             print("❌ Apple Sign In Error: \(errorDescription)")
@@ -300,7 +279,6 @@ class AuthService: ObservableObject {
             
             currentUser = response.user
             isAuthenticated = true
-            isGuestMode = false
         } catch {
             errorMessage = error.localizedDescription
             throw error
@@ -322,7 +300,6 @@ class AuthService: ObservableObject {
             // После выхода выполняем анонимный вход для продолжения работы
             currentUser = nil
             isAuthenticated = false
-            isGuestMode = false
             // Выполняем анонимный вход для продолжения работы
             await signInAnonymouslyIfNeeded()
         } catch {

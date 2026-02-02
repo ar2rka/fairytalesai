@@ -127,6 +127,8 @@ class LocalizationManager: ObservableObject {
     var libraryLongAgo: String { localized("Long ago", "Давно") }
     var libraryMinRead: String { localized("min read", "мин чтения") }
     var libraryUnknown: String { localized("Unknown", "Неизвестно") }
+    var libraryDeleteStory: String { localized("Delete", "Удалить") }
+    var libraryDeleteStoryConfirm: String { localized("Delete this story?", "Удалить эту историю?") }
     
     // Story Reading View
     var storyReadingStory: String { localized("Story", "История") }

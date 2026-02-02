@@ -14,7 +14,6 @@ class StoriesStore: ObservableObject {
     
     private let storageKey = "saved_stories"
     private let storiesService = StoriesService.shared
-    private let guestDataManager = GuestDataManager.shared
     private let authService = AuthService.shared
     private let pageSize = 10
     private var currentOffset = 0
@@ -23,10 +22,6 @@ class StoriesStore: ObservableObject {
     
     init() {
         setupSupabase()
-        // Load guest stories if in guest mode
-        if authService.isGuest {
-            stories = guestDataManager.loadGuestStories()
-        }
     }
     
     private func setupSupabase() {
@@ -64,11 +59,7 @@ class StoriesStore: ObservableObject {
     }
     
     func loadStoriesFromSupabase(userId: UUID) async {
-        // If in guest mode, stories are already loaded from local storage in init
-        if authService.isGuest {
-            return
-        }
-        
+
         isLoading = true
         errorMessage = nil
         currentOffset = 0
@@ -125,12 +116,6 @@ class StoriesStore: ObservableObject {
     ) async {
         guard let childId = childId else {
             errorMessage = "Please select a child"
-            return
-        }
-        
-        // Требуем авторизацию для генерации историй
-        guard !authService.isGuest else {
-            errorMessage = "Please sign in to generate stories"
             return
         }
         
@@ -198,12 +183,18 @@ class StoriesStore: ObservableObject {
     
     func deleteStory(_ story: Story) {
         stories.removeAll { $0.id == story.id }
-        
-        // Save to appropriate location based on auth state
-        if authService.isGuest {
-            guestDataManager.saveGuestStories(stories)
-        } else {
-            saveStories()
+        saveStories()
+    }
+    
+    /// Мягкое удаление: помечает историю как удалённую в Supabase (status = "archived") и убирает из локального списка.
+    func softDeleteStory(_ story: Story) async {
+        do {
+            try await storiesService.softDeleteStory(id: story.id)
+            stories.removeAll { $0.id == story.id }
+            errorMessage = nil
+        } catch {
+            errorMessage = error.localizedDescription
+            print("❌ Ошибка удаления истории: \(error.localizedDescription)")
         }
     }
     
