@@ -102,52 +102,64 @@ struct LibraryView: View {
                         }
                         .padding(.vertical, 12)
                         
-                        // Stories List
-                        ScrollView {
-                            LazyVStack(spacing: 16) {
-                                ForEach(filteredStories) { story in
-                                    StoryLibraryRow(story: story)
-                                        .onAppear {
-                                            // Загружаем следующую страницу когда показываем последние 5 элементов
-                                            // Только если нет фильтров и поиска (работаем с полным списком)
-                                            let localizer = LocalizationManager.shared
-                                            if selectedFilter == localizer.libraryAllStories && searchText.isEmpty {
-                                                if let index = filteredStories.firstIndex(where: { $0.id == story.id }),
-                                                   index >= max(0, filteredStories.count - 5),
-                                                   !storiesStore.isLoadingMore,
-                                                   storiesStore.hasMoreStories {
-                                                    Task {
-                                                        if let userId = authService.currentUser?.id {
-                                                            await storiesStore.loadMoreStories(userId: userId)
-                                                        }
-                                                    }
+                        // Stories List (List нужен для жеста свайпа «удалить»)
+                        List {
+                            ForEach(filteredStories) { story in
+                                StoryLibraryRow(story: story)
+                                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                                    .listRowSeparator(.hidden)
+                                    .listRowBackground(Color.clear)
+                                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                        Button(role: .destructive) {
+                                            Task {
+                                                await storiesStore.softDeleteStory(story)
+                                            }
+                                        } label: {
+                                            Label(LocalizationManager.shared.libraryDeleteStory, systemImage: "trash")
+                                        }
+                                    }
+                                    .onAppear {
+                                        let localizer = LocalizationManager.shared
+                                        if selectedFilter == localizer.libraryAllStories && searchText.isEmpty,
+                                           let index = filteredStories.firstIndex(where: { $0.id == story.id }),
+                                           index >= max(0, filteredStories.count - 5),
+                                           !storiesStore.isLoadingMore,
+                                           storiesStore.hasMoreStories {
+                                            Task {
+                                                if let userId = authService.currentUser?.id {
+                                                    await storiesStore.loadMoreStories(userId: userId)
                                                 }
                                             }
                                         }
-                                }
-                                
-                                if filteredStories.isEmpty {
-                                    Text(LocalizationManager.shared.libraryNoStoriesFound)
-                                        .font(.system(size: 16))
-                                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                                        .padding()
-                                }
-                                
-                                // Индикатор загрузки для infinite scroll
-                                if storiesStore.isLoadingMore {
-                                    HStack {
-                                        ProgressView()
-                                            .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.primaryPurple))
-                                        Text(LocalizationManager.shared.libraryLoadingMore)
-                                            .font(.system(size: 14))
-                                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                                     }
-                                    .padding()
-                                }
                             }
-                            .padding(.horizontal)
-                            .padding(.bottom, 100)
+                            
+                            if filteredStories.isEmpty {
+                                Text(LocalizationManager.shared.libraryNoStoriesFound)
+                                    .font(.system(size: 16))
+                                    .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                                    .frame(maxWidth: .infinity)
+                                    .listRowInsets(EdgeInsets(top: 24, leading: 16, bottom: 24, trailing: 16))
+                                    .listRowSeparator(.hidden)
+                                    .listRowBackground(Color.clear)
+                            }
+                            
+                            if storiesStore.isLoadingMore {
+                                HStack {
+                                    ProgressView()
+                                        .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.primaryPurple))
+                                    Text(LocalizationManager.shared.libraryLoadingMore)
+                                        .font(.system(size: 14))
+                                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                                }
+                                .frame(maxWidth: .infinity)
+                                .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
+                                .listRowSeparator(.hidden)
+                                .listRowBackground(Color.clear)
+                            }
                         }
+                        .listStyle(.plain)
+                        .scrollContentBackground(.hidden)
                     }
                 }
             }
@@ -155,6 +167,11 @@ struct LibraryView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
             .onAppear {
+                // При смене языка selectedFilter может остаться "All Stories" (EN), тогда фильтр скрывает все истории.
+                // Сбрасываем на текущий вариант "Все истории", если выбранного фильтра нет в списке.
+                if !filters.contains(selectedFilter) {
+                    selectedFilter = filters[0]
+                }
                 if let userId = authService.currentUser?.id {
                     Task {
                         await storiesStore.loadStoriesFromSupabase(userId: userId)
@@ -181,281 +198,3 @@ struct LibraryView: View {
         }
     }
 }
-
-struct FilterButton: View {
-    let title: String
-    let isSelected: Bool
-    let action: () -> Void
-    @Environment(\.colorScheme) var colorScheme
-    
-    var body: some View {
-        Button(action: action) {
-            HStack {
-                if isSelected {
-                    Image(systemName: "checkmark")
-                        .font(.system(size: 12))
-                }
-                Text(title)
-                    .font(.system(size: 14, weight: .medium))
-            }
-            .foregroundColor(isSelected ? .white : AppTheme.textPrimary(for: colorScheme))
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
-            .background(isSelected ? AppTheme.primaryPurple : AppTheme.cardBackground(for: colorScheme))
-            .cornerRadius(AppTheme.cornerRadius)
-        }
-    }
-}
-
-struct StoryLibraryRow: View {
-    let story: Story
-    @EnvironmentObject var childrenStore: ChildrenStore
-    @Environment(\.colorScheme) var colorScheme
-    @State private var showingOptions = false
-    
-    var body: some View {
-        HStack(spacing: 16) {
-            // Thumbnail
-            RoundedRectangle(cornerRadius: AppTheme.cornerRadius)
-                .fill(
-                    LinearGradient(
-                        colors: [AppTheme.primaryPurple.opacity(0.5), AppTheme.accentPurple.opacity(0.5)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .frame(width: 80, height: 80)
-                .overlay(
-                    Image(systemName: "book.fill")
-                        .font(.system(size: 30))
-                        .foregroundColor(.white.opacity(0.7))
-                )
-            
-            VStack(alignment: .leading, spacing: 8) {
-                Text(story.title)
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(AppTheme.textPrimary(for: colorScheme))
-                
-                HStack {
-                    if let childId = story.childId {
-                        Text("For: \(childName(for: childId))")
-                            .font(.system(size: 12))
-                            .foregroundColor(AppTheme.primaryPurple)
-                    }
-                    
-                    Text("•")
-                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                    
-                    Text(timeAgoString(from: story.createdAt))
-                        .font(.system(size: 12))
-                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                }
-                
-                HStack(spacing: 8) {
-                    // Language
-                    if let language = story.language {
-                        HStack(spacing: 4) {
-                            Image(systemName: "globe")
-                                .font(.system(size: 10))
-                            Text(language.uppercased())
-                                .font(.system(size: 11, weight: .medium))
-                        }
-                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(AppTheme.cardBackground(for: colorScheme).opacity(0.5))
-                        .cornerRadius(6)
-                    }
-                    
-                    // Rating
-                    if let rating = story.rating {
-                        HStack(spacing: 4) {
-                            Image(systemName: "star.fill")
-                                .font(.system(size: 10))
-                            Text("\(rating)/10")
-                                .font(.system(size: 11, weight: .medium))
-                        }
-                        .foregroundColor(AppTheme.primaryPurple)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(AppTheme.primaryPurple.opacity(0.2))
-                        .cornerRadius(6)
-                    }
-                }
-                
-                HStack(spacing: 12) {
-                    NavigationLink(destination: StoryContentView(story: story)) {
-                        HStack {
-                            Image(systemName: "book.fill")
-                            Text("Read")
-                        }
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(AppTheme.primaryPurple)
-                    }
-                    
-                    Text("\(story.duration) min")
-                        .font(.system(size: 12))
-                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                }
-            }
-            
-            Spacer()
-            
-            Button(action: { showingOptions = true }) {
-                Image(systemName: "ellipsis")
-                    .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-            }
-        }
-        .padding()
-        .background(AppTheme.cardBackground(for: colorScheme))
-        .cornerRadius(AppTheme.cornerRadius)
-    }
-    
-    private func childName(for childId: UUID) -> String {
-        childrenStore.children.first(where: { $0.id == childId })?.name ?? LocalizationManager.shared.libraryUnknown
-    }
-    
-    private func timeAgoString(from date: Date) -> String {
-        let calendar = Calendar.current
-        let now = Date()
-        let components = calendar.dateComponents([.day, .weekOfYear, .month], from: date, to: now)
-        let localizer = LocalizationManager.shared
-        
-        if let days = components.day, days < 7 {
-            return days == 1 ? "1 \(localizer.libraryDayAgo)" : "\(days) \(localizer.libraryDaysAgo)"
-        } else if let weeks = components.weekOfYear, weeks < 4 {
-            return weeks == 1 ? "1 \(localizer.libraryWeekAgo)" : "\(weeks) \(localizer.libraryWeeksAgo)"
-        } else if let months = components.month {
-            return months == 1 ? "1 \(localizer.libraryMonthAgo)" : "\(months) \(localizer.libraryMonthsAgo)"
-        } else {
-            return localizer.libraryLongAgo
-        }
-    }
-}
-
-struct AnimatedBookIcon: View {
-    var body: some View {
-        Image(systemName: "book.fill")
-            .font(.system(size: 60))
-            .frame(width: 80, height: 80) // Fixed frame to prevent layout shifts
-    }
-}
-
-struct StoryContentView: View {
-    let story: Story
-    @EnvironmentObject var premiumManager: PremiumManager
-    @EnvironmentObject var userSettings: UserSettings
-    @Environment(\.dismiss) var dismiss
-    @Environment(\.colorScheme) var colorScheme
-    @State private var showingPaywall = false
-    
-    var body: some View {
-        ZStack {
-            AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
-            
-            ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
-                    // Title
-                    Text(story.title)
-                        .font(.system(size: 28, weight: .bold))
-                        .foregroundColor(AppTheme.textPrimary(for: colorScheme))
-                    
-                    // Story metadata
-                    HStack(spacing: 16) {
-                        if let language = story.language {
-                            HStack(spacing: 4) {
-                                Image(systemName: "globe")
-                                    .font(.system(size: 12))
-                                Text(language.uppercased())
-                                    .font(.system(size: 12, weight: .medium))
-                            }
-                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                        }
-                        
-                        if let rating = story.rating {
-                            HStack(spacing: 4) {
-                                Image(systemName: "star.fill")
-                                    .font(.system(size: 12))
-                                Text("\(rating)/10")
-                                    .font(.system(size: 12, weight: .medium))
-                            }
-                            .foregroundColor(AppTheme.primaryPurple)
-                        }
-                        
-                        Text("\(story.duration) \(LocalizationManager.shared.libraryMinRead)")
-                            .font(.system(size: 12))
-                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                    }
-                    
-                    Divider()
-                        .background(AppTheme.textSecondary(for: colorScheme).opacity(0.3))
-                    
-                    // Listen Button with Premium Lock
-                    Button(action: {
-                        if !userSettings.isPremium {
-                            showingPaywall = true
-                        } else {
-                            // Start audio playback
-                            // In production, this would start the audio narration
-                        }
-                    }) {
-                        HStack {
-                            Image(systemName: userSettings.isPremium ? "play.circle.fill" : "lock.fill")
-                            Text(userSettings.isPremium ? LocalizationManager.shared.storyReadingListen : LocalizationManager.shared.storyReadingListenPremium)
-                                .font(.system(size: 16, weight: .semibold))
-                        }
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(userSettings.isPremium ? AppTheme.primaryPurple : AppTheme.primaryPurple.opacity(0.5))
-                        .cornerRadius(AppTheme.cornerRadius)
-                    }
-                    
-                    // Story content
-                    Text(story.content)
-                        .font(.system(size: userSettings.storyFontSize))
-                        .foregroundColor(AppTheme.textPrimary(for: colorScheme))
-                        .lineSpacing(8)
-                }
-                .padding()
-            }
-        }
-        .navigationTitle(LocalizationManager.shared.storyReadingStory)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                HStack(spacing: 16) {
-                    // Decrease font size button
-                    Button(action: {
-                        if userSettings.storyFontSize > 12 {
-                            userSettings.storyFontSize -= 2
-                        }
-                    }) {
-                        Image(systemName: "textformat.size.smaller")
-                            .foregroundColor(userSettings.storyFontSize > 12 ? AppTheme.primaryPurple : AppTheme.textSecondary(for: colorScheme))
-                    }
-                    .disabled(userSettings.storyFontSize <= 12)
-                    
-                    // Increase font size button
-                    Button(action: {
-                        if userSettings.storyFontSize < 24 {
-                            userSettings.storyFontSize += 2
-                        }
-                    }) {
-                        Image(systemName: "textformat.size.larger")
-                            .foregroundColor(userSettings.storyFontSize < 24 ? AppTheme.primaryPurple : AppTheme.textSecondary(for: colorScheme))
-                    }
-                    .disabled(userSettings.storyFontSize >= 24)
-                }
-            }
-        }
-        .sheet(isPresented: $showingPaywall) {
-            NavigationView {
-                PaywallView()
-                    .environmentObject(userSettings)
-            }
-        }
-    }
-}
-
-

@@ -18,7 +18,6 @@
 		9A88A6E02F02EE2B009259D7 /* Services/StoriesService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A88A6DF2F02EE2B009259D7 /* Services/StoriesService.swift */; };
 		9A88A6E12F02EE2B009259D8 /* Services/ChildrenService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A88A6E22F02EE2B009259D8 /* Services/ChildrenService.swift */; };
 		9AA414D72F21442600CE76F7 /* DailyFreeStoriesCacheService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AA414D62F21442600CE76F7 /* DailyFreeStoriesCacheService.swift */; };
-		F1A2B3C4D5E6F7A8B9C0D1E2F3 /* Services/LocalizationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E6F7A8B9C0D1E2F4 /* Services/LocalizationManager.swift */; };
 		9AA414DC2F2144B800CE76F7 /* DailyFreeStoriesCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AA414DB2F2144B800CE76F7 /* DailyFreeStoriesCache.swift */; };
 		9AAB74292F02E21D005C3BE7 /* Services/SupabaseConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AAB74272F02E21D005C3BE7 /* Services/SupabaseConfig.swift */; };
 		A1000001 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000 /* App.swift */; };
@@ -48,13 +47,38 @@
 		D9E2D5FA2EFD60A40082D3BF /* LanguageSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5FB2EFD60A40082D3BF /* LanguageSelectionView.swift */; };
 		D9E2D5FC2EFD60A40082D3C0 /* SettingsPlaceholderViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5FD2EFD60A40082D3C0 /* SettingsPlaceholderViews.swift */; };
 		D9E2D5FE2EFD60A40082D3C1 /* ThemeSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5FF2EFD60A40082D3C1 /* ThemeSelectionView.swift */; };
-		D9E2D6022EFD60A40082D3C4 /* Services/GuestDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D6032EFD60A40082D3C4 /* Services/GuestDataManager.swift */; };
 		D9E2D6062EFD60A40082D3C6 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D6072EFD60A40082D3C6 /* SignUpView.swift */; };
-
 		D9E2D60A2EFD60A40082D3C8 /* CustomTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D60B2EFD60A40082D3C8 /* CustomTabBar.swift */; };
 		D9E2D60C2EFD60A40082D3C9 /* MagicSegmentedSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D60D2EFD60A40082D3C9 /* MagicSegmentedSelector.swift */; };
 		D9E2D60E2EFD60A40082D3CA /* ProtagonistStyleSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D60F2EFD60A40082D3CA /* ProtagonistStyleSelector.swift */; };
 		D9E2D6102EFD60A40082D3CB /* AgeGroupGridSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D6112EFD60A40082D3CB /* AgeGroupGridSelector.swift */; };
+		F1A2B3C4D5E6F7A8B9C0D1E2F3 /* Services/LocalizationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E6F7A8B9C0D1E2F4 /* Services/LocalizationManager.swift */; };
+		A1000100 /* Helpers/FlagEmoji.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000101 /* FlagEmoji.swift */; };
+		A1000102 /* FilterButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000103 /* FilterButton.swift */; };
+		A1000104 /* AnimatedBookIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000105 /* AnimatedBookIcon.swift */; };
+		A1000106 /* StoryLibraryRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000107 /* StoryLibraryRow.swift */; };
+		A1000108 /* StoryContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000109 /* StoryContentView.swift */; };
+		A100010A /* PaywallFeatureRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100010B /* PaywallFeatureRow.swift */; };
+		A100010C /* ChildRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100010D /* ChildRowView.swift */; };
+		A100010E /* ChildDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100010F /* ChildDetailView.swift */; };
+		A1000110 /* FreeDemoStoryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000111 /* FreeDemoStoryCard.swift */; };
+		A1000112 /* FeatureCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000113 /* FeatureCard.swift */; };
+		A1000114 /* GetStartedCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000115 /* GetStartedCard.swift */; };
+		A1000116 /* ChildProfileCircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000117 /* ChildProfileCircle.swift */; };
+		A1000118 /* StoryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000119 /* StoryCard.swift */; };
+		A100011A /* ThemeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100011B /* ThemeButton.swift */; };
+		A100011C /* StoryReadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100011D /* StoryReadingView.swift */; };
+		A100011E /* ProfileSwitcherButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100011F /* ProfileSwitcherButton.swift */; };
+		A1000120 /* ChildPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000121 /* ChildPickerView.swift */; };
+		A1000122 /* ShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000123 /* ShareSheet.swift */; };
+		A1000124 /* ParentProfileCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000125 /* ParentProfileCard.swift */; };
+		A1000126 /* ChildCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000127 /* ChildCardView.swift */; };
+		A1000128 /* GuestModeBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000129 /* GuestModeBanner.swift */; };
+		A100012A /* ProfileEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100012B /* ProfileEditView.swift */; };
+		A100012C /* TabBarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100012D /* TabBarButton.swift */; };
+		A100012E /* HeroInterestChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100012F /* HeroInterestChip.swift */; };
+		A1000130 /* StarParticleAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000131 /* StarParticleAnimation.swift */; };
+		A1000132 /* EditChildView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000133 /* EditChildView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -64,7 +88,6 @@
 		9A88A6E12F02FDD8009259D7 /* FairyTalesAIDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FairyTalesAIDebug.entitlements; sourceTree = "<group>"; };
 		9A88A6E22F02EE2B009259D8 /* Services/ChildrenService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/ChildrenService.swift; sourceTree = "<group>"; };
 		9AA414D62F21442600CE76F7 /* DailyFreeStoriesCacheService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyFreeStoriesCacheService.swift; sourceTree = "<group>"; };
-		F1A2B3C4D5E6F7A8B9C0D1E2F4 /* Services/LocalizationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/LocalizationManager.swift; sourceTree = "<group>"; };
 		9AA414DB2F2144B800CE76F7 /* DailyFreeStoriesCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyFreeStoriesCache.swift; sourceTree = "<group>"; };
 		9AAB74272F02E21D005C3BE7 /* Services/SupabaseConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/SupabaseConfig.swift; sourceTree = "<group>"; };
 		A0FFFFFF /* FairyTalesAI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FairyTalesAI.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -96,13 +119,38 @@
 		D9E2D5FB2EFD60A40082D3BF /* LanguageSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageSelectionView.swift; sourceTree = "<group>"; };
 		D9E2D5FD2EFD60A40082D3C0 /* SettingsPlaceholderViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPlaceholderViews.swift; sourceTree = "<group>"; };
 		D9E2D5FF2EFD60A40082D3C1 /* ThemeSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeSelectionView.swift; sourceTree = "<group>"; };
-		D9E2D6032EFD60A40082D3C4 /* Services/GuestDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/GuestDataManager.swift; sourceTree = "<group>"; };
 		D9E2D6072EFD60A40082D3C6 /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
-
 		D9E2D60B2EFD60A40082D3C8 /* CustomTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabBar.swift; sourceTree = "<group>"; };
 		D9E2D60D2EFD60A40082D3C9 /* MagicSegmentedSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MagicSegmentedSelector.swift; sourceTree = "<group>"; };
 		D9E2D60F2EFD60A40082D3CA /* ProtagonistStyleSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtagonistStyleSelector.swift; sourceTree = "<group>"; };
 		D9E2D6112EFD60A40082D3CB /* AgeGroupGridSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgeGroupGridSelector.swift; sourceTree = "<group>"; };
+		F1A2B3C4D5E6F7A8B9C0D1E2F4 /* Services/LocalizationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/LocalizationManager.swift; sourceTree = "<group>"; };
+		A1000101 /* FlagEmoji.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlagEmoji.swift; sourceTree = "<group>"; };
+		A1000103 /* FilterButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterButton.swift; sourceTree = "<group>"; };
+		A1000105 /* AnimatedBookIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedBookIcon.swift; sourceTree = "<group>"; };
+		A1000107 /* StoryLibraryRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryLibraryRow.swift; sourceTree = "<group>"; };
+		A1000109 /* StoryContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryContentView.swift; sourceTree = "<group>"; };
+		A100010B /* PaywallFeatureRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallFeatureRow.swift; sourceTree = "<group>"; };
+		A100010D /* ChildRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChildRowView.swift; sourceTree = "<group>"; };
+		A100010F /* ChildDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChildDetailView.swift; sourceTree = "<group>"; };
+		A1000111 /* FreeDemoStoryCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeDemoStoryCard.swift; sourceTree = "<group>"; };
+		A1000113 /* FeatureCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureCard.swift; sourceTree = "<group>"; };
+		A1000115 /* GetStartedCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetStartedCard.swift; sourceTree = "<group>"; };
+		A1000117 /* ChildProfileCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChildProfileCircle.swift; sourceTree = "<group>"; };
+		A1000119 /* StoryCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryCard.swift; sourceTree = "<group>"; };
+		A100011B /* ThemeButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeButton.swift; sourceTree = "<group>"; };
+		A100011D /* StoryReadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryReadingView.swift; sourceTree = "<group>"; };
+		A100011F /* ProfileSwitcherButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSwitcherButton.swift; sourceTree = "<group>"; };
+		A1000121 /* ChildPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChildPickerView.swift; sourceTree = "<group>"; };
+		A1000123 /* ShareSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSheet.swift; sourceTree = "<group>"; };
+		A1000125 /* ParentProfileCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParentProfileCard.swift; sourceTree = "<group>"; };
+		A1000127 /* ChildCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChildCardView.swift; sourceTree = "<group>"; };
+		A1000129 /* GuestModeBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuestModeBanner.swift; sourceTree = "<group>"; };
+		A100012B /* ProfileEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditView.swift; sourceTree = "<group>"; };
+		A100012D /* TabBarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarButton.swift; sourceTree = "<group>"; };
+		A100012F /* HeroInterestChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroInterestChip.swift; sourceTree = "<group>"; };
+		A1000131 /* StarParticleAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarParticleAnimation.swift; sourceTree = "<group>"; };
+		A1000133 /* EditChildView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditChildView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -139,6 +187,7 @@
 				A1000004 /* Assets.xcassets */,
 				A1000009 /* FairyTalesAI.entitlements */,
 				A0FFFFFA /* Preview Content */,
+				A1000134 /* Helpers */,
 				D9E2D5CD2EFD60A40082D3B4 /* Models */,
 				D9E2D5CF2EFD60A40082D3B4 /* Theme */,
 				D9E2D5D22EFD60A40082D3B4 /* ViewModels */,
@@ -149,7 +198,6 @@
 				9A88A6DF2F02EE2B009259D7 /* Services/StoriesService.swift */,
 				9A88A6E22F02EE2B009259D8 /* Services/ChildrenService.swift */,
 				F1A2B3C4D5E6F7A8B9C0D1E2F4 /* Services/LocalizationManager.swift */,
-				D9E2D6032EFD60A40082D3C4 /* Services/GuestDataManager.swift */,
 			);
 			path = FairyTalesAI;
 			sourceTree = "<group>";
@@ -200,20 +248,31 @@
 			path = ViewModels;
 			sourceTree = "<group>";
 		};
+		A1000134 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				A1000101 /* FlagEmoji.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
 		D9E2D5DA2EFD60A40082D3B4 /* Views */ = {
 			isa = PBXGroup;
 			children = (
 				D9E2D5D32EFD60A40082D3B4 /* AddChildView.swift */,
+				A1000133 /* EditChildView.swift */,
 				D9E2D5D52EFD60A40082D3B4 /* GenerateStoryView.swift */,
 				D9E2D5D62EFD60A40082D3B4 /* HomeView.swift */,
 				D9E2D5D72EFD60A40082D3B4 /* LibraryView.swift */,
+				70E32FB058A04056809C1CBD /* LoginView.swift */,
 				D9E2D5D82EFD60A40082D3B4 /* MainTabView.swift */,
 				D9E2D5D92EFD60A40082D3B4 /* SettingsView.swift */,
-				70E32FB058A04056809C1CBD /* LoginView.swift */,
 				D9E2D6072EFD60A40082D3C6 /* SignUpView.swift */,
-
 				D9E2D60B2EFD60A40082D3C8 /* CustomTabBar.swift */,
 				D9E2D5ED2EFD60A40082D3B8 /* PaywallView.swift */,
+				A100010F /* ChildDetailView.swift */,
+				A1000109 /* StoryContentView.swift */,
+				A100011D /* StoryReadingView.swift */,
 				D9E2D5EF2EFD60A40082D3B9 /* StoryResultView.swift */,
 				D9E2D6002EFD60A40082D3C2 /* Components */,
 				D9E2D6012EFD60A40082D3C3 /* Settings */,
@@ -224,13 +283,33 @@
 		D9E2D6002EFD60A40082D3C2 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				A1000105 /* AnimatedBookIcon.swift */,
+				A100010D /* ChildRowView.swift */,
 				D9E2D5F32EFD60A40082D3BB /* ChildSelectionButton.swift */,
+				A1000127 /* ChildCardView.swift */,
+				A1000121 /* ChildPickerView.swift */,
+				A1000117 /* ChildProfileCircle.swift */,
 				D9E2D5F52EFD60A40082D3BC /* DashedButton.swift */,
-				D9E2D5F72EFD60A40082D3BD /* SettingsRow.swift */,
-				D9E2D5F92EFD60A40082D3BE /* ThemeSelectionButton.swift */,
+				A1000103 /* FilterButton.swift */,
+				A1000111 /* FreeDemoStoryCard.swift */,
+				A1000113 /* FeatureCard.swift */,
+				A1000115 /* GetStartedCard.swift */,
+				A1000129 /* GuestModeBanner.swift */,
+				A100012F /* HeroInterestChip.swift */,
 				D9E2D60D2EFD60A40082D3C9 /* MagicSegmentedSelector.swift */,
+				A1000125 /* ParentProfileCard.swift */,
+				A100010B /* PaywallFeatureRow.swift */,
+				A100011F /* ProfileSwitcherButton.swift */,
 				D9E2D60F2EFD60A40082D3CA /* ProtagonistStyleSelector.swift */,
+				D9E2D5F72EFD60A40082D3BD /* SettingsRow.swift */,
+				A1000123 /* ShareSheet.swift */,
+				A1000131 /* StarParticleAnimation.swift */,
+				A1000119 /* StoryCard.swift */,
+				A1000107 /* StoryLibraryRow.swift */,
 				D9E2D6112EFD60A40082D3CB /* AgeGroupGridSelector.swift */,
+				A100012D /* TabBarButton.swift */,
+				A100011B /* ThemeButton.swift */,
+				D9E2D5F92EFD60A40082D3BE /* ThemeSelectionButton.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -239,6 +318,7 @@
 			isa = PBXGroup;
 			children = (
 				D9E2D5FB2EFD60A40082D3BF /* LanguageSelectionView.swift */,
+				A100012B /* ProfileEditView.swift */,
 				D9E2D5FD2EFD60A40082D3C0 /* SettingsPlaceholderViews.swift */,
 				D9E2D5FF2EFD60A40082D3C1 /* ThemeSelectionView.swift */,
 			);
@@ -329,7 +409,6 @@
 				D9E2D5E92EFD60A40082D3B6 /* UserSettings.swift in Sources */,
 				926E6249870741DCB9C75C62 /* LoginView.swift in Sources */,
 				D9E2D6062EFD60A40082D3C6 /* SignUpView.swift in Sources */,
-
 				D9E2D60A2EFD60A40082D3C8 /* CustomTabBar.swift in Sources */,
 				D9E2D5EC2EFD60A40082D3B8 /* PaywallView.swift in Sources */,
 				D9E2D5DE2EFD60A40082D3B4 /* AppTheme.swift in Sources */,
@@ -344,7 +423,6 @@
 				9AA414D72F21442600CE76F7 /* DailyFreeStoriesCacheService.swift in Sources */,
 				9A88A6E12F02EE2B009259D8 /* Services/ChildrenService.swift in Sources */,
 				F1A2B3C4D5E6F7A8B9C0D1E2F3 /* Services/LocalizationManager.swift in Sources */,
-				D9E2D6022EFD60A40082D3C4 /* Services/GuestDataManager.swift in Sources */,
 				D9E2D5E42EFD60A40082D3B4 /* SettingsView.swift in Sources */,
 				D9E2D5E52EFD60A40082D3B4 /* MainTabView.swift in Sources */,
 				D9E2D5E62EFD60A40082D3B4 /* Child.swift in Sources */,
@@ -361,6 +439,32 @@
 				D9E2D5FA2EFD60A40082D3BF /* LanguageSelectionView.swift in Sources */,
 				D9E2D5FC2EFD60A40082D3C0 /* SettingsPlaceholderViews.swift in Sources */,
 				D9E2D5FE2EFD60A40082D3C1 /* ThemeSelectionView.swift in Sources */,
+				A1000100 /* Helpers/FlagEmoji.swift in Sources */,
+				A1000102 /* FilterButton.swift in Sources */,
+				A1000104 /* AnimatedBookIcon.swift in Sources */,
+				A1000106 /* StoryLibraryRow.swift in Sources */,
+				A1000108 /* StoryContentView.swift in Sources */,
+				A100010A /* PaywallFeatureRow.swift in Sources */,
+				A100010C /* ChildRowView.swift in Sources */,
+				A100010E /* ChildDetailView.swift in Sources */,
+				A1000110 /* FreeDemoStoryCard.swift in Sources */,
+				A1000112 /* FeatureCard.swift in Sources */,
+				A1000114 /* GetStartedCard.swift in Sources */,
+				A1000116 /* ChildProfileCircle.swift in Sources */,
+				A1000118 /* StoryCard.swift in Sources */,
+				A100011A /* ThemeButton.swift in Sources */,
+				A100011C /* StoryReadingView.swift in Sources */,
+				A100011E /* ProfileSwitcherButton.swift in Sources */,
+				A1000120 /* ChildPickerView.swift in Sources */,
+				A1000122 /* ShareSheet.swift in Sources */,
+				A1000124 /* ParentProfileCard.swift in Sources */,
+				A1000126 /* ChildCardView.swift in Sources */,
+				A1000128 /* GuestModeBanner.swift in Sources */,
+				A100012A /* ProfileEditView.swift in Sources */,
+				A100012C /* TabBarButton.swift in Sources */,
+				A100012E /* HeroInterestChip.swift in Sources */,
+				A1000130 /* StarParticleAnimation.swift in Sources */,
+				A1000132 /* EditChildView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
