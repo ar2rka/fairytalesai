@@ -4,16 +4,29 @@ import SwiftData
 @Model
 final class DailyFreeStoriesCache {
     var cachedDate: String // YYYY-MM-DD format
-    var stories: [CachedStory]
+    @Attribute(.externalStorage) var storiesData: Data // Хранение историй как Data
     
-    init(cachedDate: String, stories: [CachedStory]) {
+    init(cachedDate: String, storiesData: Data) {
         self.cachedDate = cachedDate
-        self.stories = stories
+        self.storiesData = storiesData
+    }
+    
+    // Вспомогательные методы для работы со Story
+    func getStories() -> [Story]? {
+        let decoder = JSONDecoder()
+        return try? decoder.decode([CachedStoryData].self, from: storiesData).map { $0.toStory() }
+    }
+    
+    static func create(cachedDate: String, stories: [Story]) -> DailyFreeStoriesCache? {
+        let encoder = JSONEncoder()
+        let cachedData = stories.map { CachedStoryData.fromStory($0) }
+        guard let data = try? encoder.encode(cachedData) else { return nil }
+        return DailyFreeStoriesCache(cachedDate: cachedDate, storiesData: data)
     }
 }
 
-@Model
-final class CachedStory {
+// Простая структура для кодирования/декодирования
+struct CachedStoryData: Codable {
     var id: UUID
     var title: String
     var content: String
@@ -22,17 +35,6 @@ final class CachedStory {
     var plot: String?
     var language: String?
     var ageCategory: String
-    
-    init(id: UUID, title: String, content: String, theme: String, duration: Int, plot: String?, language: String?, ageCategory: String) {
-        self.id = id
-        self.title = title
-        self.content = content
-        self.theme = theme
-        self.duration = duration
-        self.plot = plot
-        self.language = language
-        self.ageCategory = ageCategory
-    }
     
     func toStory() -> Story {
         return Story(
@@ -51,8 +53,8 @@ final class CachedStory {
         )
     }
     
-    static func fromStory(_ story: Story) -> CachedStory {
-        return CachedStory(
+    static func fromStory(_ story: Story) -> CachedStoryData {
+        return CachedStoryData(
             id: story.id,
             title: story.title,
             content: story.content,

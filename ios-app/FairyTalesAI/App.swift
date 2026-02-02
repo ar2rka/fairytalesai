@@ -15,9 +15,8 @@ struct FairyTalesAIApp: App {
     }
     
     // SwiftData ModelContainer для кеширования ежедневных историй
-    // SwiftData ModelContainer для кеширования ежедневных историй
     private let modelContainer: ModelContainer = {
-        let schema = Schema([DailyFreeStoriesCache.self, CachedStory.self])
+        let schema = Schema([DailyFreeStoriesCache.self])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
         do {

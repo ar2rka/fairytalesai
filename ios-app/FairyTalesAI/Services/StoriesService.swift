@@ -122,13 +122,14 @@ class StoriesService: ObservableObject {
     func fetchDailyFreeStories(modelContext: ModelContext? = nil) async throws -> [Story] {
         // Сначала проверяем кеш, если передан ModelContext
         if let modelContext = modelContext {
-            if let cachedStories = DailyFreeStoriesCacheService.shared.getCachedStories(modelContext: modelContext) {
-                print("✅ Использованы истории из кеша")
+            if let cachedStories = DailyFreeStoriesCacheService.shared.getCachedStories(modelContext: modelContext),
+               !cachedStories.isEmpty {
+                print("✅ Использованы истории из кеша, количество: \(cachedStories.count)")
                 return cachedStories
             }
         }
         
-        // Если кеша нет или ModelContext не передан, загружаем из Supabase
+        // Если кеша нет, он пустой, или ModelContext не передан, загружаем из Supabase
         guard let supabase = supabase else {
             throw StoriesServiceError.supabaseNotConfigured
         }
@@ -149,7 +150,7 @@ class StoriesService: ObservableObject {
             .value
         
         let stories = response.map { $0.toStory() }
-        print("✅ Загружено \(stories.count) ежедневных бесплатных историй")
+        print("✅ Загружено \(stories.count) ежедневных бесплатных историй из Supabase")
         
         // Сохраняем в кеш, если передан ModelContext
         if let modelContext = modelContext {
