@@ -70,7 +70,7 @@ def sample_story():
         language=Language.ENGLISH,
         child_id="child-456",
         child_name="Emma",
-        child_age=6,
+        age_category="5-7",
         child_gender="female",
         child_interests=["unicorns", "fairies"],
         story_length=StoryLength(minutes=5),

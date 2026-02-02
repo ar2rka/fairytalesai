@@ -202,7 +202,7 @@ class LangGraphWorkflowService:
                 original_prompt=prompt,
                 child_id=str(child.id) if child.id else "",
                 child_name=child.name,
-                child_age_category=child.age_category,
+                age_category=child.age_category,
                 child_gender=child.gender.value,
                 child_interests=child.interests or [],
                 story_type=story_type,

@@ -530,7 +530,7 @@ class SupabaseClient:
             key_mapping = {
                 'child_id': 'child_id',
                 'child_name': 'child_name',
-                'child_age_category': 'child_age_category',
+                'age_category': 'age_category',
                 'child_gender': 'child_gender',
                 'child_interests': 'child_interests',
                 'hero_id': 'hero_id',
@@ -571,9 +571,9 @@ class SupabaseClient:
             if response.data:
                 # Return the saved story with generated ID and timestamps
                 saved_story_data = response.data[0]
-                # Map snake_case keys back to camelCase keys for the model
+                # Map DB column names back to model keys (py_key -> db_key in key_mapping)
                 model_story_data = {}
-                for db_key, py_key in key_mapping.items():
+                for py_key, db_key in key_mapping.items():
                     if db_key in saved_story_data:
                         model_story_data[py_key] = saved_story_data[db_key]
                 
@@ -605,7 +605,7 @@ class SupabaseClient:
                 key_mapping = {
                     'child_id': 'child_id',
                     'child_name': 'child_name',
-                    'child_age_category': 'child_age_category',
+                    'age_category': 'age_category',
                     'child_gender': 'child_gender',
                     'child_interests': 'child_interests',
                     'story_type': 'story_type',
@@ -664,7 +664,7 @@ class SupabaseClient:
             key_mapping = {
                 'child_id': 'child_id',
                 'child_name': 'child_name',
-                'child_age_category': 'child_age_category',
+                'age_category': 'age_category',
                 'child_gender': 'child_gender',
                 'child_interests': 'child_interests',
                 'hero_id': 'hero_id',
@@ -723,7 +723,7 @@ class SupabaseClient:
             key_mapping = {
                 'child_id': 'child_id',
                 'child_name': 'child_name',
-                'child_age_category': 'child_age_category',
+                'age_category': 'age_category',
                 'child_gender': 'child_gender',
                 'child_interests': 'child_interests',
                 'created_at': 'created_at',
@@ -778,7 +778,7 @@ class SupabaseClient:
             key_mapping = {
                 'child_id': 'child_id',
                 'child_name': 'child_name',
-                'child_age_category': 'child_age_category',
+                'age_category': 'age_category',
                 'child_gender': 'child_gender',
                 'child_interests': 'child_interests',
                 'story_type': 'story_type',
@@ -845,7 +845,7 @@ class SupabaseClient:
             key_mapping = {
                 'child_id': 'child_id',
                 'child_name': 'child_name',
-                'child_age_category': 'child_age_category',
+                'age_category': 'age_category',
                 'child_gender': 'child_gender',
                 'child_interests': 'child_interests',
                 'story_type': 'story_type',
@@ -924,7 +924,7 @@ class SupabaseClient:
                 key_mapping = {
                     'child_id': 'child_id',
                     'child_name': 'child_name',
-                    'child_age_category': 'child_age_category',
+                    'age_category': 'age_category',
                     'child_gender': 'child_gender',
                     'child_interests': 'child_interests',
                     'created_at': 'created_at',
@@ -992,7 +992,7 @@ class SupabaseClient:
                 key_mapping = {
                     'child_id': 'child_id',
                     'child_name': 'child_name',
-                    'child_age_category': 'child_age_category',
+                    'age_category': 'age_category',
                     'child_gender': 'child_gender',
                     'child_interests': 'child_interests',
                     'story_type': 'story_type',
@@ -1083,7 +1083,7 @@ class SupabaseClient:
                 key_mapping = {
                     'child_id': 'child_id',
                     'child_name': 'child_name',
-                    'child_age_category': 'child_age_category',
+                    'age_category': 'age_category',
                     'child_gender': 'child_gender',
                     'child_interests': 'child_interests',
                     'story_type': 'story_type',

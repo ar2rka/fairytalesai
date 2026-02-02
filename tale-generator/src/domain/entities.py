@@ -126,7 +126,7 @@ class Story:
     story_type: str = "child"  # child, hero, or combined
     child_id: Optional[str] = None
     child_name: Optional[str] = None
-    child_age_category: Optional[str] = None
+    age_category: Optional[str] = None
     child_gender: Optional[str] = None
     child_interests: Optional[List[str]] = None
     hero_id: Optional[str] = None

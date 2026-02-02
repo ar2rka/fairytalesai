@@ -116,7 +116,7 @@ class StoryDBResponseDTO(BaseModel):
     language: str = Field(..., description="Story language")
     child_id: Optional[str] = Field(None, description="Child ID")
     child_name: Optional[str] = Field(None, description="Child name")
-    child_age: Optional[int] = Field(None, description="Child age")
+    age_category: Optional[str] = Field(None, description="Child age category (e.g. '2-3', '3-5', '5-7')")
     child_gender: Optional[str] = Field(None, description="Child gender")
     child_interests: Optional[List[str]] = Field(None, description="Child interests")
     story_length: Optional[int] = Field(None, description="Story length in minutes")

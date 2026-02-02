@@ -790,15 +790,15 @@ class OpenRouterClient:
                 story_length_minutes = 5
             
             # Default age_category if not provided
-            child_age_category = "3-5"  # Default age category
+            age_category = "3-5"  # Default age category
             
-            logger.debug(f"Using child_name={child_name}, child_age_category={child_age_category} for workflow")
+            logger.debug(f"Using child_name={child_name}, age_category={age_category} for workflow")
             
             # Create child entity for workflow
             try:
                 child = Child(
                     name=child_name,
-                    age_category=child_age_category,
+                    age_category=age_category,
                     gender=Gender(child_gender),
                     interests=child_interests
                 )
@@ -823,7 +823,7 @@ class OpenRouterClient:
                 original_prompt=prompt,
                 child_id="",
                 child_name=child.name,
-                child_age_category=child.age_category,
+                age_category=child.age_category,
                 child_gender=child.gender.value,
                 child_interests=child.interests or [],
                 story_type="child",

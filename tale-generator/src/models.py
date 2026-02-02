@@ -101,7 +101,7 @@ class StoryDB(BaseModel):
     # Reference to child instead of storing child data directly
     child_id: Optional[str] = None
     child_name: Optional[str] = None
-    child_age_category: Optional[str] = None
+    age_category: Optional[str] = None
     child_gender: Optional[str] = None
     child_interests: Optional[List[str]] = None
     # Reference to hero for hero and combined stories

@@ -51,7 +51,7 @@ class StoryService:
             language=language,
             child_id=child.id if child else None,
             child_name=child.name if child else None,
-            child_age_category=child.age_category if child else None,
+            age_category=child.age_category if child else None,
             child_gender=child.gender.value if child else None,
             child_interests=child.interests if child else None,
             story_length=story_length,

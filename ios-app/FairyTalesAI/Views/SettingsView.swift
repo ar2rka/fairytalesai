@@ -5,8 +5,8 @@ import AuthenticationServices
 struct SettingsView: View {
     @EnvironmentObject var childrenStore: ChildrenStore
     @EnvironmentObject var authService: AuthService
+    @EnvironmentObject var userSettings: UserSettings
     @AppStorage("pushNotificationsEnabled") private var pushNotificationsEnabled = true
-    @AppStorage("selectedLanguage") private var selectedLanguage = "English"
     @AppStorage("themeMode") private var themeModeRaw = ThemeMode.system.rawValue
     @Environment(\.colorScheme) var colorScheme
     @State private var showingShareSheet = false
@@ -239,7 +239,7 @@ struct SettingsView: View {
                         title: LocalizationManager.shared.settingsLanguage,
                         trailing: {
                             HStack {
-                                Text(selectedLanguage == "English" ? LocalizationManager.shared.languageEnglish : LocalizationManager.shared.languageRussian)
+                                Text(userSettings.selectedLanguage == "English" ? LocalizationManager.shared.languageEnglish : LocalizationManager.shared.languageRussian)
                                     .font(.system(size: 14))
                                     .foregroundColor(AppTheme.primaryPurple)
                                 Image(systemName: "chevron.right")

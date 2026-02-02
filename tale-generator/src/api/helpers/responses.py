@@ -60,7 +60,7 @@ async def save_story(
         moral=moral,
         child_id=child.id,
         child_name=child.name,
-        child_age_category=child.age_category,
+        age_category=child.age_category,
         child_gender=child.gender.value,
         child_interests=child.interests,
         hero_id=hero.id if hero else None,
