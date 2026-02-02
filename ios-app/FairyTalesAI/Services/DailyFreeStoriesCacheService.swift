@@ -25,9 +25,15 @@ class DailyFreeStoriesCacheService {
         
         do {
             let cached = try modelContext.fetch(descriptor).first
-            if let cached = cached {
-                print("📦 Найдены истории в кеше для даты: \(currentDateString)")
-                return cached.stories.map { $0.toStory() }
+            if let cached = cached, let stories = cached.getStories() {
+                // Возвращаем истории только если их количество > 0
+                // Если в кеше 0 историй, возвращаем nil, чтобы загрузить из Supabase
+                if stories.isEmpty {
+                    print("⚠️ В кеше для даты \(currentDateString) нет историй (0 записей), требуется загрузка из Supabase")
+                    return nil
+                }
+                print("📦 Найдены истории в кеше для даты: \(currentDateString), количество: \(stories.count)")
+                return stories
             }
         } catch {
             print("❌ Ошибка чтения кеша: \(error.localizedDescription)")
@@ -40,17 +46,15 @@ class DailyFreeStoriesCacheService {
     func saveStoriesToCache(_ stories: [Story], modelContext: ModelContext) {
         let currentDateString = getCurrentDateString()
         
-        // Удаляем старые кешированные истории
-        clearOldCache(modelContext: modelContext)
+        // Удаляем все старые кеши
+        clearAllCache(modelContext: modelContext)
         
-        // Создаем новые кешированные истории и вставляем их в контекст
-        let cachedStories = stories.map { story -> CachedStory in
-            let cachedStory = CachedStory.fromStory(story)
-            modelContext.insert(cachedStory)
-            return cachedStory
+        // Создаем новый кеш с помощью статического метода
+        guard let cache = DailyFreeStoriesCache.create(cachedDate: currentDateString, stories: stories) else {
+            print("❌ Не удалось создать кеш для даты: \(currentDateString)")
+            return
         }
         
-        let cache = DailyFreeStoriesCache(cachedDate: currentDateString, stories: cachedStories)
         modelContext.insert(cache)
         
         do {
@@ -61,25 +65,22 @@ class DailyFreeStoriesCacheService {
         }
     }
     
-    /// Очищает старые кешированные истории (для других дат)
-    private func clearOldCache(modelContext: ModelContext) {
-        let currentDateString = getCurrentDateString()
-        
-        let descriptor = FetchDescriptor<DailyFreeStoriesCache>(
-            predicate: #Predicate { $0.cachedDate != currentDateString }
-        )
+    /// Очищает все кешированные истории
+    private func clearAllCache(modelContext: ModelContext) {
+        let descriptor = FetchDescriptor<DailyFreeStoriesCache>()
         
         do {
-            let oldCaches = try modelContext.fetch(descriptor)
-            for cache in oldCaches {
+            let allCaches = try modelContext.fetch(descriptor)
+            for cache in allCaches {
                 modelContext.delete(cache)
             }
+            
             try modelContext.save()
-            if !oldCaches.isEmpty {
-                print("🗑️ Удалено \(oldCaches.count) старых кешей")
+            if !allCaches.isEmpty {
+                print("🗑️ Удалено \(allCaches.count) старых кешей")
             }
         } catch {
-            print("❌ Ошибка очистки старого кеша: \(error.localizedDescription)")
+            print("❌ Ошибка очистки кеша: \(error.localizedDescription)")
         }
     }
 }
