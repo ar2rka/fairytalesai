@@ -21,16 +21,31 @@ class GenerateStoryViewModel: ObservableObject {
         }
     }
     
+    /// Enable Generate when: child selected AND (theme selected OR plot ≥ 10 chars).
     var canGenerate: Bool {
-        selectedChildId != nil && selectedTheme != nil
+        guard selectedChildId != nil else { return false }
+        let hasTheme = selectedTheme != nil
+        let plotTrimmed = plot.trimmingCharacters(in: .whitespaces)
+        let hasPlot = plotTrimmed.count >= 10
+        return hasTheme || hasPlot
     }
-    
+
+    /// Theme to send to API: selected theme, or "Animals" when only plot is filled.
+    var effectiveTheme: StoryTheme? {
+        if let t = selectedTheme { return t }
+        let plotTrimmed = plot.trimmingCharacters(in: .whitespaces)
+        if plotTrimmed.count >= 10 {
+            return StoryTheme.allThemes.first { $0.name == "Animals" }
+        }
+        return nil
+    }
+
     func generateStory(
         userSettings: UserSettings,
         storiesStore: StoriesStore,
         childrenStore: ChildrenStore
     ) {
-        guard let theme = selectedTheme else { return }
+        guard let theme = effectiveTheme else { return }
         
         let finalDuration = Int(selectedDuration)
         

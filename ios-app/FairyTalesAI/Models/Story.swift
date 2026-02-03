@@ -87,6 +87,47 @@ struct StoryTheme: Identifiable, Hashable {
         StoryTheme(name: "Magic School", description: "Wizardry & Spells", emoji: "🏰"),
         StoryTheme(name: "Robots", description: "Tech Adventures", emoji: "🤖")
     ]
+
+    /// Calm themes for evening (6pm–10pm): gentle, bedtime-friendly.
+    private static let calmThemeNames = ["Mermaids", "Animals"]
+    /// Adventure themes for daytime/afternoon.
+    private static let adventureThemeNames = ["Space", "Pirates", "Dinosaurs"]
+
+    /// Returns a theme based on current time: calm in evening (18–22), adventure otherwise.
+    static var tonightsPick: StoryTheme {
+        let hour = Calendar.current.component(.hour, from: Date())
+        let isEvening = (18..<22).contains(hour)
+        let names = isEvening ? calmThemeNames : adventureThemeNames
+        let name = names[abs(hour) % names.count]
+        return allThemes.first { $0.name == name } ?? allThemes[0]
+    }
+
+    /// Age-based theme for Create Story (Slot 2). Uses Animals as fallback when child/age unknown.
+    private static func ageBasedTheme(for child: Child?) -> StoryTheme {
+        guard let child = child else {
+            return allThemes.first { $0.name == "Animals" } ?? allThemes[0]
+        }
+        switch child.ageCategory {
+        case .twoThree: return allThemes.first { $0.name == "Animals" } ?? allThemes[0]
+        case .threeFive: return allThemes.first { $0.name == "Dinosaurs" } ?? allThemes[0]
+        case .fiveSeven, .eightPlus: return allThemes.first { $0.name == "Space" } ?? allThemes[0]
+        }
+    }
+
+    /// Exactly 3 themes for Create Story: Tonight's Pick, age-based, then Space (🚀) — deduped.
+    static func visibleThemes(for child: Child?) -> [StoryTheme] {
+        let pick = tonightsPick
+        var ageBased = ageBasedTheme(for: child)
+        let space = allThemes.first { $0.name == "Space" } ?? allThemes[0]
+        if ageBased.name == pick.name {
+            ageBased = space
+        }
+        var third = space
+        if third.name == pick.name || third.name == ageBased.name {
+            third = allThemes.first { $0.name == "Pirates" } ?? allThemes[0]
+        }
+        return [pick, ageBased, third]
+    }
 }
 
 

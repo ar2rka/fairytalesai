@@ -39,6 +39,7 @@
 		A1000116 /* ChildProfileCircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000117 /* ChildProfileCircle.swift */; };
 		A1000118 /* StoryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000119 /* StoryCard.swift */; };
 		A100011A /* ThemeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100011B /* ThemeButton.swift */; };
+		A1000136 /* TonightsPickCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000135 /* TonightsPickCard.swift */; };
 		A100011C /* StoryReadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100011D /* StoryReadingView.swift */; };
 		A100011E /* ProfileSwitcherButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100011F /* ProfileSwitcherButton.swift */; };
 		A1000120 /* ChildPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000121 /* ChildPickerView.swift */; };
@@ -112,6 +113,7 @@
 		A1000117 /* ChildProfileCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChildProfileCircle.swift; sourceTree = "<group>"; };
 		A1000119 /* StoryCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryCard.swift; sourceTree = "<group>"; };
 		A100011B /* ThemeButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeButton.swift; sourceTree = "<group>"; };
+		A1000135 /* TonightsPickCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TonightsPickCard.swift; sourceTree = "<group>"; };
 		A100011D /* StoryReadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryReadingView.swift; sourceTree = "<group>"; };
 		A100011F /* ProfileSwitcherButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSwitcherButton.swift; sourceTree = "<group>"; };
 		A1000121 /* ChildPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChildPickerView.swift; sourceTree = "<group>"; };
@@ -312,6 +314,7 @@
 				D9E2D6112EFD60A40082D3CB /* AgeGroupGridSelector.swift */,
 				A100012D /* TabBarButton.swift */,
 				A100011B /* ThemeButton.swift */,
+				A1000135 /* TonightsPickCard.swift */,
 				D9E2D5F92EFD60A40082D3BE /* ThemeSelectionButton.swift */,
 			);
 			path = Components;
@@ -457,6 +460,7 @@
 				A1000116 /* ChildProfileCircle.swift in Sources */,
 				A1000118 /* StoryCard.swift in Sources */,
 				A100011A /* ThemeButton.swift in Sources */,
+				A1000136 /* TonightsPickCard.swift in Sources */,
 				A100011C /* StoryReadingView.swift in Sources */,
 				A100011E /* ProfileSwitcherButton.swift in Sources */,
 				A1000120 /* ChildPickerView.swift in Sources */,

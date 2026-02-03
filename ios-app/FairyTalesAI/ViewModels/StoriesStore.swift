@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 import Supabase
+import Combine
 
 @MainActor
 class StoriesStore: ObservableObject {
@@ -19,9 +20,26 @@ class StoriesStore: ObservableObject {
     private var currentOffset = 0
     private var isLoadingPage = false
     private var supabase: SupabaseClient?
+    private var authCancellable: AnyCancellable?
     
     init() {
         setupSupabase()
+        // Show cached stories immediately so Home "Continue" button can appear without waiting for network
+        loadStories()
+        // Fetch stories when user becomes available (app launch or sign-in)
+        authCancellable = authService.$currentUser
+            .receive(on: RunLoop.main)
+            .sink { [weak self] user in
+                guard let self = self else { return }
+                Task { @MainActor in
+                    if let userId = user?.id {
+                        await self.loadStoriesFromSupabase(userId: userId)
+                    } else {
+                        self.stories = []
+                        self.saveStories()
+                    }
+                }
+            }
     }
     
     private func setupSupabase() {
@@ -72,6 +90,7 @@ class StoriesStore: ObservableObject {
             stories = fetchedStories
             currentOffset = fetchedStories.count
             hasMoreStories = fetchedStories.count >= pageSize
+            saveStories()
         } catch {
             errorMessage = error.localizedDescription
             print("❌ Ошибка загрузки историй: \(error.localizedDescription)")

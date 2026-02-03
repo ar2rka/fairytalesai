@@ -9,6 +9,8 @@ struct GenerateStoryView: View {
     @Environment(\.dismiss) var dismiss
     
     @StateObject private var viewModel = GenerateStoryViewModel()
+    @State private var showDisabledGenerateAlert = false
+    @State private var showAllThemes = false
     
     var body: some View {
         NavigationView {
@@ -56,12 +58,14 @@ struct GenerateStoryView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     ScrollView {
-                        VStack(spacing: 32) {
+                        VStack(spacing: 24) {
                             childrenSelectionSection
                             
                             durationSection
                             
                             themeSelectionSection
+                            
+                            seeAllThemesButton
                             
                             plotSection
                             
@@ -91,6 +95,16 @@ struct GenerateStoryView: View {
             }
             .task {
                 await childrenStore.loadChildrenIfNeeded()
+            }
+            .onAppear {
+                if childrenStore.children.count == 1 {
+                    viewModel.selectedChildId = childrenStore.children.first?.id
+                }
+            }
+            .onChange(of: childrenStore.children.count) { _, newCount in
+                if newCount == 1 {
+                    viewModel.selectedChildId = childrenStore.children.first?.id
+                }
             }
             .sheet(isPresented: $viewModel.showingAddChild) {
                 AddChildView()
@@ -209,24 +223,69 @@ struct GenerateStoryView: View {
         .padding(.horizontal)
     }
     
+    private var selectedChildForThemes: Child? {
+        guard let id = viewModel.selectedChildId else { return nil }
+        return childrenStore.children.first { $0.id == id }
+    }
+
     private var themeSelectionSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 10) {
             Text(LocalizationManager.shared.generateStoryChooseTheme)
                 .font(.system(size: 20, weight: .bold))
                 .foregroundColor(AppTheme.textPrimary(for: colorScheme))
             
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
-                ForEach(StoryTheme.allThemes) { theme in
-                    ThemeSelectionButton(
-                        theme: theme,
-                        isSelected: viewModel.selectedTheme?.id == theme.id
-                    ) {
-                        viewModel.selectedTheme = viewModel.selectedTheme?.id == theme.id ? nil : theme
+            if showAllThemes {
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+                    ForEach(StoryTheme.allThemes, id: \.name) { theme in
+                        ThemeSelectionButton(
+                            theme: theme,
+                            isSelected: viewModel.selectedTheme?.name == theme.name
+                        ) {
+                            viewModel.selectedTheme = viewModel.selectedTheme?.name == theme.name ? nil : theme
+                        }
+                    }
+                }
+            } else {
+                HStack(alignment: .top, spacing: 10) {
+                    ForEach(StoryTheme.visibleThemes(for: selectedChildForThemes), id: \.name) { theme in
+                        ThemeSelectionButton(
+                            theme: theme,
+                            isSelected: viewModel.selectedTheme?.name == theme.name
+                        ) {
+                            viewModel.selectedTheme = viewModel.selectedTheme?.name == theme.name ? nil : theme
+                        }
                     }
                 }
             }
         }
         .padding(.horizontal)
+    }
+
+    private var seeAllThemesButton: some View {
+        Button(action: {
+            withAnimation(.easeInOut(duration: 0.25)) {
+                showAllThemes.toggle()
+            }
+        }) {
+            HStack(spacing: 4) {
+                if showAllThemes {
+                    Text(LocalizationManager.shared.generateStoryShowLess)
+                    Image(systemName: "chevron.up")
+                        .font(.system(size: 12, weight: .semibold))
+                } else {
+                    Text(LocalizationManager.shared.generateStorySeeAllThemes)
+                    Text(LocalizationManager.shared.generateStoryMoreThemes)
+                        .foregroundColor(Color(white: 0.55))
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 12, weight: .semibold))
+                }
+            }
+            .font(.system(size: 15, weight: .medium))
+            .foregroundColor(AppTheme.primaryPurple)
+        }
+        .frame(maxWidth: .infinity, alignment: .trailing)
+        .padding(.horizontal)
+        .padding(.top, 2)
     }
     
     private var plotSection: some View {
@@ -236,12 +295,6 @@ struct GenerateStoryView: View {
                 .foregroundColor(AppTheme.textPrimary(for: colorScheme))
             
             ZStack(alignment: .topLeading) {
-                if viewModel.plot.isEmpty {
-                    Text(LocalizationManager.shared.generateStoryDescribeStory)
-                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                        .padding()
-                }
-                
                 TextEditor(text: $viewModel.plot)
                     .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                     .scrollContentBackground(.hidden)
@@ -249,43 +302,79 @@ struct GenerateStoryView: View {
                     .frame(minHeight: 120)
                     .background(AppTheme.cardBackground(for: colorScheme))
                     .cornerRadius(25)
+                    .overlay(alignment: .topLeading) {
+                        if viewModel.plot.isEmpty {
+                            Text(LocalizationManager.shared.generateStoryPlotPlaceholder)
+                                .font(.system(size: 16, weight: .regular))
+                                .italic()
+                                .foregroundColor(Color(red: 0.72, green: 0.75, blue: 0.8)) // Lighter gray - visible on dark card
+                                .multilineTextAlignment(.leading)
+                                .padding(12)
+                                .allowsHitTesting(false)
+                        }
+                    }
             }
         }
         .padding(.horizontal)
     }
     
     private var generateButton: some View {
-        Button(action: {
-            // Очищаем предыдущую ошибку перед новой попыткой
-            storiesStore.errorMessage = nil
-            viewModel.generateStory(
-                userSettings: userSettings,
-                storiesStore: storiesStore,
-                childrenStore: childrenStore
-            )
-        }) {
-            HStack {
-                if storiesStore.isGenerating {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                } else {
-                    Image(systemName: "wand.and.stars")
+        VStack(spacing: 8) {
+            Button(action: {
+                if !viewModel.canGenerate {
+                    showDisabledGenerateAlert = true
+                    return
                 }
-                Text(storiesStore.isGenerating ? LocalizationManager.shared.generateStoryGenerating : LocalizationManager.shared.generateStoryGenerateStory)
-                    .font(.system(size: 18, weight: .bold))
+                storiesStore.errorMessage = nil
+                viewModel.generateStory(
+                    userSettings: userSettings,
+                    storiesStore: storiesStore,
+                    childrenStore: childrenStore
+                )
+            }) {
+                HStack {
+                    if storiesStore.isGenerating {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    } else {
+                        Image(systemName: "wand.and.stars")
+                    }
+                    Text(storiesStore.isGenerating ? LocalizationManager.shared.generateStoryGenerating : LocalizationManager.shared.generateStoryGenerateStory)
+                        .font(.system(size: 18, weight: .bold))
+                }
+                .foregroundColor(viewModel.canGenerate && !storiesStore.isGenerating ? .white : Color.white.opacity(0.75))
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 25)
+                        .fill(AppTheme.primaryPurple)
+                        .opacity(viewModel.canGenerate && !storiesStore.isGenerating ? 1.0 : 0.6)
+                )
+                .shadow(
+                    color: viewModel.canGenerate && !storiesStore.isGenerating ? AppTheme.primaryPurple.opacity(0.4) : .clear,
+                    radius: viewModel.canGenerate ? 12 : 0,
+                    x: 0,
+                    y: 4
+                )
+                .opacity(viewModel.canGenerate && !storiesStore.isGenerating ? 1.0 : 0.5)
             }
-            .foregroundColor(.white)
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(
-                viewModel.canGenerate && !storiesStore.isGenerating ?
-                AppTheme.primaryPurple : AppTheme.primaryPurple.opacity(0.5)
-            )
-            .cornerRadius(25)
+            .disabled(storiesStore.isGenerating)
+            .buttonStyle(PlainButtonStyle())
+            .animation(.easeInOut(duration: 0.2), value: viewModel.canGenerate)
+
+            if !viewModel.canGenerate {
+                Text(LocalizationManager.shared.generateStoryPickThemeOrPlot)
+                    .font(.system(size: 13))
+                    .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+            }
         }
-        .disabled(!viewModel.canGenerate || storiesStore.isGenerating)
         .padding(.horizontal)
         .padding(.bottom, 100)
+        .alert(LocalizationManager.shared.generateStoryChooseAdventure, isPresented: $showDisabledGenerateAlert) {
+            Button(LocalizationManager.shared.generateStoryGotIt, role: .cancel) { }
+        } message: {
+            Text(LocalizationManager.shared.generateStoryPickThemeOrPlotAlert)
+        }
     }
     
     private func errorAlertView(message: String) -> some View {

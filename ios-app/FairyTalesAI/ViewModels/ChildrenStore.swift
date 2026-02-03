@@ -5,6 +5,7 @@ import Combine
 @MainActor
 class ChildrenStore: ObservableObject {
     @Published var children: [Child] = []
+    @Published var selectedChildId: UUID?
     @Published var isLoading = false
     @Published var errorMessage: String?
     

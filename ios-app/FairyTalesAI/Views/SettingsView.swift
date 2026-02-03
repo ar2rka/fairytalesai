@@ -7,16 +7,11 @@ struct SettingsView: View {
     @EnvironmentObject var authService: AuthService
     @EnvironmentObject var userSettings: UserSettings
     @AppStorage("pushNotificationsEnabled") private var pushNotificationsEnabled = true
-    @AppStorage("themeMode") private var themeModeRaw = ThemeMode.system.rawValue
     @Environment(\.colorScheme) var colorScheme
     @State private var showingShareSheet = false
     @State private var showingAddChild = false
     @State private var showLogoutAlert = false
     @State private var showingProfileEdit = false
-    
-    private var themeMode: ThemeMode {
-        ThemeMode(rawValue: themeModeRaw) ?? .system
-    }
     
     // Check if user is logged in (has email, not anonymous)
     private var isLoggedInUser: Bool {
@@ -206,32 +201,6 @@ struct SettingsView: View {
                     .background(AppTheme.textSecondary(for: colorScheme).opacity(0.3))
                     .padding(.leading, 60)
                 
-                NavigationLink(destination: ThemeSelectionView(selectedTheme: Binding(
-                    get: { themeMode },
-                    set: { themeModeRaw = $0.rawValue }
-                ))) {
-                    SettingsRow(
-                        icon: "paintbrush.fill",
-                        iconColor: Color.orange,
-                        title: LocalizationManager.shared.settingsAppearance,
-                        trailing: {
-                            HStack {
-                                Text(themeMode.displayName)
-                                    .font(.system(size: 14))
-                                    .foregroundColor(AppTheme.primaryPurple)
-                                Image(systemName: "chevron.right")
-                                    .font(.system(size: 12))
-                                    .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                            }
-                        }
-                    )
-                }
-                .buttonStyle(PlainButtonStyle())
-                
-                Divider()
-                    .background(AppTheme.textSecondary(for: colorScheme).opacity(0.3))
-                    .padding(.leading, 60)
-                
                 NavigationLink(destination: LanguageSelectionView()) {
                     SettingsRow(
                         icon: "globe",
@@ -294,7 +263,11 @@ struct SettingsView: View {
                 .padding(.horizontal)
             
             VStack(spacing: 0) {
-                NavigationLink(destination: HelpCenterView()) {
+                Button(action: {
+                    if let url = URL(string: "mailto:bugor.dev@gmail.com") {
+                        UIApplication.shared.open(url)
+                    }
+                }) {
                     SettingsRow(
                         icon: "questionmark.circle.fill",
                         iconColor: Color.green,

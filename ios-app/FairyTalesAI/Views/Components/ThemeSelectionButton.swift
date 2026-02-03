@@ -5,7 +5,7 @@ struct ThemeSelectionButton: View {
     let isSelected: Bool
     let action: () -> Void
     @Environment(\.colorScheme) var colorScheme
-    @State private var bounceScale: CGFloat = 1.0
+    @State private var tapScale: CGFloat = 1.0
     
     private var themeColor: Color {
         switch theme.name.lowercased() {
@@ -23,22 +23,16 @@ struct ThemeSelectionButton: View {
     
     var body: some View {
         Button(action: {
-            // Haptic feedback
             let impactFeedback = UIImpactFeedbackGenerator(style: .light)
             impactFeedback.impactOccurred()
-            
-            // Bounce animation
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) {
-                bounceScale = 1.1
+            withAnimation(.easeOut(duration: 0.2)) {
+                tapScale = 1.08
             }
-            
-            // Reset bounce
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) {
-                    bounceScale = 1.0
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                withAnimation(.easeOut(duration: 0.2)) {
+                    tapScale = 1.0
                 }
             }
-            
             action()
         }) {
             VStack(spacing: 12) {
@@ -52,7 +46,7 @@ struct ThemeSelectionButton: View {
                     
                     Text(theme.localizedDescription)
                         .font(.system(size: 12))
-                        .foregroundColor(isSelected ? .white.opacity(0.8) : Color(white: 0.85)) // Lighter for better contrast
+                        .foregroundColor(isSelected ? .white.opacity(0.8) : Color(white: 0.85))
                 }
             }
             .frame(maxWidth: .infinity)
@@ -62,30 +56,28 @@ struct ThemeSelectionButton: View {
             .overlay(
                 RoundedRectangle(cornerRadius: AppTheme.cornerRadius)
                     .stroke(
-                        isSelected ? themeColor : Color.clear,
-                        lineWidth: isSelected ? 2 : 0
-                    )
-                    .shadow(
-                        color: isSelected ? themeColor.opacity(0.6) : .clear,
-                        radius: isSelected ? 8 : 0
+                        isSelected ? AppTheme.primaryPurple : Color.clear,
+                        lineWidth: isSelected ? 3 : 0
                     )
             )
-            .overlay(
-                Group {
-                    if isSelected {
-                        VStack {
-                            HStack {
-                                Spacer()
-                                Image(systemName: "checkmark.circle.fill")
-                                    .foregroundColor(.white)
-                                    .padding(8)
-                            }
-                            Spacer()
-                        }
-                    }
+            .shadow(
+                color: isSelected ? AppTheme.primaryPurple.opacity(0.5) : .clear,
+                radius: isSelected ? 6 : 0,
+                x: 0,
+                y: 0
+            )
+            .overlay(alignment: .topTrailing) {
+                if isSelected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 22))
+                        .foregroundStyle(.white)
+                        .padding(8)
                 }
-            )
-            .scaleEffect(bounceScale)
+            }
+            .scaleEffect(isSelected ? 1.05 : 1.0)
+            .scaleEffect(tapScale)
+            .animation(.easeOut(duration: 0.2), value: isSelected)
         }
+        .buttonStyle(PlainButtonStyle())
     }
 }

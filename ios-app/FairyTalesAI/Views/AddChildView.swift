@@ -8,7 +8,6 @@ struct AddChildView: View {
     @State private var name: String = ""
     @State private var selectedStoryStyle: StoryStyle = .hero
     @State private var selectedAgeCategory: AgeCategory = .threeFive
-    @State private var selectedInterests: Set<String> = []
     @State private var isLoading = false
     @State private var errorMessage: String?
     @State private var showStarAnimation = false
@@ -17,19 +16,6 @@ struct AddChildView: View {
     
     init(child: Child? = nil) {
         self.child = child
-    }
-    
-    // Hero Creator Interests
-    private var heroInterests: [(name: String, emoji: String)] {
-        let localizer = LocalizationManager.shared
-        return [
-            (localizer.interestDinosaurs, "🦖"),
-            (localizer.interestSpace, "🚀"),
-            (localizer.interestUnicorns, "🦄"),
-            (localizer.interestCastles, "🏰"),
-            (localizer.interestMystery, "🕵️"),
-            (localizer.interestAnimals, "🦁")
-        ]
     }
     
     // Age Group Options for Hero Creator
@@ -92,34 +78,6 @@ struct AddChildView: View {
                         }
                         .padding(.horizontal)
                         
-                        // Magic Ingredients - Interests
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text(LocalizationManager.shared.addChildMagicIngredients)
-                                .font(.system(size: 18, weight: .semibold))
-                                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
-                            
-                            Text(LocalizationManager.shared.addChildSelectInterests)
-                                .font(.system(size: 14))
-                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                            
-                            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                                ForEach(heroInterests, id: \.name) { interest in
-                                    HeroInterestChip(
-                                        name: interest.name,
-                                        emoji: interest.emoji,
-                                        isSelected: selectedInterests.contains(interest.name)
-                                    ) {
-                                        if selectedInterests.contains(interest.name) {
-                                            selectedInterests.remove(interest.name)
-                                        } else {
-                                            selectedInterests.insert(interest.name)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        .padding(.horizontal)
-                        
                         // Error Message
                         if let errorMessage = errorMessage {
                             Text(errorMessage)
@@ -173,7 +131,6 @@ struct AddChildView: View {
                         selectedStoryStyle = .hero
                     }
                     selectedAgeCategory = child.ageCategory
-                    selectedInterests = Set(child.interests)
                 }
             }
         }
@@ -205,8 +162,6 @@ struct AddChildView: View {
         
         defer { isLoading = false }
         
-        let interestsArray = Array(selectedInterests)
-        
         do {
             // Map StoryStyle to gender string for backward compatibility
             let genderString = selectedStoryStyle.genderString
@@ -217,7 +172,7 @@ struct AddChildView: View {
                     name: name,
                     gender: genderString,
                     ageCategory: selectedAgeCategory,
-                    interests: interestsArray,
+                    interests: [],
                     userId: existingChild.userId,
                     createdAt: existingChild.createdAt,
                     updatedAt: Date()
@@ -228,7 +183,7 @@ struct AddChildView: View {
                     name: name,
                     gender: genderString,
                     ageCategory: selectedAgeCategory,
-                    interests: interestsArray
+                    interests: []
                 )
                 _ = try await childrenStore.addChild(newChild)
             }
