@@ -174,7 +174,10 @@ struct HomeView: View {
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     HStack(spacing: 16) {
                                         ForEach(storiesStore.stories.prefix(5)) { story in
-                                            StoryCard(story: story)
+                                            NavigationLink(destination: StoryReadingView(story: story)) {
+                                                StoryCard(story: story)
+                                            }
+                                            .buttonStyle(PlainButtonStyle())
                                         }
                                     }
                                     .padding(.horizontal)

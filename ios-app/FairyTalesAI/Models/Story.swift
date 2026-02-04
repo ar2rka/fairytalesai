@@ -114,19 +114,15 @@ struct StoryTheme: Identifiable, Hashable {
         }
     }
 
-    /// Exactly 3 themes for Create Story: Tonight's Pick, age-based, then Space (🚀) — deduped.
+    /// Exactly 2 themes for Create Story: Tonight's Pick and age-based — deduped.
     static func visibleThemes(for child: Child?) -> [StoryTheme] {
         let pick = tonightsPick
         var ageBased = ageBasedTheme(for: child)
-        let space = allThemes.first { $0.name == "Space" } ?? allThemes[0]
         if ageBased.name == pick.name {
-            ageBased = space
+            // If age-based matches Tonight's Pick, use Space as the second theme
+            ageBased = allThemes.first { $0.name == "Space" } ?? allThemes[0]
         }
-        var third = space
-        if third.name == pick.name || third.name == ageBased.name {
-            third = allThemes.first { $0.name == "Pirates" } ?? allThemes[0]
-        }
-        return [pick, ageBased, third]
+        return [pick, ageBased]
     }
 }
 
