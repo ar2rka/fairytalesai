@@ -2,8 +2,10 @@
 
 import os
 import logging
+import base64
+import secrets
 from typing import Optional
-from fastapi import HTTPException, Security, status, Depends
+from fastapi import HTTPException, Security, status, Depends, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import jwt
 from jwt import PyJWKClient
@@ -147,6 +149,50 @@ def get_current_user(
     
     logger.info(f"Authentication successful for user: {user_id}")
     return AuthUser(user_id=user_id, email=email, metadata=user_metadata)
+
+
+def get_admin_auth(request: Request) -> AuthUser:
+    """
+    Dependency for admin API: accept either Bearer (JWT) or Basic auth.
+    Use for routes under /admin/ so the admin UI (Basic auth) can call them
+    with credentials: 'include' without a JWT.
+    """
+    auth = request.headers.get("authorization")
+    if not auth:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Missing authorization",
+            headers={"WWW-Authenticate": "Bearer, Basic"},
+        )
+    if auth.lower().startswith("bearer "):
+        token = auth[7:].strip()
+        payload = verify_token(token)
+        user_id = payload.get("sub")
+        email = payload.get("email") or ""
+        return AuthUser(user_id=user_id, email=email, metadata=payload.get("user_metadata", {}))
+    if auth.lower().startswith("basic "):
+        try:
+            decoded = base64.b64decode(auth[6:].strip()).decode("utf-8")
+            username, _, password = decoded.partition(":")
+            correct_username = os.getenv("OPENAPI_USERNAME", "admin")
+            correct_password = os.getenv("OPENAPI_PASSWORD", "")
+            if not correct_password:
+                logger.debug("Admin Basic auth: no OPENAPI_PASSWORD set, allowing")
+                return AuthUser(user_id="admin", email=username or "admin", metadata={})
+            if secrets.compare_digest(username, correct_username) and secrets.compare_digest(password, correct_password):
+                return AuthUser(user_id="admin", email=username, metadata={})
+        except Exception as e:
+            logger.debug(f"Admin Basic auth decode failed: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Invalid authorization",
+        headers={"WWW-Authenticate": "Bearer, Basic"},
+    )
 
 
 def get_optional_user(

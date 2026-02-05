@@ -6,6 +6,7 @@ import asyncio
 from fastapi import APIRouter, HTTPException, Depends
 from typing import Optional, List
 from datetime import datetime
+from pydantic import BaseModel, Field
 
 from src.models import StoryDB
 from src.application.dto import (
@@ -16,7 +17,7 @@ from src.application.dto import (
     DailyStoryReactionRequestDTO,
     DailyStoryReactionResponseDTO
 )
-from src.api.auth import get_current_user, AuthUser, get_optional_user
+from src.api.auth import get_current_user, AuthUser, get_optional_user, get_admin_auth
 from src.api.subscription_validator import SubscriptionValidator
 from src.domain.services.subscription_service import SubscriptionService, SubscriptionPlan, SubscriptionStatus
 from src.domain.value_objects import Language, StoryLength
@@ -26,7 +27,7 @@ from src.api.helpers.services import (
     initialize_openrouter_client,
     initialize_supabase_client,
     initialize_voice_service,
-    initialize_prompt_service
+    initialize_prompt_service,
 )
 from src.api.helpers.validators import (
     validate_language,
@@ -52,6 +53,9 @@ from src.api.helpers.responses import (
     save_story,
     build_response
 )
+from src.openrouter_client import OpenRouterModel
+from src.domain.entities import Child
+from src.domain.value_objects import Gender
 
 # Set up logger
 logger = logging.getLogger("tale_generator.api")
@@ -650,7 +654,7 @@ async def get_purchase_history(
 
 @router.get("/admin/generations/test")
 async def test_generations_access(
-    user: AuthUser = Depends(get_current_user)
+    user: AuthUser = Depends(get_admin_auth)
 ):
     """Test endpoint to check if we can access generations table."""
     try:
@@ -679,7 +683,7 @@ async def test_generations_access(
 @router.get("/admin/generations/{generation_id}/test")
 async def test_generation_detail(
     generation_id: str,
-    user: AuthUser = Depends(get_current_user)
+    user: AuthUser = Depends(get_admin_auth)
 ):
     """Test endpoint to check if we can access a specific generation."""
     try:
@@ -719,7 +723,7 @@ async def get_generations(
     status: Optional[str] = None,
     model_used: Optional[str] = None,
     story_type: Optional[str] = None,
-    user: AuthUser = Depends(get_current_user)
+    user: AuthUser = Depends(get_admin_auth)
 ):
     """Get all generations with optional filters (admin endpoint)."""
     try:
@@ -794,10 +798,89 @@ async def get_generations(
         )
 
 
+class AdminDryRunRequest(BaseModel):
+    """Request body for admin dry-run story generation (no save, no LangGraph)."""
+    language: str = Field(..., description="Story language: en or ru")
+    model: str = Field(..., description="OpenRouter model ID")
+    prompt: str = Field(..., min_length=1, description="Full prompt text (user edits and submits)")
+
+
+@router.post("/admin/generations/dry-run")
+async def admin_generations_dry_run(
+    body: AdminDryRunRequest,
+    user: AuthUser = Depends(get_admin_auth)
+):
+    """Run a one-off story generation without saving or LangGraph (admin endpoint). Returns only story content."""
+    try:
+        if body.language not in ("en", "ru"):
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid language. Must be 'en' or 'ru'."
+            )
+        try:
+            model_enum = OpenRouterModel(body.model)
+        except ValueError:
+            valid = [m.value for m in OpenRouterModel]
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid model. Must be one of: {', '.join(valid)}"
+            )
+        if openrouter_client is None:
+            raise HTTPException(status_code=500, detail="OpenRouter client not configured")
+
+        result = await openrouter_client.generate_story(
+            prompt=body.prompt.strip(),
+            model=model_enum,
+            use_langgraph=False,
+        )
+        return {"content": result.content}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Admin dry-run generation failed: {str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
+
+
+# Default child used to render the prompt template for admin UI
+_DEFAULT_PROMPT_CHILD = Child(
+    name="David",
+    age_category="4-5",
+    gender=Gender.OTHER,
+    interests=["cars", "unicorns"],
+)
+
+
+@router.get("/admin/generations/prompt-default")
+async def admin_generations_prompt_default(
+    language: str = "en",
+    user: AuthUser = Depends(get_admin_auth)
+):
+    """Return the prompt text rendered from the child template (child_en.md / child_ru.md) with default values. Used to pre-fill the admin dry-run form."""
+    if language not in ("en", "ru"):
+        raise HTTPException(status_code=400, detail="Invalid language. Must be 'en' or 'ru'.")
+    try:
+        lang_enum = Language.ENGLISH if language == "en" else Language.RUSSIAN
+        story_length = StoryLength(minutes=5)
+        prompt_text = prompt_service.generate_child_prompt(
+            child=_DEFAULT_PROMPT_CHILD,
+            moral="kindness",
+            language=lang_enum,
+            story_length=story_length,
+            theme=None,
+        )
+        return {"prompt": prompt_text}
+    except Exception as e:
+        logger.error(f"Failed to render prompt template: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.get("/admin/generations/{generation_id}")
 async def get_generation_detail(
     generation_id: str,
-    user: AuthUser = Depends(get_current_user)
+    user: AuthUser = Depends(get_admin_auth)
 ):
     """Get detailed information about a specific generation including all attempts (admin endpoint)."""
     try:
