@@ -219,6 +219,57 @@
         .generations-table a code {
             color: var(--primary-color);
         }
+        
+        .dry-run-section {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+        
+        .dry-run-section h2 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+        
+        .dry-run-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 600px;
+        }
+        
+        .dry-run-form .filter-group textarea {
+            min-height: 120px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        .dry-run-status {
+            margin-top: 1rem;
+        }
+        
+        .dry-run-status.hidden {
+            display: none;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .dry-run-result {
+            background: var(--light-color);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
@@ -229,6 +280,56 @@
         </header>
 
         <main>
+            <section class="dry-run-section">
+                <h2><i class="fas fa-magic"></i> Запуск генерации</h2>
+                <p style="margin-bottom: 1rem; color: var(--gray-color); font-size: 0.9rem;">Генерация без сохранения и проверок. Внесите в текст промпта данные о ребёнке и нажмите «Сгенерировать».</p>
+                <form id="dry-run-form" class="dry-run-form">
+                    <div class="filter-group">
+                        <label for="dry-run-language">Язык:</label>
+                        <select id="dry-run-language" name="language" required>
+                            <option value="en">English</option>
+                            <option value="ru">Русский</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="dry-run-model">Модель:</label>
+                        <select id="dry-run-model" name="model" required>
+                            <option value="openai/gpt-4o">GPT-4o</option>
+                            <option value="openai/gpt-4o-mini">GPT-4o Mini</option>
+                            <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
+                            <option value="anthropic/claude-3-haiku">Claude 3 Haiku</option>
+                            <option value="anthropic/claude-haiku-4.5">Claude 4.5 Haiku</option>
+                            <option value="meta-llama/llama-3.1-405b-instruct">Llama 3.1 405B</option>
+                            <option value="meta-llama/llama-3.1-70b-instruct">Llama 3.1 70B</option>
+                            <option value="meta-llama/llama-3.1-8b-instruct">Llama 3.1 8B</option>
+                            <option value="google/gemma-2-27b-it">Gemma 2 27B</option>
+                            <option value="mistralai/mixtral-8x22b-instruct">Mixtral 8x22B</option>
+                            <option value="google/gemini-2.0-flash-exp:free">Gemini 2.0 Flash (free)</option>
+                            <option value="x-ai/grok-4.1-fast:free">Grok 4.1 (free)</option>
+                            <option value="openai/gpt-oss-120b:exacto">GPT-OSS 120B</option>
+                            <option value="mistralai/mistral-small-creative">Mistral Small Creative</option>
+                            <option value="mistralai/magistral-medium-2506">Mistral Medium</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="dry-run-prompt">Текст промпта:</label>
+                        <textarea id="dry-run-prompt" name="prompt" required placeholder="Загрузка шаблона…"></textarea>
+                        <p id="dry-run-prompt-hint" class="hidden" style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--gray-color);">Загружено из шаблона (child_<span id="dry-run-prompt-lang">en</span>.md). Редактируйте при необходимости.</p>
+                    </div>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-play"></i> Сгенерировать
+                    </button>
+                </form>
+                <div id="dry-run-status" class="dry-run-status hidden">
+                    <div id="dry-run-loading" class="loading hidden">
+                        <i class="fas fa-spinner fa-spin fa-2x"></i>
+                        <p>Генерация…</p>
+                    </div>
+                    <div id="dry-run-error" class="error-message hidden"></div>
+                    <div id="dry-run-result" class="dry-run-result hidden"></div>
+                </div>
+            </section>
+
             <div class="generations-container">
                 <div class="filters-section">
                     <div class="filter-group">
@@ -318,6 +419,28 @@
     <script>
         const API_BASE = '/api/v1';
         
+        async function loadPromptTemplate(lang) {
+            const textarea = document.getElementById('dry-run-prompt');
+            const hint = document.getElementById('dry-run-prompt-hint');
+            const langSpan = document.getElementById('dry-run-prompt-lang');
+            textarea.placeholder = 'Загрузка шаблона…';
+            if (langSpan) langSpan.textContent = lang || 'en';
+            try {
+                const response = await fetch(`${API_BASE}/admin/generations/prompt-default?language=${encodeURIComponent(lang || 'en')}`, {
+                    credentials: 'include'
+                });
+                if (!response.ok) throw new Error('Не удалось загрузить шаблон');
+                const data = await response.json();
+                textarea.value = data.prompt || '';
+                textarea.placeholder = 'Введите или отредактируйте текст промпта';
+                if (hint) hint.classList.remove('hidden');
+            } catch (err) {
+                console.error('Load prompt template:', err);
+                textarea.placeholder = 'Ошибка загрузки шаблона. Введите промпт вручную.';
+                if (hint) hint.classList.add('hidden');
+            }
+        }
+        
         async function loadGenerations() {
             const status = document.getElementById('status-filter').value;
             const storyType = document.getElementById('story-type-filter').value;
@@ -338,7 +461,9 @@
                 if (storyType) params.append('story_type', storyType);
                 if (model) params.append('model_used', model);
                 
-                const response = await fetch(`${API_BASE}/admin/generations?${params}`);
+                const response = await fetch(`${API_BASE}/admin/generations?${params}`, {
+                    credentials: 'include'
+                });
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -453,7 +578,71 @@
             }
         });
         
-        // Load on page load
+        document.getElementById('dry-run-language').addEventListener('change', function() {
+            loadPromptTemplate(this.value);
+        });
+        
+        // Dry-run form: run generation without saving
+        (function() {
+            const form = document.getElementById('dry-run-form');
+            const statusEl = document.getElementById('dry-run-status');
+            const loadingEl = document.getElementById('dry-run-loading');
+            const errorEl = document.getElementById('dry-run-error');
+            const resultEl = document.getElementById('dry-run-result');
+            
+            function setDryRunState(loading, errorText, content) {
+                statusEl.classList.remove('hidden');
+                if (loading) {
+                    loadingEl.classList.remove('hidden');
+                    errorEl.classList.add('hidden');
+                    resultEl.classList.add('hidden');
+                    errorEl.textContent = '';
+                    resultEl.textContent = '';
+                } else {
+                    loadingEl.classList.add('hidden');
+                    if (errorText) {
+                        errorEl.classList.remove('hidden');
+                        errorEl.textContent = errorText;
+                        resultEl.classList.add('hidden');
+                    } else {
+                        errorEl.classList.add('hidden');
+                        resultEl.classList.remove('hidden');
+                        resultEl.textContent = content || '';
+                    }
+                }
+            }
+            
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const language = document.getElementById('dry-run-language').value;
+                const model = document.getElementById('dry-run-model').value;
+                const prompt = document.getElementById('dry-run-prompt').value.trim();
+                if (!prompt) {
+                    setDryRunState(false, 'Введите текст промпта.');
+                    return;
+                }
+                setDryRunState(true);
+                try {
+                    const response = await fetch(`${API_BASE}/admin/generations/dry-run`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ language, model, prompt }),
+                        credentials: 'include'
+                    });
+                    const data = await response.json().catch(() => ({}));
+                    if (!response.ok) {
+                        setDryRunState(false, data.detail || data.message || `Ошибка ${response.status}`);
+                        return;
+                    }
+                    setDryRunState(false, null, data.content || '');
+                } catch (err) {
+                    setDryRunState(false, 'Ошибка запроса: ' + err.message);
+                }
+            });
+        })();
+        
+        // Load on page load: prompt template (from child_en.md / child_ru.md) and generations table
+        loadPromptTemplate(document.getElementById('dry-run-language').value);
         loadGenerations();
     </script>
 </body>

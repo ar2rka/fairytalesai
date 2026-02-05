@@ -174,25 +174,23 @@ def create_app() -> FastAPI:
         logger.debug("Health check endpoint accessed")
         return {"status": "healthy"}
     
+    def _read_admin_page():
+        """Read the main admin page (generations)."""
+        path = os.path.join(os.path.dirname(__file__), "src", "admin", "templates", "generations.html")
+        if os.path.exists(path):
+            with open(path, "r", encoding="utf-8") as f:
+                return f.read()
+        return "<h1>Admin not found</h1><p>generations.html is missing.</p>"
+
     @app.get("/adminui", response_class=HTMLResponse, dependencies=[Depends(verify_admin_credentials)])
     async def admin_panel():
-        """Serve the admin panel HTML (protected with basic auth)."""
-        admin_template_path = os.path.join(os.path.dirname(__file__), "src", "admin", "templates", "admin.html")
-        if os.path.exists(admin_template_path):
-            with open(admin_template_path, "r", encoding="utf-8") as f:
-                return f.read()
-        else:
-            return "<h1>Admin panel not found</h1><p>The admin panel files are missing.</p>"
-    
+        """Serve the admin panel (generations view) at /adminui."""
+        return _read_admin_page()
+
     @app.get("/adminui/generations", response_class=HTMLResponse, dependencies=[Depends(verify_admin_credentials)])
     async def generations_view():
-        """Serve the generations view HTML (protected with basic auth)."""
-        generations_template_path = os.path.join(os.path.dirname(__file__), "src", "admin", "templates", "generations.html")
-        if os.path.exists(generations_template_path):
-            with open(generations_template_path, "r", encoding="utf-8") as f:
-                return f.read()
-        else:
-            return "<h1>Generations view not found</h1><p>The generations view files are missing.</p>"
+        """Serve the same admin panel at /adminui/generations (e.g. back-link from detail)."""
+        return _read_admin_page()
     
     @app.get("/adminui/generations/{generation_id}", response_class=HTMLResponse, dependencies=[Depends(verify_admin_credentials)])
     async def generation_detail_view(generation_id: str):

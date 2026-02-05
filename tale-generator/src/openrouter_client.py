@@ -908,6 +908,7 @@ class OpenRouterClient:
                 "selected_attempt": final_state.get("selected_attempt_number"),
                 "total_attempts": len(generation_attempts),
                 "validation_result": final_state.get("validation_result"),
+                "story_content": story_content,
                 "workflow_metadata": {
                     "total_duration": final_state.get("total_duration"),
                     "validation_duration": final_state.get("validation_duration"),

@@ -319,7 +319,9 @@
             console.log('API URL:', `${API_BASE}/admin/generations/${generationId}`);
             
             try {
-                const response = await fetch(`${API_BASE}/admin/generations/${generationId}`);
+                const response = await fetch(`${API_BASE}/admin/generations/${generationId}`, {
+                    credentials: 'include'
+                });
                 
                 console.log('Response status:', response.status);
                 console.log('Response ok:', response.ok);

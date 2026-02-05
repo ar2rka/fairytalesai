@@ -35,8 +35,6 @@ class Child:
                 details={"value": self.age_category}
             )
         
-        if not self.interests:
-            raise ValidationError("Child must have at least one interest", field="interests")
     
     def add_interest(self, interest: str) -> None:
         """Add an interest to the child.
