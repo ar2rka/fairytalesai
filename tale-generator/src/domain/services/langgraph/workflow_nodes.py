@@ -58,6 +58,7 @@ async def validate_prompt_node(
             child_name=state["child_name"],
             age_category=state.get("age_category", "3-5"),  # Default for backward compatibility
             child_interests=state["child_interests"],
+            moral=state.get("moral", "kindness"),
             model=config.get("validation_model", "openai/gpt-4o-mini")
         )
         
@@ -69,18 +70,15 @@ async def validate_prompt_node(
         logger.info(f"Recommendation: {validation_result.recommendation}")
         logger.info(f"Is Safe: {validation_result.is_safe}")
         logger.info(f"Age Appropriate: {validation_result.is_age_appropriate}")
-        logger.info(f"Has Licensed Characters: {validation_result.has_licensed_characters}")
         logger.info(f"Reasoning: {validation_result.reasoning}")
         
         if validation_result.recommendation == "rejected":
             state["workflow_status"] = WorkflowStatus.REJECTED.value
             
-            # Build detailed rejection message
+            # Build detailed rejection message (safety and age only; licensed chars not checked)
             rejection_details = []
             if not validation_result.is_safe:
                 rejection_details.append("Safety concerns")
-            if validation_result.has_licensed_characters:
-                rejection_details.append("Licensed characters detected")
             if not validation_result.is_age_appropriate:
                 rejection_details.append("Age appropriateness concerns")
             if validation_result.detected_issues:
@@ -90,7 +88,6 @@ async def validate_prompt_node(
             state["error_messages"].append(f"Prompt validation failed: {rejection_message}")
             logger.warning(f"❌ Prompt REJECTED: {rejection_message}")
             logger.warning(f"   Details - is_safe: {validation_result.is_safe}, "
-                         f"has_licensed: {validation_result.has_licensed_characters}, "
                          f"is_age_appropriate: {validation_result.is_age_appropriate}")
             
             # Update generation record in Supabase
