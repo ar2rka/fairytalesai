@@ -6,7 +6,7 @@ import logging
 import time
 import uuid
 from enum import StrEnum
-from typing import Optional, Dict, Any, List, Type, TypeVar
+from typing import Optional, Dict, Any, List, Type, TypeVar, Union
 from pydantic import BaseModel, Field
 import httpx
 from openai import AsyncOpenAI
@@ -324,6 +324,37 @@ class OpenRouterClient:
         # Use default fallback chain
         self._fallback_models = DEFAULT_FALLBACK_MODELS
         return self._fallback_models
+
+    def _resolve_default_generation_model(self) -> OpenRouterModel:
+        """Resolve default generation model from settings (env).
+
+        Prefers LANGGRAPH_GENERATION_MODEL, then OPENROUTER_DEFAULT_MODEL.
+        Falls back to CLAUDE_3_HAIKU if unset or invalid.
+
+        Returns:
+            OpenRouterModel to use for story generation
+        """
+        try:
+            from src.infrastructure.config.settings import get_settings
+            settings = get_settings()
+            model_str = (
+                settings.langgraph_workflow.generation_model
+                or settings.ai_service.default_model
+            )
+            if model_str:
+                try:
+                    return OpenRouterModel(model_str)
+                except ValueError:
+                    for m in OpenRouterModel:
+                        if m.value == model_str:
+                            return m
+                    logger.warning(
+                        f"Configured model '{model_str}' not in OpenRouterModel enum, "
+                        "using GPT_4O_MINI"
+                    )
+        except Exception as e:
+            logger.debug(f"Could not load default model from settings: {e}, using CLAUDE_3_HAIKU")
+        return OpenRouterModel.GPT_4O_MINI
 
     async def _get_http_client(self) -> httpx.AsyncClient:
         """Get or create async HTTP client with connection pooling."""
@@ -712,7 +743,7 @@ class OpenRouterClient:
     async def generate_story(
         self,
         prompt: str,
-        model: OpenRouterModel = OpenRouterModel.CLAUDE_3_HAIKU,
+        model: Optional[Union[OpenRouterModel, str]] = None,
         max_tokens: int = 10000,
         max_retries: int = 3,
         retry_delay: float = 1.0,
@@ -753,6 +784,10 @@ class OpenRouterClient:
         Returns:
             StoryGenerationResult containing the content, model used, full response, and generation info
         """
+        if model is None:
+            model = self._resolve_default_generation_model()
+        elif isinstance(model, str):
+            model = OpenRouterModel(model)
         if use_langgraph:
             # Use full LangGraph workflow with validation and quality assessment
             # Import workflow dependencies lazily to avoid circular imports
@@ -1008,6 +1043,7 @@ class OpenRouterClient:
                                         # Default fallback
                                         result_model = OpenRouterModel.LLAMA_3_1_8B
                         
+                        logger.info(f"Successfully generated story with model {model_value}")   
                         return StoryGenerationResult(
                             content=response.choices[0].message.content,
                             model=result_model,
