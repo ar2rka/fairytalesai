@@ -207,11 +207,11 @@ def get_january_2026_dates() -> List[datetime]:
         List of datetime objects for each day in January 2026
     """
     dates = []
-    start_date = datetime(2026, 1, 1, 0, 0, 0)  # Start at noon for each day
+    start_date = datetime(2026, 2, 1, 0, 0, 0)  # Start at noon for each day
     current_date = start_date
     
     # January has 31 days
-    for _ in range(31):
+    for _ in range(28):
         dates.append(current_date)
         current_date += timedelta(days=1)
     

@@ -12,42 +12,12 @@ logger = get_logger("langgraph.prompt_validator")
 
 
 class PromptValidatorService:
-    """Service for validating story prompts for safety and appropriateness."""
+    """Service for validating story prompts for safety and appropriateness.
     
-    # Common licensed character keywords to detect
-    # Note: Common names like "Anna", "Elsa", "Mario" are excluded to avoid false positives
-    # Only very specific character names or phrases are included
-    LICENSED_CHARACTERS = [
-        # Disney - only very specific character names
-        "mickey mouse", "minnie mouse", "donald duck", "goofy", "pluto",
-        "olaf", "moana", "simba", "nala", "aladdin",
-        "jasmine", "belle", "ariel", "cinderella", "snow white",
-        "rapunzel", "tangled", "frozen",  # "frozen" as movie title, not just word
-        # Note: "elsa" and "anna" removed - these are common names
-        
-        # Marvel - specific superhero names
-        "spider-man", "iron man", "hulk", "thor", "captain america",
-        "black widow", "hawkeye", "avengers", "thanos", "loki",
-        
-        # DC Comics
-        "batman", "superman", "wonder woman", "flash", "aquaman",
-        "joker", "harley quinn", "green lantern",
-        
-        # Other franchises - very specific names only
-        "harry potter", "hermione granger", "ron weasley", "dumbledore",
-        "pokemon", "pikachu", "luigi", "sonic the hedgehog",
-        "spongebob squarepants", "patrick star", "peppa pig",
-        "paw patrol", "bluey",
-        # Note: "mario" removed - common name, only check "super mario" or "mario bros"
-    ]
-    
-    # Phrases that indicate licensed character references (more reliable)
-    LICENSED_PHRASES = [
-        "super mario", "mario bros", "princess elsa", "queen elsa", "princess anna",
-        "princess ariel", "princess jasmine", "princess belle", "princess cinderella",
-        "princess rapunzel", "princess moana", "princess anna of arendelle"
-    ]
-    
+    Validates only: age appropriateness (moral) and absence of bad/forbidden content.
+    Licensed character checks are not performed.
+    """
+
     def __init__(self, openrouter_client):
         """Initialize validator service.
         
@@ -62,6 +32,7 @@ class PromptValidatorService:
         child_name: str,
         age_category: str,
         child_interests: List[str],
+        moral: str = "kindness",
         model: str = "openai/gpt-4o-mini"
     ) -> ValidationResult:
         """Validate story prompt for safety and appropriateness.
@@ -71,12 +42,13 @@ class PromptValidatorService:
             child_name: Child's name
             age_category: Child's age category ('2-3', '3-5', or '5-7')
             child_interests: List of child's interests
+            moral: Moral value for the story (validated for appropriateness)
             model: LLM model to use for validation
             
         Returns:
             ValidationResult with validation outcome
         """
-        logger.info(f"Validating prompt for child_name='{child_name}', age_category={age_category}, child_interests={child_interests}")
+        logger.info(f"Validating prompt for child_name='{child_name}', age_category={age_category}, moral='{moral}', child_interests={child_interests}")
         # Normalize age category for comparison
         from src.utils.age_category_utils import normalize_age_category
         try:
@@ -88,23 +60,15 @@ class PromptValidatorService:
             if child_name == "Child":
                 logger.warning(f"⚠️ Using default values! child_name='{child_name}', age_category={age_category} - this might indicate missing data")
         
-        # First, quick keyword-based check for licensed characters
-        # Exclude child's name from the prompt for checking to avoid false positives
-        # (e.g., if child is named "Anna", we don't want to flag it as licensed character)
-        prompt_for_check = prompt
-        if child_name:
-            # Remove child's name from prompt temporarily for licensed character check
-            # This prevents false positives when child has a name that matches a character
-            child_name_lower = child_name.lower()
-            # Replace child's name with placeholder to avoid matching
-            prompt_for_check = prompt.replace(child_name, "[CHILD_NAME]")
-            prompt_for_check = prompt_for_check.replace(child_name_lower, "[CHILD_NAME]")
-        
-        has_licensed_chars = self._quick_licensed_character_check(prompt_for_check)
-        
-        # Build validation prompt for LLM
+        # Quick check: moral must be non-empty
+        moral_clean = (moral or "").strip()
+        if not moral_clean:
+            logger.warning("Moral is empty, using default 'kindness' for validation")
+            moral_clean = "kindness"
+
+        # Build validation prompt for LLM (safety + age + moral appropriateness)
         validation_prompt = self._build_validation_prompt(
-            prompt, child_name, age_category, child_interests
+            prompt, child_name, age_category, child_interests, moral_clean
         )
         
         try:
@@ -120,16 +84,10 @@ class PromptValidatorService:
             # Parse LLM response
             validation_data = self._parse_validation_response(result.content)
             
-            # Combine quick check with LLM validation
-            if has_licensed_chars:
-                validation_data["has_licensed_characters"] = True
-                if "Licensed character" not in validation_data.get("detected_issues", []):
-                    validation_data["detected_issues"].append("Licensed character detected in prompt")
-            
-            # Create validation result
+            # Create validation result (licensed characters not checked)
             validation_result = ValidationResult(
                 is_safe=validation_data.get("is_safe", True),
-                has_licensed_characters=validation_data.get("has_licensed_characters", has_licensed_chars),
+                has_licensed_characters=False,  # Not validated anymore
                 is_age_appropriate=validation_data.get("is_age_appropriate", True),
                 detected_issues=validation_data.get("detected_issues", []),
                 reasoning=validation_data.get("reasoning", ""),
@@ -137,14 +95,11 @@ class PromptValidatorService:
                 timestamp=datetime.now()
             )
             
-            # Final decision: approve only if all critical checks pass
-            # Only reject if there are serious safety issues or licensed characters
-            # Age appropriateness issues are warnings but not necessarily rejections
+            # Final decision: reject only on safety concerns (bad/forbidden content)
+            # Age appropriateness issues are warnings, not rejections
             rejection_reasons = []
             if not validation_result.is_safe:
                 rejection_reasons.append("Safety concerns detected")
-            if validation_result.has_licensed_characters:
-                rejection_reasons.append("Licensed characters detected")
             
             if rejection_reasons:
                 validation_result.recommendation = "rejected"
@@ -160,7 +115,6 @@ class PromptValidatorService:
             logger.info(f"Validation complete: {validation_result.recommendation}")
             if validation_result.recommendation == "rejected":
                 logger.info(f"Rejection details - is_safe: {validation_result.is_safe}, "
-                          f"has_licensed: {validation_result.has_licensed_characters}, "
                           f"is_age_appropriate: {validation_result.is_age_appropriate}")
             return validation_result
             
@@ -177,63 +131,13 @@ class PromptValidatorService:
                 timestamp=datetime.now()
             )
     
-    def _quick_licensed_character_check(self, prompt: str) -> bool:
-        """Quick keyword-based check for licensed characters.
-        
-        This method avoids false positives by:
-        1. Only checking very specific character names/phrases
-        2. Excluding common names that might match character names (e.g., "Anna", "Elsa", "Mario")
-        3. Using context-aware checking for ambiguous cases
-        
-        Args:
-            prompt: Prompt text to check
-            
-        Returns:
-            True if licensed character detected
-        """
-        prompt_lower = prompt.lower()
-        
-        # First check for specific phrases (most reliable)
-        # These phrases are very specific and unlikely to be false positives
-        for phrase in self.LICENSED_PHRASES:
-            if phrase in prompt_lower:
-                # Additional check: make sure it's not just a name match
-                # For phrases like "princess anna", check that "princess" or "queen" is present
-                if "princess" in phrase or "queen" in phrase:
-                    # Make sure the full phrase appears, not just the name part
-                    if phrase in prompt_lower:
-                        logger.warning(f"Licensed character phrase detected: {phrase}")
-                        return True
-                else:
-                    # Other specific phrases
-                    logger.warning(f"Licensed character phrase detected: {phrase}")
-                    return True
-        
-        # Then check for specific character names
-        for character in self.LICENSED_CHARACTERS:
-            if character in prompt_lower:
-                # Additional context check for ambiguous cases
-                # If it's a common name that could be a character, check context
-                if character in ["frozen"]:
-                    # "frozen" could be the movie or just the word
-                    # Only flag if it appears with character-related context
-                    context_indicators = ["movie", "film", "princess", "queen", "character", "story about"]
-                    if any(indicator in prompt_lower for indicator in context_indicators):
-                        logger.warning(f"Licensed character detected: {character}")
-                        return True
-                else:
-                    # Very specific character names - safe to flag
-                    logger.warning(f"Licensed character detected: {character}")
-                    return True
-        
-        return False
-    
     def _build_validation_prompt(
         self,
         prompt: str,
         child_name: str,
         age_category: str,
-        child_interests: List[str]
+        child_interests: List[str],
+        moral: str,
     ) -> str:
         """Build validation prompt for LLM.
         
@@ -242,6 +146,7 @@ class PromptValidatorService:
             child_name: Child's name
             age_category: Child's age category ('2-3', '3-5', or '5-7')
             child_interests: Child's interests
+            moral: Moral value for the story (must be appropriate for children)
             
         Returns:
             Validation prompt for LLM
@@ -252,7 +157,7 @@ class PromptValidatorService:
         interests_str = ", ".join(child_interests) if child_interests else "none specified"
         age_display = get_age_category_for_prompt(age_category, Language.ENGLISH)
         
-        return f"""You are a content safety validator for children's stories. Analyze the provided story prompt for safety concerns.
+        return f"""You are a content safety validator for children's stories. Analyze the provided story prompt.
 
 Story Prompt to Validate:
 {prompt}
@@ -261,25 +166,26 @@ Child Context:
 - Name: {child_name}
 - Age: {age_display}
 - Interests: {interests_str}
+- Moral (intended lesson): {moral}
 
-Evaluation Criteria:
-1. Licensed Characters: Check for trademarked characters from Disney, Marvel, DC, DreamWorks, Pixar, Nintendo, etc.
-2. Age Appropriateness: Ensure content is suitable for children aged {age_display}
-3. Safety: No violence, horror, discrimination, or inappropriate themes
-4. Coherence: Prompt is clear and actionable
+Evaluation Criteria (check only these):
+1. Moral correctness: The stated moral "{moral}" must be appropriate for children—a positive value (e.g. kindness, honesty, bravery, friendship). Reject if moral is empty, harmful, promotes negative values, or is inappropriate for kids.
+2. Age Appropriateness: Content must be suitable for children aged {age_display}. Consider: complexity of themes, scary elements, violence level, emotional intensity.
+3. Safety: No violence, horror, discrimination, inappropriate themes, or forbidden content.
+4. Coherence: Prompt is clear and actionable.
+
+Do NOT check for licensed/trademarked characters.
 
 Provide your assessment in the following JSON format:
 {{
     "is_safe": true/false,
-    "has_licensed_characters": true/false,
     "is_age_appropriate": true/false,
     "detected_issues": ["issue1", "issue2", ...],
     "reasoning": "Detailed explanation of your assessment",
     "recommendation": "approved" or "rejected"
 }}
 
-IMPORTANT: Be strict about licensed characters. Even indirect references should be flagged.
-For age appropriateness, consider: complexity of themes, scary elements, violence level, and emotional intensity.
+Reject (recommendation: "rejected") if: the moral is inappropriate, or there are safety concerns/forbidden content. Age appropriateness concerns can be noted in reasoning but do not require rejection.
 """
     
     def _parse_validation_response(self, response: str) -> Dict[str, Any]:
@@ -311,7 +217,7 @@ For age appropriateness, consider: complexity of themes, scary elements, violenc
             data = json.loads(json_str)
             
             # Validate required fields
-            required_fields = ["is_safe", "has_licensed_characters", "is_age_appropriate", "recommendation"]
+            required_fields = ["is_safe", "is_age_appropriate", "recommendation"]
             for field in required_fields:
                 if field not in data:
                     logger.warning(f"Missing field in validation response: {field}")
