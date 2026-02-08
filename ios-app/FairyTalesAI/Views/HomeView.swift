@@ -39,6 +39,11 @@ struct HomeView: View {
     }
 
     private static let recentStoryInterval: TimeInterval = 7 * 24 * 60 * 60
+    
+    private var isCompactDevice: Bool {
+        let size = UIScreen.main.bounds.size
+        return size.width <= 375 && size.height <= 812
+    }
 
     /// Most recent story for the selected child that is within the last 7 days (for "Continue Last Night's Adventure").
     private var recentStoryForSelectedChild: Story? {
@@ -96,22 +101,27 @@ struct HomeView: View {
             AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
 
             GeometryReader { proxy in
+                let isCompactPhone = isCompactPhone(proxy)
+                let headerTitleSize: CGFloat = isCompactPhone ? 28 : 32
+                let sectionTitleSize: CGFloat = isCompactPhone ? 18 : 20
+                let welcomeSize: CGFloat = isCompactPhone ? 14 : 16
+                let sectionSpacing: CGFloat = isCompactPhone ? 16 : 20
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 20) {
+                    VStack(alignment: .leading, spacing: sectionSpacing) {
                         // 1. Welcome Header
                         VStack(alignment: .leading, spacing: 8) {
                             Text(LocalizationManager.shared.homeWelcome)
-                                .font(.system(size: 16, weight: .medium))
+                                .font(.system(size: welcomeSize, weight: .medium))
                                 .foregroundColor(Color(white: 0.85))
                             
                             Text(LocalizationManager.shared.homeCreateMagicalStories)
-                                .font(.system(size: 32, weight: .bold))
+                                .font(.system(size: headerTitleSize, weight: .bold))
                                 .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                         }
-                        .padding(.top, 10)
+                        .padding(.top, isCompactPhone ? 6 : 10)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal)
-                        .padding(.top, 8)
+                        .padding(.top, isCompactPhone ? 4 : 8)
                         .background(
                             GeometryReader { headerGeo in
                                 Color.clear.preference(
@@ -128,7 +138,7 @@ struct HomeView: View {
                         if !freeDemoStories.isEmpty || isLoadingFreeStories {
                             VStack(alignment: .leading, spacing: 16) {
                                 Text(LocalizationManager.shared.homeDailyFreeStory)
-                                    .font(.system(size: 20, weight: .semibold))
+                                    .font(.system(size: sectionTitleSize, weight: .semibold))
                                     .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                                     .padding(.horizontal)
                                 
@@ -161,7 +171,7 @@ struct HomeView: View {
                             VStack(alignment: .leading, spacing: 12) {
                                 HStack {
                                     Text(LocalizationManager.shared.homeRecentMagic)
-                                        .font(.system(size: 20, weight: .semibold))
+                                        .font(.system(size: sectionTitleSize, weight: .semibold))
                                         .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                                     
                                     Spacer()
@@ -193,7 +203,7 @@ struct HomeView: View {
                             continueStoryButton
                         }
                     }
-                    .padding(.bottom, 100)
+                    .padding(.bottom, isCompactPhone ? 70 : 100)
                     
                     // Bottom spacing for TabBar
                     Spacer(minLength: 50)
@@ -208,6 +218,12 @@ struct HomeView: View {
             await loadDailyFreeStories()
         }
     }
+
+    private func isCompactPhone(_ proxy: GeometryProxy) -> Bool {
+        let width = proxy.size.width
+        let height = proxy.size.height
+        return width <= 375 && height <= 812
+    }
     
     // MARK: - Sections
 
@@ -215,7 +231,7 @@ struct HomeView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text(LocalizationManager.shared.homeWhoIsListening)
-                    .font(.system(size: 20, weight: .semibold))
+                    .font(.system(size: isCompactDevice ? 18 : 20, weight: .semibold))
                     .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                 
                 Spacer()
@@ -270,11 +286,11 @@ struct HomeView: View {
                         .foregroundColor(AppTheme.primaryPurple.opacity(0.6))
                     
                     Text(LocalizationManager.shared.homeWhoIsOurHero)
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(.system(size: isCompactDevice ? 15 : 16, weight: .semibold))
                         .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                     
                     Text(LocalizationManager.shared.homeAddProfileDescription)
-                        .font(.system(size: 14))
+                        .font(.system(size: isCompactDevice ? 13 : 14))
                         .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                         .multilineTextAlignment(.center)
                     
@@ -282,7 +298,7 @@ struct HomeView: View {
                         HStack {
                             Image(systemName: "plus")
                             Text(LocalizationManager.shared.homeAddProfile)
-                                .font(.system(size: 14, weight: .semibold))
+                                .font(.system(size: isCompactDevice ? 13 : 14, weight: .semibold))
                         }
                         .foregroundColor(.white)
                         .padding(.horizontal, 20)
@@ -301,7 +317,7 @@ struct HomeView: View {
     private var tonightsPickSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(LocalizationManager.shared.homeTonightsPick)
-                .font(.system(size: 20, weight: .semibold))
+                .font(.system(size: isCompactDevice ? 18 : 20, weight: .semibold))
                 .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                 .padding(.horizontal)
             

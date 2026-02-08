@@ -414,6 +414,8 @@ class OpenRouterClient:
         max_tokens: int = 10000,
         temperature: float = 0.7,
         max_retries: int = 3,
+        frequency_penalty=0.5,
+        presence_penalty=0.3,
         retry_delay: float = 1.0
     ) -> T:
         """Generate structured output using OpenRouter API with Pydantic model validation.

@@ -30,27 +30,27 @@ class LocalizationManager: ObservableObject {
     var homeWelcome: String { localized("Welcome", "Добро пожаловать") }
     var homeCreateMagicalStories: String { localized("Create Magical Stories", "Создавайте волшебные истории") }
     var homeFreeStories: String { localized("Free Stories", "Бесплатные истории") }
-    var homeDailyFreeStory: String { localized("Daily Free Story", "История дня") }
+    var homeDailyFreeStory: String { localized("Daily Free Story", "Бесплатная история дня") }
     var homeWhoIsListening: String { localized("Who is listening?", "Кто слушает?") }
     var homeManage: String { localized("Manage", "Управление") }
-    var homeTonightsPick: String { localized("Tonight's Pick", "Выбор вечера") }
+    var homeTonightsPick: String { localized("Tonight's Pick", "Вечерний выбор") }
     var homeContinueLastNight: String { localized("Continue Last Night's Adventure", "Продолжить вчерашнее приключение") }
     var homeWhoIsOurHero: String { localized("Who is our hero today?", "Кто наш герой сегодня?") }
     var homeAddProfile: String { localized("Add Profile", "Добавить профиль") }
     var homeAddProfileDescription: String { localized("Add a profile to start the adventure.", "Добавьте профиль, чтобы начать приключение.") }
     var homeAdd: String { localized("Add", "Добавить") }
     var homeRecentMagic: String { localized("Recent Magic", "Недавняя магия") }
-    var homeViewAll: String { localized("View All", "Смотреть все") }
+    var homeViewAll: String { localized("View All", "Показать всё") }
     var homePopularThemes: String { localized("Popular Themes", "Популярные темы") }
-    var homeSparkNewAdventure: String { localized("Spark a New Adventure", "Зажги новое приключение") }
+    var homeSparkNewAdventure: String { localized("Spark a New Adventure", "Начните новое приключение") }
     var homeCreateNewTale: String { localized("Create New Tale", "Создать новую сказку") }
-    var homeEveryStoryNeedsHero: String { localized("Every story needs a hero. Add your child to start the magic!", "Каждой истории нужен герой. Добавьте вашего ребенка, чтобы начать магию!") }
-    var homeAddChildProfile: String { localized("Add Child Profile", "Добавить профиль ребенка") }
+    var homeEveryStoryNeedsHero: String { localized("Every story needs a hero. Add your child to start the magic!", "Каждой истории нужен герой. Добавьте ребёнка, чтобы начать волшебство!") }
+    var homeAddChildProfile: String { localized("Add Child Profile", "Добавить профиль ребёнка") }
     
     // Settings View
     var settingsAccount: String { localized("Account", "Аккаунт") }
     var settingsChildren: String { localized("CHILDREN", "ДЕТИ") }
-    var settingsAppExperience: String { localized("APP EXPERIENCE", "ОПЫТ ПРИЛОЖЕНИЯ") }
+    var settingsAppExperience: String { localized("APP EXPERIENCE", "НАСТРОЙКИ ПРИЛОЖЕНИЯ") }
     var settingsPushNotifications: String { localized("Push Notifications", "Push-уведомления") }
     var settingsSoundEffects: String { localized("Sound Effects", "Звуковые эффекты") }
     var settingsLanguage: String { localized("Language", "Язык") }
@@ -58,11 +58,11 @@ class LocalizationManager: ObservableObject {
     var settingsStorytellerPro: String { localized("Storyteller Pro", "Storyteller Pro") }
     var settingsActivePlan: String { localized("Active Plan", "Активный план") }
     var settingsManageSubscription: String { localized("Manage Subscription", "Управление подпиской") }
-    var settingsSpreadTheMagic: String { localized("SPREAD THE MAGIC", "РАСПРОСТРАНИТЕ МАГИЮ") }
-    var settingsInviteParentFriend: String { localized("Invite a Parent Friend", "Пригласить друга-родителя") }
+    var settingsSpreadTheMagic: String { localized("SPREAD THE MAGIC", "ДЕЛИТЕСЬ МАГИЕЙ") }
+    var settingsInviteParentFriend: String { localized("Invite a Parent Friend", "Пригласить друга‑родителя") }
     var settingsGiveMagicGetCredits: String { localized("Give magic", "Дарите магию") }
     var settingsSupportLegal: String { localized("SUPPORT & LEGAL", "ПОДДЕРЖКА И ПРАВО") }
-    var settingsHelpCenter: String { localized("Help Center", "Центр помощи") }
+    var settingsHelpCenter: String { localized("Help Center", "Центр поддержки") }
     var settingsPrivacyPolicy: String { localized("Privacy Policy", "Политика конфиденциальности") }
     var settingsTermsOfService: String { localized("Terms of Service", "Условия использования") }
     var settingsLogOut: String { localized("Log Out", "Выйти") }
@@ -73,7 +73,7 @@ class LocalizationManager: ObservableObject {
     var settingsSyncProfiles: String { localized("Sync profiles and stories across all your devices.", "Синхронизируйте профили и истории на всех ваших устройствах.") }
     var settingsSignIn: String { localized("Sign In", "Войти") }
     var settingsCreateAccount: String { localized("Create Account", "Создать аккаунт") }
-    var settingsAddNewChild: String { localized("Add a new child", "Добавить нового ребенка") }
+    var settingsAddNewChild: String { localized("Add a new child", "Добавить ребёнка") }
     
     // Add Child View
     var addChildCreateHero: String { localized("Create Hero", "Создать героя") }
@@ -87,9 +87,9 @@ class LocalizationManager: ObservableObject {
     // Generate Story View
     var generateStoryCreateStory: String { localized("Create Story", "Создать историю") }
     var generateStoryWhoIsListening: String { localized("Who is listening?", "Кто слушает?") }
-    var generateStoryLoadingChildren: String { localized("Loading children...", "Загрузка детей...") }
-    var generateStoryAddChildFirst: String { localized("Add a child first", "Сначала добавьте ребенка") }
-    var generateStoryNew: String { localized("NEW", "НОВЫЙ") }
+    var generateStoryLoadingChildren: String { localized("Loading children...", "Загружаем профили...") }
+    var generateStoryAddChildFirst: String { localized("Add a child first", "Сначала добавьте ребёнка") }
+    var generateStoryNew: String { localized("NEW", "НОВОЕ") }
     var generateStoryDuration: String { localized("Duration", "Длительность") }
     var generateStoryMin: String { localized("min", "мин") }
     var generateStoryPremium: String { localized("Premium", "Премиум") }
@@ -98,32 +98,32 @@ class LocalizationManager: ObservableObject {
     var generateStoryChooseTheme: String { localized("Choose a Theme", "Выберите тему") }
     var generateStoryBriefPlot: String { localized("Brief Plot", "Краткий сюжет") }
     var generateStoryDescribeStory: String { localized("Describe the story you want to create...", "Опишите историю, которую хотите создать...") }
-    var generateStoryPlotPlaceholder: String { localized("Optional: Add your own twist...\nExample: 'The hero finds a magical map in the attic'", "Необязательно: Добавьте свой поворот...\nПример: 'Герой находит волшебную карту на чердаке'") }
+    var generateStoryPlotPlaceholder: String { localized("Optional: Add your own twist...\nExample: 'The hero finds a magical map in the attic'", "Необязательно: добавьте свой поворот...\nПример: «Герой находит волшебную карту на чердаке»") }
     var generateStoryPickThemeOrPlot: String { localized("Pick a theme or describe a story to begin ✨", "Выберите тему или опишите историю, чтобы начать ✨") }
     var generateStoryChooseAdventure: String { localized("Choose Your Adventure", "Выберите приключение") }
-    var generateStoryPickThemeOrPlotAlert: String { localized("Pick a theme or describe your own story to begin the magic ✨", "Выберите тему или опишите свою историю, чтобы начать магию ✨") }
+    var generateStoryPickThemeOrPlotAlert: String { localized("Pick a theme or describe your own story to begin the magic ✨", "Выберите тему или опишите свою историю, чтобы начать волшебство ✨") }
     var generateStoryGotIt: String { localized("Got it", "Понятно") }
-    var generateStorySeeAllThemes: String { localized("See All Themes", "Все темы") }
+    var generateStorySeeAllThemes: String { localized("See All Themes", "Показать все темы") }
     var generateStoryMoreThemes: String { localized("(5 more)", "(ещё 5)") }
     var generateStoryShowLess: String { localized("Show less", "Свернуть") }
-    var generateStoryGenerating: String { localized("Generating...", "Генерация...") }
+    var generateStoryGenerating: String { localized("Generating...", "Создаём...") }
     var generateStoryGenerateStory: String { localized("Generate Story", "Создать историю") }
-    var generateStoryWhoIsHeroToday: String { localized("Who is the hero today?", "Кто герой сегодня?") }
-    var generateStoryNeedProfile: String { localized("You need to add a child profile before we can craft a tale.", "Вам нужно добавить профиль ребенка, прежде чем мы сможем создать сказку.") }
+    var generateStoryWhoIsHeroToday: String { localized("Who is the hero today?", "Кто сегодня герой?") }
+    var generateStoryNeedProfile: String { localized("You need to add a child profile before we can craft a tale.", "Нужно добавить профиль ребёнка, прежде чем мы сможем создать сказку.") }
     var generateStoryCreateProfile: String { localized("Create a Profile", "Создать профиль") }
     
     // Library View
     var libraryMyLibrary: String { localized("My Library", "Моя библиотека") }
-    var libraryLoadingStories: String { localized("Loading stories...", "Загрузка историй...") }
-    var libraryNoStoriesYet: String { localized("No stories yet", "Историй пока нет") }
+    var libraryLoadingStories: String { localized("Loading stories...", "Загружаем истории...") }
+    var libraryNoStoriesYet: String { localized("No stories yet", "Пока нет историй") }
     var libraryCreateFirstStory: String { localized("Create your first magical story", "Создайте свою первую волшебную историю") }
     var librarySearchStories: String { localized("Search stories, characters...", "Поиск историй, персонажей...") }
     var libraryAllStories: String { localized("All Stories", "Все истории") }
     var libraryBedtime: String { localized("Bedtime", "Перед сном") }
-    var libraryAdventure: String { localized("Adventure", "Приключение") }
+    var libraryAdventure: String { localized("Adventure", "Приключения") }
     var libraryFantasy: String { localized("Fantasy", "Фэнтези") }
     var libraryNoStoriesFound: String { localized("No stories found", "Истории не найдены") }
-    var libraryLoadingMore: String { localized("Loading more stories...", "Загрузка дополнительных историй...") }
+    var libraryLoadingMore: String { localized("Loading more stories...", "Загружаем ещё истории...") }
     var libraryFor: String { localized("For:", "Для:") }
     var libraryRead: String { localized("Read", "Читать") }
     var libraryDayAgo: String { localized("day ago", "день назад") }
@@ -147,7 +147,7 @@ class LocalizationManager: ObservableObject {
     var ageToddler: String { localized("Toddler", "Малыш") }
     var agePreschool: String { localized("Preschool", "Дошкольник") }
     var ageExplorer: String { localized("Explorer", "Исследователь") }
-    var ageBigKid: String { localized("Big Kid", "Большой ребенок") }
+    var ageBigKid: String { localized("Big Kid", "Старший ребёнок") }
     var ageYears: String { localized("years", "лет") }
     var ageToddlerRange: String { localized("1-2 years", "1-2 года") }
     var agePreschoolRange: String { localized("3-5 years", "3-5 лет") }
@@ -174,24 +174,24 @@ class LocalizationManager: ObservableObject {
     
     // Story Themes
     var themeSpace: String { localized("Space", "Космос") }
-    var themeSpaceDesc: String { localized("Galaxies & Aliens", "Галактики и инопланетяне") }
+    var themeSpaceDesc: String { localized("Galaxies & Aliens", "Галактики и пришельцы") }
     var themePirates: String { localized("Pirates", "Пираты") }
     var themePiratesDesc: String { localized("Treasure & Adventure", "Сокровища и приключения") }
     var themeDinosaurs: String { localized("Dinosaurs", "Динозавры") }
-    var themeDinosaursDesc: String { localized("Prehistoric Adventures", "Доисторические приключения") }
+    var themeDinosaursDesc: String { localized("Prehistoric Adventures", "Приключения в доисторическом мире") }
     var themeMermaids: String { localized("Mermaids", "Русалки") }
-    var themeMermaidsDesc: String { localized("Ocean Magic", "Океанская магия") }
+    var themeMermaidsDesc: String { localized("Ocean Magic", "Магия океана") }
     var themeAnimals: String { localized("Animals", "Животные") }
     var themeAnimalsDesc: String { localized("Forest Friends", "Лесные друзья") }
     var themeMystery: String { localized("Mystery", "Тайна") }
-    var themeMysteryDesc: String { localized("Clues & Secrets", "Подсказки и секреты") }
+    var themeMysteryDesc: String { localized("Clues & Secrets", "Улики и тайны") }
     var themeMagicSchool: String { localized("Magic School", "Школа магии") }
-    var themeMagicSchoolDesc: String { localized("Wizardry & Spells", "Колдовство и заклинания") }
+    var themeMagicSchoolDesc: String { localized("Wizardry & Spells", "Волшебство и заклинания") }
     var themeRobots: String { localized("Robots", "Роботы") }
-    var themeRobotsDesc: String { localized("Tech Adventures", "Технические приключения") }
+    var themeRobotsDesc: String { localized("Tech Adventures", "Техно‑приключения") }
     
     // Protagonist Style Selector
-    var styleSelectorCaption: String { localized("The Hero style focuses on your child's name for a classic story feel.", "Стиль Герой фокусируется на имени вашего ребенка для классического ощущения истории.") }
+    var styleSelectorCaption: String { localized("The Hero style focuses on your child's name for a classic story feel.", "Стиль «Герой» делает акцент на имени ребёнка — классическое ощущение сказки.") }
     
     // Helper function
     private func localized(_ english: String, _ russian: String) -> String {

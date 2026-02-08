@@ -13,106 +13,104 @@ struct GenerateStoryView: View {
     @State private var showAllThemes = false
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
-                
-                if !childrenStore.hasProfiles {
-                    // Empty State
-                    VStack(spacing: 24) {
-                        Image(systemName: "person.fill.badge.plus")
-                            .font(.system(size: 80, weight: .light))
-                            .foregroundColor(AppTheme.primaryPurple.opacity(0.6))
-                            .symbolEffect(.pulse, options: .repeating)
-                        
-                        Text(LocalizationManager.shared.generateStoryWhoIsHeroToday)
-                            .font(.system(size: 28, weight: .bold))
-                            .foregroundColor(AppTheme.textPrimary(for: colorScheme))
-                        
-                        Text(LocalizationManager.shared.generateStoryNeedProfile)
-                            .font(.system(size: 16))
-                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal, 40)
-                        
-                        Button(action: { viewModel.showingAddChild = true }) {
-                            HStack {
-                                Image(systemName: "person.fill.badge.plus")
-                                Text(LocalizationManager.shared.generateStoryCreateProfile)
-                                    .font(.system(size: 18, weight: .semibold))
-                            }
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(
-                                LinearGradient(
-                                    colors: [AppTheme.primaryPurple, AppTheme.accentPurple],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                            .cornerRadius(AppTheme.cornerRadius)
-                        }
+        ZStack {
+            AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
+            
+            if !childrenStore.hasProfiles {
+                // Empty State
+                VStack(spacing: 24) {
+                    Image(systemName: "person.fill.badge.plus")
+                        .font(.system(size: 80, weight: .light))
+                        .foregroundColor(AppTheme.primaryPurple.opacity(0.6))
+                        .symbolEffect(.pulse, options: .repeating)
+                    
+                    Text(LocalizationManager.shared.generateStoryWhoIsHeroToday)
+                        .font(.system(size: 28, weight: .bold))
+                        .foregroundColor(AppTheme.textPrimary(for: colorScheme))
+                    
+                    Text(LocalizationManager.shared.generateStoryNeedProfile)
+                        .font(.system(size: 16))
+                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                        .multilineTextAlignment(.center)
                         .padding(.horizontal, 40)
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else {
-                    ScrollView {
-                        VStack(spacing: 24) {
-                            childrenSelectionSection
-                            
-                            durationSection
-                            
-                            themeSelectionSection
-                            
-                            seeAllThemesButton
-                            
-                            plotSection
-                            
-                            // Отображение ошибок
-                            if let errorMessage = storiesStore.errorMessage {
-                                errorAlertView(message: errorMessage)
-                            }
-                            
-                            generateButton
+                    
+                    Button(action: { viewModel.showingAddChild = true }) {
+                        HStack {
+                            Image(systemName: "person.fill.badge.plus")
+                            Text(LocalizationManager.shared.generateStoryCreateProfile)
+                                .font(.system(size: 18, weight: .semibold))
                         }
-                        .padding(.top)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(
+                            LinearGradient(
+                                colors: [AppTheme.primaryPurple, AppTheme.accentPurple],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .cornerRadius(AppTheme.cornerRadius)
+                    }
+                    .padding(.horizontal, 40)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                ScrollView {
+                    VStack(spacing: 24) {
+                        childrenSelectionSection
+                        
+                        durationSection
+                        
+                        themeSelectionSection
+                        
+                        seeAllThemesButton
+                        
+                        plotSection
+                        
+                        // Отображение ошибок
+                        if let errorMessage = storiesStore.errorMessage {
+                            errorAlertView(message: errorMessage)
+                        }
+                        
+                        generateButton
                     }
                 }
+                .contentMargins(.top, 0, for: .scrollContent)
             }
-            .navigationTitle(LocalizationManager.shared.generateStoryCreateStory)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        dismiss()
-                    }) {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                    }
+        }
+        .navigationTitle(LocalizationManager.shared.generateStoryCreateStory)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: {
+                    dismiss()
+                }) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                 }
             }
-            .task {
-                await childrenStore.loadChildrenIfNeeded()
+        }
+        .task {
+            await childrenStore.loadChildrenIfNeeded()
+        }
+        .onAppear {
+            if childrenStore.children.count == 1 {
+                viewModel.selectedChildId = childrenStore.children.first?.id
             }
-            .onAppear {
-                if childrenStore.children.count == 1 {
-                    viewModel.selectedChildId = childrenStore.children.first?.id
-                }
+        }
+        .onChange(of: childrenStore.children.count) { _, newCount in
+            if newCount == 1 {
+                viewModel.selectedChildId = childrenStore.children.first?.id
             }
-            .onChange(of: childrenStore.children.count) { _, newCount in
-                if newCount == 1 {
-                    viewModel.selectedChildId = childrenStore.children.first?.id
-                }
-            }
-            .sheet(isPresented: $viewModel.showingAddChild) {
-                AddChildView()
-            }
-            .sheet(isPresented: $viewModel.showingStoryResult) {
-                if let story = viewModel.generatedStory {
-                    StoryResultView(story: story)
-                }
+        }
+        .sheet(isPresented: $viewModel.showingAddChild) {
+            AddChildView()
+        }
+        .sheet(isPresented: $viewModel.showingStoryResult) {
+            if let story = viewModel.generatedStory {
+                StoryResultView(story: story)
             }
         }
     }
