@@ -207,7 +207,7 @@ class StoriesService: ObservableObject {
         }
         
         guard (200...299).contains(httpResponse.statusCode) else {
-            let errorMessage = String(data: data, encoding: .utf8) ?? "Unknown error"
+            let errorMessage = Self.extractDetail(from: data) ?? String(data: data, encoding: .utf8) ?? "Unknown error"
             print("❌ API Error: Status \(httpResponse.statusCode), Message: \(errorMessage)")
             
             // Специальная обработка для ошибки 429 (Too Many Requests)
@@ -254,6 +254,50 @@ class StoriesService: ObservableObject {
             rating: nil,
             ageCategory: apiResponse.ageCategory
         )
+    }
+}
+
+// MARK: - API Error detail extraction
+private struct APIErrorDetail: Decodable {
+    let detail: DetailValue?
+    enum DetailValue: Decodable {
+        case string(String)
+        case stringArray([String])
+        case objectArray([DetailItem])
+        init(from decoder: Decoder) throws {
+            let c = try decoder.singleValueContainer()
+            if let s = try? c.decode(String.self) {
+                self = .string(s)
+            } else if let a = try? c.decode([String].self) {
+                self = .stringArray(a)
+            } else if let a = try? c.decode([DetailItem].self) {
+                self = .objectArray(a)
+            } else {
+                self = .string("Unknown error")
+            }
+        }
+    }
+    struct DetailItem: Decodable {
+        let msg: String?
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            msg = try c.decodeIfPresent(String.self, forKey: .msg)
+        }
+        private enum CodingKeys: String, CodingKey { case msg }
+    }
+}
+
+extension StoriesService {
+    static func extractDetail(from data: Data) -> String? {
+        guard let decoded = try? JSONDecoder().decode(APIErrorDetail.self, from: data),
+              let detail = decoded.detail else { return nil }
+        switch detail {
+        case .string(let s): return s
+        case .stringArray(let a): return a.isEmpty ? nil : a.joined(separator: "\n")
+        case .objectArray(let a):
+            let messages = a.compactMap { $0.msg }
+            return messages.isEmpty ? nil : messages.joined(separator: "\n")
+        }
     }
 }
 
@@ -466,26 +510,18 @@ enum StoriesServiceError: LocalizedError {
     case rateLimitExceeded(retryAfterSeconds: Int?)
     
     var errorDescription: String? {
+        let L = LocalizationManager.shared
         switch self {
         case .supabaseNotConfigured:
-            return "Supabase не настроен. Пожалуйста, заполните конфигурацию."
+            return L.errorSupabaseNotConfigured
         case .invalidURL:
-            return "Неверный URL для генерации истории."
+            return L.errorInvalidURL
         case .invalidResponse:
-            return "Неверный ответ от сервера."
+            return L.errorInvalidResponse
         case .apiError(let statusCode, let message):
-            return "Ошибка API (код \(statusCode)): \(message)"
+            return L.errorApiError(statusCode: statusCode, message: message)
         case .rateLimitExceeded(let retryAfterSeconds):
-            if let seconds = retryAfterSeconds {
-                let minutes = seconds / 60
-                if minutes > 0 {
-                    return "Превышен лимит запросов. Попробуйте снова через \(minutes) \(minutes == 1 ? "минуту" : minutes < 5 ? "минуты" : "минут")."
-                } else {
-                    return "Превышен лимит запросов. Попробуйте снова через \(seconds) \(seconds == 1 ? "секунду" : seconds < 5 ? "секунды" : "секунд")."
-                }
-            } else {
-                return "Превышен лимит запросов. Пожалуйста, подождите немного и попробуйте снова."
-            }
+            return L.errorRateLimitExceeded(retryAfterSeconds: retryAfterSeconds)
         }
     }
 }

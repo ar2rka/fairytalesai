@@ -6,7 +6,6 @@ struct StoryReadingView: View {
     @EnvironmentObject var userSettings: UserSettings
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
-    @State private var showingPaywall = false
     @State private var showShareSheet = false
     
     var body: some View {
@@ -39,26 +38,23 @@ struct StoryReadingView: View {
                         }
                     }
                     
-                    // Listen Button with Premium Lock
+                    // Listen Button with Premium Lock (inactive when not premium)
                     Button(action: {
-                        if !userSettings.isPremium {
-                            showingPaywall = true
-                        } else {
-                            // Start audio playback
-                            // In production, this would start the audio narration
-                        }
+                        // Start audio playback — only reachable when premium
                     }) {
-                            HStack {
-                                Image(systemName: userSettings.isPremium ? "play.circle.fill" : "lock.fill")
-                                Text(userSettings.isPremium ? LocalizationManager.shared.storyReadingListen : LocalizationManager.shared.storyReadingListenPremium)
-                                    .font(.system(size: 16, weight: .semibold))
-                            }
+                        HStack {
+                            Image(systemName: userSettings.isPremium ? "play.circle.fill" : "lock.fill")
+                            Text(userSettings.isPremium ? LocalizationManager.shared.storyReadingListen : LocalizationManager.shared.storyReadingListenPremium)
+                                .font(.system(size: 16, weight: .semibold))
+                        }
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(userSettings.isPremium ? AppTheme.primaryPurple : AppTheme.primaryPurple.opacity(0.5))
                         .cornerRadius(AppTheme.cornerRadius)
                     }
+                    .disabled(!userSettings.isPremium)
+                    .allowsHitTesting(userSettings.isPremium)
                     
                     // Story Content
                     Text(story.content)
@@ -85,12 +81,6 @@ struct StoryReadingView: View {
                             .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                     }
                 }
-            }
-        }
-        .sheet(isPresented: $showingPaywall) {
-            NavigationView {
-                PaywallView()
-                    .environmentObject(userSettings)
             }
         }
         .sheet(isPresented: $showShareSheet) {

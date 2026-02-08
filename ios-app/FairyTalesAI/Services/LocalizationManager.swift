@@ -141,7 +141,7 @@ class LocalizationManager: ObservableObject {
     // Story Reading View
     var storyReadingStory: String { localized("Story", "История") }
     var storyReadingListen: String { localized("Listen", "Слушать") }
-    var storyReadingListenPremium: String { localized("Listen (Premium)", "Слушать (Премиум)") }
+    var storyReadingListenPremium: String { localized("Listen (Soon)", "Слушать (Скоро)") }
     
     // Age Categories
     var ageToddler: String { localized("Toddler", "Малыш") }
@@ -192,6 +192,65 @@ class LocalizationManager: ObservableObject {
     
     // Protagonist Style Selector
     var styleSelectorCaption: String { localized("The Hero style focuses on your child's name for a classic story feel.", "Стиль «Герой» делает акцент на имени ребёнка — классическое ощущение сказки.") }
+    
+    // Stories Service Errors
+    var errorSupabaseNotConfigured: String { localized("Supabase is not configured. Please fill in the configuration.", "Supabase не настроен. Пожалуйста, заполните конфигурацию.") }
+    var errorInvalidURL: String { localized("Invalid URL for story generation.", "Неверный URL для генерации истории.") }
+    var errorInvalidResponse: String { localized("Invalid response from server.", "Неверный ответ от сервера.") }
+    private var errorLabel: String { localized("Error", "Ошибка") }
+    func errorApiError(statusCode: Int, message: String) -> String {
+        let localizedMessage = localizedApiErrorMessage(message)
+        return "\(errorLabel): \(localizedMessage)"
+    }
+    /// Maps known API detail strings to localized text; unknown messages are returned as-is.
+    private func localizedApiErrorMessage(_ message: String) -> String {
+        let trimmed = message.trimmingCharacters(in: .whitespacesAndNewlines)
+        // Map common API error messages to localized strings
+        switch trimmed {
+        case _ where trimmed.lowercased().contains("error generating story"):
+            return localized("Something went wrong while generating the story. Please try again.", "Не удалось сгенерировать историю. Попробуйте ещё раз.")
+        case _ where trimmed.lowercased().contains("supabase not configured"):
+            return errorSupabaseNotConfigured
+        case _ where trimmed.lowercased().contains("invalid language"):
+            return localized("Invalid language. Please choose a supported language.", "Неверный язык. Выберите поддерживаемый язык.")
+        case _ where trimmed.lowercased().contains("rate limit") || trimmed.lowercased().contains("too many requests"):
+            return localized("Too many requests. Please try again later.", "Слишком много запросов. Попробуйте позже.")
+        case _ where trimmed.lowercased().contains("not found") || trimmed.lowercased().contains("access denied"):
+            return localized("Resource not found or access denied.", "Ресурс не найден или доступ запрещён.")
+        case _ where trimmed.lowercased().contains("timeout") || trimmed.lowercased().contains("timed out"):
+            return localized("Request timed out. Please try again.", "Превышено время ожидания. Попробуйте ещё раз.")
+        case _ where trimmed.lowercased().contains("internal server error") || trimmed.lowercased().contains("server error"):
+            return localized("Server error. Please try again later.", "Ошибка сервера. Попробуйте позже.")
+        case _ where trimmed.lowercased().contains("prompt validation rejected"):
+            return localized("Your request didn't pass our safety check. Please try different words or topic.", "Запрос не прошёл проверку. Попробуйте другие слова или тему.")
+        default:
+            return message
+        }
+    }
+    func errorRateLimitExceeded(retryAfterSeconds: Int?) -> String {
+        if let seconds = retryAfterSeconds {
+            let minutes = seconds / 60
+            if minutes > 0 {
+                if isRussian {
+                    let word = minutes == 1 ? "минуту" : (minutes < 5 ? "минуты" : "минут")
+                    return "Превышен лимит запросов. Попробуйте снова через \(minutes) \(word)."
+                } else {
+                    let word = minutes == 1 ? "minute" : "minutes"
+                    return "Rate limit exceeded. Try again in \(minutes) \(word)."
+                }
+            } else {
+                if isRussian {
+                    let word = seconds == 1 ? "секунду" : (seconds < 5 ? "секунды" : "секунд")
+                    return "Превышен лимит запросов. Попробуйте снова через \(seconds) \(word)."
+                } else {
+                    let word = seconds == 1 ? "second" : "seconds"
+                    return "Rate limit exceeded. Try again in \(seconds) \(word)."
+                }
+            }
+        } else {
+            return localized("Rate limit exceeded. Try again tomorrow.", "Превышен лимит запросов. Пожалуйста, подождите немного и попробуйте снова.")
+        }
+    }
     
     // Helper function
     private func localized(_ english: String, _ russian: String) -> String {

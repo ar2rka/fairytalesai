@@ -8,8 +8,6 @@ struct StoryResultView: View {
     @EnvironmentObject var premiumManager: PremiumManager
     @EnvironmentObject var userSettings: UserSettings
     @AppStorage("selectedLanguage") private var selectedLanguage = "English"
-    @State private var showingPaywall = false
-    
     private var soonText: String {
         selectedLanguage == "Russian" ? "Скоро" : "Soon"
     }
@@ -25,30 +23,27 @@ struct StoryResultView: View {
                             .font(.system(size: 28, weight: .bold))
                             .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                         
-                        // Listen Button with Premium Lock
+                        // Listen Button with Premium Lock (inactive when not premium)
                         Button(action: {
-                            if !userSettings.isPremium {
-                                showingPaywall = true
-                            } else {
-                                // Start audio playback
-                                // In production, this would start the audio narration
-                            }
+                            // Start audio playback — only reachable when premium
+                            // In production, this would start the audio narration
                         }) {
                             HStack(spacing: 12) {
                                 Image(systemName: userSettings.isPremium ? "play.circle.fill" : "lock.fill")
-                                Text(userSettings.isPremium ? "Listen" : "Listen (Premium)")
+                                Text(userSettings.isPremium ? "Listen" : "Listen (Soon)")
                                     .font(.system(size: 16, weight: .semibold))
                                 
                                 Spacer()
                                 
-                                // Soon badge
-                                Text(soonText)
-                                    .font(.system(size: 12, weight: .semibold))
-                                    .foregroundColor(.white)
-                                    .padding(.horizontal, 8)
-                                    .padding(.vertical, 4)
-                                    .background(Color.white.opacity(0.3))
-                                    .cornerRadius(8)
+                                if !userSettings.isPremium {
+                                    Text(soonText)
+                                        .font(.system(size: 12, weight: .semibold))
+                                        .foregroundColor(.white)
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 4)
+                                        .background(Color.white.opacity(0.3))
+                                        .cornerRadius(8)
+                                }
                             }
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
@@ -56,6 +51,8 @@ struct StoryResultView: View {
                             .background(userSettings.isPremium ? AppTheme.primaryPurple : AppTheme.primaryPurple.opacity(0.5))
                             .cornerRadius(25)
                         }
+                        .disabled(!userSettings.isPremium)
+                        .allowsHitTesting(userSettings.isPremium)
                         
                         Text(story.content)
                             .font(.system(size: userSettings.storyFontSize))
@@ -97,12 +94,6 @@ struct StoryResultView: View {
                         }
                         .foregroundColor(AppTheme.primaryPurple)
                     }
-                }
-            }
-            .sheet(isPresented: $showingPaywall) {
-                NavigationView {
-                    PaywallView()
-                        .environmentObject(userSettings)
                 }
             }
         }

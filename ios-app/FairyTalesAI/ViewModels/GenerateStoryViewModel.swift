@@ -64,14 +64,13 @@ class GenerateStoryViewModel: ObservableObject {
                 children: childrenStore.children,
                 language: userSettings.languageCode
             )
-            
-            // Используем lastGeneratedStoryId для более надежного определения последней истории
+            // Show result only when generation succeeded (no error); otherwise stay on generation page
+            guard storiesStore.errorMessage == nil else { return }
             if let storyId = storiesStore.lastGeneratedStoryId,
                let latestStory = storiesStore.stories.first(where: { $0.id == storyId }) {
                 self.generatedStory = latestStory
                 self.showingStoryResult = true
             } else if let latestStory = storiesStore.stories.first {
-                // Fallback на первую историю в списке
                 self.generatedStory = latestStory
                 self.showingStoryResult = true
             }

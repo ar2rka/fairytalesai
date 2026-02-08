@@ -3,6 +3,7 @@ import SwiftUI
 /// Highlighted "Tonight's Pick" theme card with badge and subtle glow. Same tap behavior as ThemeButton.
 struct TonightsPickCard: View {
     let theme: StoryTheme
+    var onTap: ((StoryTheme) -> Void)? = nil
     @Environment(\.colorScheme) var colorScheme
     @State private var bounceScale: CGFloat = 1.0
     
@@ -24,6 +25,7 @@ struct TonightsPickCard: View {
         Button(action: {
             let impactFeedback = UIImpactFeedbackGenerator(style: .light)
             impactFeedback.impactOccurred()
+            onTap?(theme)
             withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) {
                 bounceScale = 1.05
             }

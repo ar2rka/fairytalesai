@@ -1,5 +1,18 @@
 import SwiftUI
 
+/// Coordinates presenting Create Story from tab bar (no theme) or from Home "Tonight's Pick" (preselected theme).
+final class CreateStoryPresentation: ObservableObject {
+    @Published var isPresented = false
+    @Published var preselectedTheme: StoryTheme?
+    func present(withTheme theme: StoryTheme?) {
+        preselectedTheme = theme
+        isPresented = true
+    }
+    func clearPreselectedTheme() {
+        preselectedTheme = nil
+    }
+}
+
 struct MainTabView: View {
     @EnvironmentObject var childrenStore: ChildrenStore
     @EnvironmentObject var storiesStore: StoriesStore
@@ -8,7 +21,7 @@ struct MainTabView: View {
     @EnvironmentObject var authService: AuthService
     
     @State private var selectedTab = 0
-    @State private var showingCreateStory = false
+    @StateObject private var createStoryPresentation = CreateStoryPresentation()
     
     var body: some View {
         ZStack {
@@ -33,20 +46,23 @@ struct MainTabView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding(.bottom, 65) // Space for tab bar
+            .environmentObject(createStoryPresentation)
 
             // 4-tab liquid glass tab bar at the bottom
             VStack {
                 Spacer()
                 CustomTabBar(selectedTab: $selectedTab, onCreateTapped: {
-                    showingCreateStory = true
+                    createStoryPresentation.present(withTheme: nil)
                 })
             }
         }
         .edgesIgnoringSafeArea(.bottom)
         .preferredColorScheme(.dark) // Force dark mode
-        .fullScreenCover(isPresented: $showingCreateStory) {
+        .fullScreenCover(isPresented: $createStoryPresentation.isPresented, onDismiss: {
+            createStoryPresentation.clearPreselectedTheme()
+        }) {
             NavigationView {
-                GenerateStoryView()
+                GenerateStoryView(preselectedTheme: createStoryPresentation.preselectedTheme)
             }
             .environmentObject(childrenStore)
             .environmentObject(storiesStore)

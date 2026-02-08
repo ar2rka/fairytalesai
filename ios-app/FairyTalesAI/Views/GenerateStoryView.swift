@@ -12,6 +12,9 @@ struct GenerateStoryView: View {
     @State private var showDisabledGenerateAlert = false
     @State private var showAllThemes = false
     
+    /// When opening from "Tonight's Pick" on Home, this theme is preselected.
+    var preselectedTheme: StoryTheme? = nil
+    
     var body: some View {
         ZStack {
             AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
@@ -99,6 +102,9 @@ struct GenerateStoryView: View {
             if childrenStore.children.count == 1 {
                 viewModel.selectedChildId = childrenStore.children.first?.id
             }
+            if let theme = preselectedTheme {
+                viewModel.selectedTheme = theme
+            }
         }
         .onChange(of: childrenStore.children.count) { _, newCount in
             if newCount == 1 {
@@ -108,7 +114,9 @@ struct GenerateStoryView: View {
         .sheet(isPresented: $viewModel.showingAddChild) {
             AddChildView()
         }
-        .sheet(isPresented: $viewModel.showingStoryResult) {
+        .sheet(isPresented: $viewModel.showingStoryResult, onDismiss: {
+            dismiss()
+        }) {
             if let story = viewModel.generatedStory {
                 StoryResultView(story: story)
             }

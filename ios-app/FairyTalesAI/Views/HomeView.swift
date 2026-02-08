@@ -13,6 +13,7 @@ struct ContentMinYPreferenceKey: PreferenceKey {
 struct HomeView: View {
     @EnvironmentObject var childrenStore: ChildrenStore
     @EnvironmentObject var storiesStore: StoriesStore
+    @EnvironmentObject var createStoryPresentation: CreateStoryPresentation
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.modelContext) private var modelContext
     
@@ -74,10 +75,10 @@ struct HomeView: View {
             return false
         }
 
-        // Rule 2: Don't evaluate until story data has loaded (avoids race condition)
-        if storiesStore.isLoading {
+        // Rule 2: Hide only when loading and we have no stories yet (allow showing from cache)
+        if storiesStore.isLoading && storiesStore.stories.isEmpty {
             #if DEBUG
-            print("  - ⏳ Stories still loading")
+            print("  - ⏳ Stories still loading (no cache)")
             #endif
             return false
         }
@@ -217,6 +218,16 @@ struct HomeView: View {
         .task {
             await loadDailyFreeStories()
         }
+        .onAppear {
+            if supabaseChildren.count == 1 && childrenStore.selectedChildId == nil {
+                childrenStore.selectedChildId = supabaseChildren.first?.id
+            }
+        }
+        .onChange(of: supabaseChildren.count) { _, newCount in
+            if newCount == 1 && childrenStore.selectedChildId == nil {
+                childrenStore.selectedChildId = supabaseChildren.first?.id
+            }
+        }
     }
 
     private func isCompactPhone(_ proxy: GeometryProxy) -> Bool {
@@ -321,8 +332,10 @@ struct HomeView: View {
                 .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                 .padding(.horizontal)
             
-            TonightsPickCard(theme: StoryTheme.tonightsPick)
-                .padding(.horizontal)
+            TonightsPickCard(theme: StoryTheme.tonightsPick) { theme in
+                createStoryPresentation.present(withTheme: theme)
+            }
+            .padding(.horizontal)
         }
     }
 
