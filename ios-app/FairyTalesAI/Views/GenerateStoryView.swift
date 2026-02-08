@@ -99,7 +99,10 @@ struct GenerateStoryView: View {
             await childrenStore.loadChildrenIfNeeded()
         }
         .onAppear {
-            if childrenStore.children.count == 1 {
+            if let homeSelectedId = childrenStore.selectedChildId,
+               childrenStore.children.contains(where: { $0.id == homeSelectedId }) {
+                viewModel.selectedChildId = homeSelectedId
+            } else if childrenStore.children.count == 1 {
                 viewModel.selectedChildId = childrenStore.children.first?.id
             }
             if let theme = preselectedTheme {
@@ -107,8 +110,16 @@ struct GenerateStoryView: View {
             }
         }
         .onChange(of: childrenStore.children.count) { _, newCount in
-            if newCount == 1 {
+            if let homeSelectedId = childrenStore.selectedChildId,
+               childrenStore.children.contains(where: { $0.id == homeSelectedId }) {
+                viewModel.selectedChildId = homeSelectedId
+            } else if newCount == 1 {
                 viewModel.selectedChildId = childrenStore.children.first?.id
+            }
+        }
+        .onChange(of: viewModel.selectedChildId) { _, newId in
+            if let id = newId {
+                childrenStore.selectedChildId = id
             }
         }
         .sheet(isPresented: $viewModel.showingAddChild) {
