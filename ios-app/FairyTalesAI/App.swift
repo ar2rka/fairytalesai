@@ -14,6 +14,25 @@ struct FairyTalesAIApp: App {
         ThemeMode(rawValue: themeModeRaw) ?? .system
     }
     
+    // Check if initial data loading is complete
+    private var shouldShowLoadingScreen: Bool {
+        // Show loading screen if:
+        // 1. Auth is still loading (no user yet) OR
+        // 2. Children are still loading (when user exists)
+        if authService.currentUser == nil {
+            // Wait for auth to complete
+            return true
+        }
+        
+        // If children are loading, show loading screen
+        if childrenStore.isLoading {
+            return true
+        }
+        
+        // Loading is complete (either children loaded or determined empty)
+        return false
+    }
+    
     // SwiftData ModelContainer для кеширования ежедневных историй
     private let modelContainer: ModelContainer = {
         let schema = Schema([DailyFreeStoriesCache.self])
@@ -65,19 +84,39 @@ struct FairyTalesAIApp: App {
     
     var body: some Scene {
         WindowGroup {
-            // Always show main app - anonymous sign-in happens automatically in background
-            // No login screen at startup - users can sign up/login from Settings if needed
-            MainTabView()
-                .environmentObject(childrenStore)
-                .environmentObject(storiesStore)
-                .environmentObject(premiumManager)
-                .environmentObject(userSettings)
-                .environmentObject(authService)
-                .modelContainer(modelContainer)
-                .preferredColorScheme(.dark) // Force dark mode for bedtime-friendly UI
-                .onAppear {
-                    premiumManager.syncWithUserSettings(userSettings)
+            Group {
+                if shouldShowLoadingScreen {
+                    // Loading screen - wait for auth and children data to load
+                    ZStack {
+                        AppTheme.backgroundColor(for: themeMode.colorScheme)
+                            .ignoresSafeArea()
+                        
+                        VStack(spacing: 24) {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.primaryPurple))
+                                .scaleEffect(1.5)
+                            
+                            Text("Loading...")
+                                .font(.system(size: 16))
+                                .foregroundColor(AppTheme.textSecondary(for: themeMode.colorScheme))
+                        }
+                    }
+                } else {
+                    // Always show main app - anonymous sign-in happens automatically in background
+                    // No login screen at startup - users can sign up/login from Settings if needed
+                    MainTabView()
+                        .environmentObject(childrenStore)
+                        .environmentObject(storiesStore)
+                        .environmentObject(premiumManager)
+                        .environmentObject(userSettings)
+                        .environmentObject(authService)
+                        .modelContainer(modelContainer)
+                        .preferredColorScheme(.dark) // Force dark mode for bedtime-friendly UI
+                        .onAppear {
+                            premiumManager.syncWithUserSettings(userSettings)
+                        }
                 }
+            }
             .preferredColorScheme(.dark) // Force dark mode globally
         }
     }

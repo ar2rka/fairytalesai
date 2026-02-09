@@ -24,7 +24,8 @@ struct SettingsView: View {
             
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    // Guest Mode Banner - show for anonymous users only
+                    // Guest Mode Banner - Commented out for now, will be needed in future when Sign in with Apple is enabled
+                    /*
                     if authService.isAnonymousUser {
                         GuestModeBanner()
                             .padding(.horizontal)
@@ -38,6 +39,11 @@ struct SettingsView: View {
                         Spacer()
                             .frame(height: 10)
                     }
+                    */
+                    
+                    // Add small top padding (replacing the banner space)
+                    Spacer()
+                        .frame(height: 10)
                     
                     // Parent Profile Card - show only for logged-in users
                     if isLoggedInUser {

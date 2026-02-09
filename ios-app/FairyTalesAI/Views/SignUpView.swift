@@ -37,7 +37,8 @@ struct SignUpView: View {
                         }
                         .padding(.top, 40)
                         
-                        // Sign in with Apple Button
+                        // Sign in with Apple Button - Commented out for now, will be needed in future
+                        /*
                         SignInWithAppleButton(
                             onRequest: { request in
                                 request.requestedScopes = [.fullName, .email]
@@ -48,6 +49,7 @@ struct SignUpView: View {
                         .frame(height: 50)
                         .cornerRadius(AppTheme.cornerRadius)
                         .padding(.horizontal, 24)
+                        */
                         
                         if let errorMessage = authService.errorMessage {
                             Text(errorMessage)
