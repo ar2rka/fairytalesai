@@ -14,6 +14,8 @@ struct GenerateStoryView: View {
     
     /// When opening from "Tonight's Pick" on Home, this theme is preselected.
     var preselectedTheme: StoryTheme? = nil
+    /// When opening from "Continue Last Night's Adventure", summary of the latest story for the new plot.
+    var preselectedPlot: String? = nil
     
     var body: some View {
         ZStack {
@@ -107,6 +109,9 @@ struct GenerateStoryView: View {
             }
             if let theme = preselectedTheme {
                 viewModel.selectedTheme = theme
+            }
+            if let plot = preselectedPlot, !plot.isEmpty {
+                viewModel.plot = plot
             }
         }
         .onChange(of: childrenStore.children.count) { _, newCount in
@@ -359,26 +364,26 @@ struct GenerateStoryView: View {
                     Text(storiesStore.isGenerating ? LocalizationManager.shared.generateStoryGenerating : LocalizationManager.shared.generateStoryGenerateStory)
                         .font(.system(size: 18, weight: .bold))
                 }
-                .foregroundColor(viewModel.canGenerate && !storiesStore.isGenerating ? .white : Color.white.opacity(0.75))
+                .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .padding()
                 .background(
-                    RoundedRectangle(cornerRadius: 25)
-                        .fill(AppTheme.primaryPurple)
-                        .opacity(viewModel.canGenerate && !storiesStore.isGenerating ? 1.0 : 0.6)
+                    GenerateButtonBackground(
+                        isGenerating: $storiesStore.isGenerating,
+                        isEnabled: viewModel.canGenerate
+                    )
                 )
                 .shadow(
-                    color: viewModel.canGenerate && !storiesStore.isGenerating ? AppTheme.primaryPurple.opacity(0.4) : .clear,
-                    radius: viewModel.canGenerate ? 12 : 0,
+                    color: (viewModel.canGenerate || storiesStore.isGenerating) ? AppTheme.primaryPurple.opacity(0.4) : .clear,
+                    radius: (viewModel.canGenerate || storiesStore.isGenerating) ? 12 : 0,
                     x: 0,
                     y: 4
                 )
-                .opacity(viewModel.canGenerate && !storiesStore.isGenerating ? 1.0 : 0.5)
+                .opacity(viewModel.canGenerate || storiesStore.isGenerating ? 1.0 : 0.5)
             }
             .disabled(storiesStore.isGenerating)
             .buttonStyle(PlainButtonStyle())
             .animation(.easeInOut(duration: 0.2), value: viewModel.canGenerate)
-
             if !viewModel.canGenerate {
                 Text(LocalizationManager.shared.generateStoryPickThemeOrPlot)
                     .font(.system(size: 13))
@@ -394,6 +399,111 @@ struct GenerateStoryView: View {
         }
     }
     
+// MARK: - Generate button background: static purple + conditional shimmer while generating
+private struct GenerateButtonBackground: View {
+    @Binding var isGenerating: Bool
+    let isEnabled: Bool
+    @State private var shimmerStartTime = Date()
+    
+    private static let violetA = Color(red: 0x66 / 255, green: 0x7e / 255, blue: 0xea / 255) // #667eea
+    private static let violetB = Color(red: 0x76 / 255, green: 0x4b / 255, blue: 0xa2 / 255) // #764ba2
+    private static let violetC = Color(red: 0xf0 / 255, green: 0x93 / 255, blue: 0xfb / 255) // #f093fb
+    private static let auroraCyan = Color(red: 0x48 / 255, green: 0xd9 / 255, blue: 0xff / 255)
+    
+    var body: some View {
+        GeometryReader { proxy in
+            ZStack {
+                RoundedRectangle(cornerRadius: 25)
+                    .fill(
+                        LinearGradient(
+                            colors: [AppTheme.primaryPurple, AppTheme.accentPurple],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .opacity(isEnabled || isGenerating ? 1.0 : 0.6)
+                
+                if isGenerating {
+                    TimelineView(.animation(minimumInterval: 1.0 / 45.0, paused: !isGenerating)) { context in
+                        auroraShimmerOverlay(size: proxy.size, now: context.date)
+                    }
+                    .transition(.opacity)
+                }
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 25))
+        .onChange(of: isGenerating) { _, newValue in
+            if newValue {
+                shimmerStartTime = Date()
+            }
+        }
+        .animation(.easeInOut(duration: 0.28), value: isGenerating)
+    }
+    
+    private func auroraShimmerOverlay(size: CGSize, now: Date) -> some View {
+        let elapsed = now.timeIntervalSince(shimmerStartTime)
+        _ = size
+        
+        let sweep = CGFloat((elapsed / 2.1).truncatingRemainder(dividingBy: 1.0))
+        let sweep2 = CGFloat((elapsed / 3.4).truncatingRemainder(dividingBy: 1.0))
+        
+        // Full-surface movement: gradient vectors travel beyond bounds,
+        // but the fill always covers the whole button.
+        let startA = UnitPoint(x: -1.0 + 2.0 * sweep, y: 0.0)
+        let endA = UnitPoint(x: 0.6 + 2.0 * sweep, y: 1.0)
+        let startB = UnitPoint(x: 1.2 - 2.0 * sweep2, y: 0.2)
+        let endB = UnitPoint(x: -0.4 - 2.0 * sweep2, y: 0.9)
+        let swirl = Angle.degrees(elapsed * 24.0)
+        
+        return ZStack {
+            RoundedRectangle(cornerRadius: 25)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Self.violetA.opacity(0.42),
+                            Self.violetB.opacity(0.28),
+                            Self.violetC.opacity(0.46),
+                            Self.violetB.opacity(0.32),
+                            Self.violetA.opacity(0.42)
+                        ],
+                        startPoint: startA,
+                        endPoint: endA
+                    )
+                )
+            
+            RoundedRectangle(cornerRadius: 25)
+                .fill(
+                    AngularGradient(
+                        gradient: Gradient(colors: [
+                            Self.auroraCyan.opacity(0.22),
+                            Self.violetC.opacity(0.32),
+                            Self.violetA.opacity(0.18),
+                            Self.auroraCyan.opacity(0.22)
+                        ]),
+                        center: .center,
+                        angle: swirl
+                    )
+                )
+            
+            RoundedRectangle(cornerRadius: 25)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Self.auroraCyan.opacity(0.0),
+                            Self.auroraCyan.opacity(0.28),
+                            Self.violetC.opacity(0.0)
+                        ],
+                        startPoint: startB,
+                        endPoint: endB
+                    )
+                )
+        }
+        .opacity(0.92)
+        .blendMode(.plusLighter)
+        .clipShape(RoundedRectangle(cornerRadius: 25))
+    }
+}
+
     private func errorAlertView(message: String) -> some View {
         HStack(spacing: 12) {
             Image(systemName: "exclamationmark.triangle.fill")

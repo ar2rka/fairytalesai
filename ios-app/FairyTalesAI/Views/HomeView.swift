@@ -46,12 +46,13 @@ struct HomeView: View {
         return size.width <= 375 && size.height <= 812
     }
 
-    /// Most recent story for the selected child that is within the last 7 days (for "Continue Last Night's Adventure").
+    /// Latest story for the selected child within the last 7 days. Used for "Continue Last Night's Adventure"; the full Story is passed so all parameters (title, content, theme, duration, etc.) are used.
     private var recentStoryForSelectedChild: Story? {
         let sevenDaysAgo = Date().addingTimeInterval(-Self.recentStoryInterval)
         return childStoriesForSelected
             .filter { $0.createdAt > sevenDaysAgo }
-            .max(by: { $0.createdAt < $1.createdAt })
+            .sorted(by: { $0.createdAt > $1.createdAt })
+            .first
     }
 
     /// Visibility rule: show button only when selected child has at least one story from the last 7 days, and story data has loaded.
@@ -342,7 +343,11 @@ struct HomeView: View {
     private var continueStoryButton: some View {
         Group {
             if let story = recentStoryForSelectedChild {
-                NavigationLink(destination: StoryReadingView(story: story)) {
+                Button {
+                    let theme = themeFromStory(story)
+                    let summary = continuationSummary(from: story)
+                    createStoryPresentation.present(withTheme: theme, plot: summary)
+                } label: {
                     HStack {
                         Image(systemName: "book.fill")
                         Text(LocalizationManager.shared.homeContinueLastNight)
@@ -365,6 +370,22 @@ struct HomeView: View {
             }
         }
         .padding(.horizontal)
+    }
+    
+    /// Theme for Create Story from the latest story's theme name.
+    private func themeFromStory(_ story: Story) -> StoryTheme {
+        StoryTheme.allThemes.first { $0.name.lowercased() == story.theme.lowercased() }
+            ?? StoryTheme.tonightsPick
+    }
+    
+    /// Summary of the latest story to prefill plot for "Continue" — used to generate a new story based on it.
+    private func continuationSummary(from story: Story) -> String {
+        if let plot = story.plot, !plot.trimmingCharacters(in: .whitespaces).isEmpty {
+            return "Continue the adventure. Previous story: \"\(story.title)\". Summary: \(plot). Write a new chapter that continues this story."
+        }
+        let snippet = String(story.content.prefix(500)).trimmingCharacters(in: .whitespacesAndNewlines)
+        let suffix = story.content.count > 500 ? "…" : ""
+        return "Continue the adventure. Previous story: \"\(story.title)\". Here is how it went: \(snippet)\(suffix) Write a new chapter that continues this story."
     }
 
     private func loadDailyFreeStories() async {

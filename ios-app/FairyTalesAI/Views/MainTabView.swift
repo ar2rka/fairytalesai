@@ -1,15 +1,18 @@
 import SwiftUI
 
-/// Coordinates presenting Create Story from tab bar (no theme) or from Home "Tonight's Pick" (preselected theme).
+/// Coordinates presenting Create Story from tab bar, "Tonight's Pick", or "Continue Last Night's Adventure" (theme + plot).
 final class CreateStoryPresentation: ObservableObject {
     @Published var isPresented = false
     @Published var preselectedTheme: StoryTheme?
-    func present(withTheme theme: StoryTheme?) {
+    @Published var preselectedPlot: String?
+    func present(withTheme theme: StoryTheme?, plot: String? = nil) {
         preselectedTheme = theme
+        preselectedPlot = plot
         isPresented = true
     }
-    func clearPreselectedTheme() {
+    func clearPreselected() {
         preselectedTheme = nil
+        preselectedPlot = nil
     }
 }
 
@@ -59,10 +62,13 @@ struct MainTabView: View {
         .edgesIgnoringSafeArea(.bottom)
         .preferredColorScheme(.dark) // Force dark mode
         .fullScreenCover(isPresented: $createStoryPresentation.isPresented, onDismiss: {
-            createStoryPresentation.clearPreselectedTheme()
+            createStoryPresentation.clearPreselected()
         }) {
             NavigationView {
-                GenerateStoryView(preselectedTheme: createStoryPresentation.preselectedTheme)
+                GenerateStoryView(
+                    preselectedTheme: createStoryPresentation.preselectedTheme,
+                    preselectedPlot: createStoryPresentation.preselectedPlot
+                )
             }
             .environmentObject(childrenStore)
             .environmentObject(storiesStore)
