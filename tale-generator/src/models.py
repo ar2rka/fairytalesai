@@ -118,6 +118,8 @@ class StoryDB(BaseModel):
     generation_id: str
     # Reference to parent story for continuation narratives
     parent_id: Optional[str] = None
+    # Requested length of the story in minutes (denormalized from generations)
+    story_length: Optional[int] = None
 
 
 class StoryRatingRequest(BaseModel):
