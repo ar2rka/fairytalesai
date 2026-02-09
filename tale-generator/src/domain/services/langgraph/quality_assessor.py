@@ -172,6 +172,7 @@ Additional Considerations:
 - Does the story length approximately match the expected word count?
 - Are there any concerning elements (scary, violent, inappropriate)?
 - Is the story original and creative?
+- The story must have a clear, natural ending. If there is a long repetitive, nonsensical, or stream-of-consciousness word salad at the end (e.g. endless synonyms, religious exclamations, or run-on words without proper sentences), score Narrative Coherence and Language Quality low (e.g. 1-3) and mention this in feedback.
 
 Provide your assessment in the following JSON format:
 {{
