@@ -7,31 +7,13 @@ struct LibraryView: View {
     @EnvironmentObject var authService: AuthService
     @Environment(\.colorScheme) var colorScheme
     @State private var searchText = ""
-    @State private var selectedFilter = "All Stories"
-    
-    private var filters: [String] {
-        let localizer = LocalizationManager.shared
-        return [localizer.libraryAllStories, localizer.libraryBedtime, localizer.libraryAdventure, localizer.libraryFantasy]
-    }
     
     var filteredStories: [Story] {
-        var stories = storiesStore.stories
-        
-        if !searchText.isEmpty {
-            stories = stories.filter { story in
-                story.title.localizedCaseInsensitiveContains(searchText) ||
-                story.theme.localizedCaseInsensitiveContains(searchText)
-            }
+        guard !searchText.isEmpty else { return storiesStore.stories }
+        return storiesStore.stories.filter { story in
+            story.title.localizedCaseInsensitiveContains(searchText) ||
+            story.theme.localizedCaseInsensitiveContains(searchText)
         }
-        
-        let localizer = LocalizationManager.shared
-        if selectedFilter != localizer.libraryAllStories {
-            // Map localized filter back to English theme name for filtering
-            let englishFilter = mapLocalizedFilterToEnglish(selectedFilter)
-            stories = stories.filter { $0.theme.lowercased() == englishFilter.lowercased() }
-        }
-        
-        return stories
     }
     
     var body: some View {
@@ -86,22 +68,6 @@ struct LibraryView: View {
                         .padding(.horizontal)
                         .padding(.top)
                         
-                        // Filter Bar
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 12) {
-                                ForEach(filters, id: \.self) { filter in
-                                    FilterButton(
-                                        title: filter,
-                                        isSelected: selectedFilter == filter
-                                    ) {
-                                        selectedFilter = filter
-                                    }
-                                }
-                            }
-                            .padding(.horizontal)
-                        }
-                        .padding(.vertical, 12)
-                        
                         // Stories List (List нужен для жеста свайпа «удалить»)
                         List {
                             ForEach(filteredStories) { story in
@@ -119,8 +85,7 @@ struct LibraryView: View {
                                         }
                                     }
                                     .onAppear {
-                                        let localizer = LocalizationManager.shared
-                                        if selectedFilter == localizer.libraryAllStories && searchText.isEmpty,
+                                        if searchText.isEmpty,
                                            let index = filteredStories.firstIndex(where: { $0.id == story.id }),
                                            index >= max(0, filteredStories.count - 5),
                                            !storiesStore.isLoadingMore,
@@ -167,11 +132,6 @@ struct LibraryView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
             .onAppear {
-                // При смене языка selectedFilter может остаться "All Stories" (EN), тогда фильтр скрывает все истории.
-                // Сбрасываем на текущий вариант "Все истории", если выбранного фильтра нет в списке.
-                if !filters.contains(selectedFilter) {
-                    selectedFilter = filters[0]
-                }
                 if let userId = authService.currentUser?.id {
                     Task {
                         await storiesStore.loadStoriesFromSupabase(userId: userId)
@@ -186,15 +146,5 @@ struct LibraryView: View {
             return LocalizationManager.shared.libraryUnknown
         }
         return child.name
-    }
-    
-    private func mapLocalizedFilterToEnglish(_ localizedFilter: String) -> String {
-        let localizer = LocalizationManager.shared
-        switch localizedFilter {
-        case localizer.libraryBedtime: return "Bedtime"
-        case localizer.libraryAdventure: return "Adventure"
-        case localizer.libraryFantasy: return "Fantasy"
-        default: return localizedFilter
-        }
     }
 }
