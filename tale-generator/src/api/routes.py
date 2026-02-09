@@ -208,7 +208,8 @@ async def generate_story(
             audio_file_url=None,  # Will be updated after audio generation
             user_id=user.user_id,
             supabase_client=supabase_client,
-            parent_id=request.parent_id
+            parent_id=request.parent_id,
+            story_length=story_length.minutes
         )
         
         # Get story ID (fallback to uuid if save failed)
