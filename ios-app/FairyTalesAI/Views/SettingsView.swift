@@ -6,11 +6,9 @@ struct SettingsView: View {
     @EnvironmentObject var childrenStore: ChildrenStore
     @EnvironmentObject var authService: AuthService
     @EnvironmentObject var userSettings: UserSettings
-    @AppStorage("pushNotificationsEnabled") private var pushNotificationsEnabled = true
     @Environment(\.colorScheme) var colorScheme
     @State private var showingShareSheet = false
     @State private var showingAddChild = false
-    @State private var showLogoutAlert = false
     @State private var showingProfileEdit = false
     
     // Check if user is logged in (has email, not anonymous)
@@ -68,9 +66,6 @@ struct SettingsView: View {
                     // Support & Legal Section
                     supportLegalSection
                     
-                    // Log Out Button
-                    logoutButton
-                    
                     // Version Info
                     Text("Version 1.0.2 (Build 2024)")
                         .font(.system(size: 12))
@@ -91,19 +86,6 @@ struct SettingsView: View {
         }
         .sheet(isPresented: $showingAddChild) {
             AddChildView()
-        }
-        .alert(LocalizationManager.shared.settingsLogOutAlert, isPresented: $showLogoutAlert) {
-            Button(LocalizationManager.shared.settingsCancel, role: .cancel) { }
-            Button(LocalizationManager.shared.settingsLogOutConfirm, role: .destructive) {
-                Task {
-                    do {
-                        try await authService.signOut()
-                    } catch {
-                        // Error is handled by AuthService's errorMessage
-                        print("Sign out error: \(error.localizedDescription)")
-                    }
-                }
-            }
         }
         .sheet(isPresented: $showingProfileEdit) {
             // Placeholder for profile editing view
@@ -193,20 +175,6 @@ struct SettingsView: View {
                 .padding(.horizontal)
             
             VStack(spacing: 0) {
-                SettingsRow(
-                    icon: "bell.fill",
-                    iconColor: AppTheme.primaryPurple,
-                    title: LocalizationManager.shared.settingsPushNotifications,
-                    trailing: {
-                        Toggle("", isOn: $pushNotificationsEnabled)
-                            .tint(AppTheme.primaryPurple)
-                    }
-                )
-                
-                Divider()
-                    .background(AppTheme.textSecondary(for: colorScheme).opacity(0.3))
-                    .padding(.leading, 60)
-                
                 NavigationLink(destination: LanguageSelectionView()) {
                     SettingsRow(
                         icon: "globe",
@@ -332,24 +300,5 @@ struct SettingsView: View {
         }
     }
     
-    private var logoutButton: some View {
-        Button(action: { showLogoutAlert = true }) {
-            HStack {
-                if authService.isLoading {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .red))
-                } else {
-                    Text(LocalizationManager.shared.settingsLogOut)
-                        .font(.system(size: 16, weight: .semibold))
-                }
-            }
-            .foregroundColor(.red)
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(AppTheme.cardBackground(for: colorScheme))
-            .cornerRadius(AppTheme.cornerRadius)
-        }
-        .padding(.horizontal)
-    }
 }
 
