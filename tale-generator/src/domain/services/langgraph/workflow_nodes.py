@@ -13,6 +13,7 @@ from src.domain.services.langgraph.workflow_state import (
 )
 from src.domain.services.langgraph.prompt_validator import PromptValidatorService
 from src.domain.services.langgraph.quality_assessor import QualityAssessorService
+from src.domain.services.langgraph.story_content_validator import detect_and_trim_gibberish_tail
 from src.domain.services.prompt_service import PromptService
 from src.domain.entities import Child, Hero
 from src.domain.value_objects import Language, Gender, StoryLength
@@ -366,6 +367,12 @@ async def generate_story_node(
         # Title is stored separately in GenerationAttempt
         full_content = content
         
+        # Detect and trim gibberish/word-salad tail if present
+        has_gibberish, trimmed = detect_and_trim_gibberish_tail(full_content)
+        if has_gibberish:
+            full_content = trimmed
+            logger.info("✂️ Gibberish tail trimmed from story content")
+        
         # Safely extract model value (handle both enum and string)
         model_used_str = "unknown"
         if model:
@@ -392,7 +399,7 @@ async def generate_story_node(
         
         logger.info(f"✅ Story generated successfully in {state['generation_duration']:.2f}s")
         logger.info(f"📚 Title: {title}")
-        logger.info(f"📝 Content length: {len(content)} chars, ~{len(content.split())} words")
+        logger.info(f"📝 Content length: {len(full_content)} chars, ~{len(full_content.split())} words")
         logger.info(f"🤖 Model used: {model_used_str}")
         logger.info(f"🌡️ Temperature: {temperature}")
         
@@ -407,7 +414,7 @@ async def generate_story_node(
                     generation_id=state["generation_id"],
                     attempt_number=attempt_number,
                     model_used=model_used_str,
-                    full_response=result.full_response if hasattr(result, 'full_response') else None,
+                    full_response=story_output.full_response if hasattr(story_output, 'full_response') else None,
                     status="success",
                     prompt=prompt_for_db,
                     user_id=state["user_id"],
