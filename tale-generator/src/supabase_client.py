@@ -543,6 +543,7 @@ class SupabaseClient:
                 'moral': 'moral',
                 'language': 'language',
                 'rating': 'rating',
+                'story_length': 'story_length',
                 'audio_file_url': 'audio_file_url',
                 'user_id': 'user_id',
                 'status': 'status',
