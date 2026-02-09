@@ -311,6 +311,7 @@ private struct SupabaseStory: Codable {
     let language: String?
     let rating: Int?
     let ageCategory: String
+    let storyLength: Int?
     
     enum CodingKeys: String, CodingKey {
         case id
@@ -321,6 +322,7 @@ private struct SupabaseStory: Codable {
         case language
         case rating
         case ageCategory = "age_category"
+        case storyLength = "story_length"
     }
     
     func toStory() -> Story {
@@ -345,7 +347,7 @@ private struct SupabaseStory: Codable {
             content: content,
             childId: childId,
             theme: "Adventure", // Default theme, можно извлечь из других полей если нужно
-            duration: estimateDuration(from: content),
+            duration: storyLength ?? estimateDuration(from: content),
             plot: nil,
             createdAt: createdAtDate,
             favoriteStatus: false,
@@ -374,7 +376,8 @@ private struct SupabaseStory: Codable {
             createdAt: dateFormatter.string(from: story.createdAt),
             language: story.language,
             rating: story.rating,
-            ageCategory: story.ageCategory
+            ageCategory: story.ageCategory,
+            storyLength: story.duration
         )
     }
 }
