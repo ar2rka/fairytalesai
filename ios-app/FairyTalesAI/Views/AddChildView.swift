@@ -6,7 +6,7 @@ struct AddChildView: View {
     @Environment(\.colorScheme) var colorScheme
     
     @State private var name: String = ""
-    @State private var selectedStoryStyle: StoryStyle = .hero
+    @State private var selectedStoryStyle: StoryStyle = .boy
     @State private var selectedAgeCategory: AgeCategory = .threeFive
     @State private var isLoading = false
     @State private var errorMessage: String?
@@ -128,7 +128,7 @@ struct AddChildView: View {
                     case "girl":
                         selectedStoryStyle = .girl
                     default:
-                        selectedStoryStyle = .hero
+                        selectedStoryStyle = .boy
                     }
                     selectedAgeCategory = child.ageCategory
                 }

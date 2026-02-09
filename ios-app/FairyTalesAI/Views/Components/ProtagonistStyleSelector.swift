@@ -4,7 +4,7 @@ struct ProtagonistStyleSelector: View {
     @Binding var selectedStyle: StoryStyle
     @Environment(\.colorScheme) var colorScheme
     
-    private let styles: [StoryStyle] = [.hero, .boy, .girl]
+    private let styles: [StoryStyle] = [.boy, .girl]
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -86,7 +86,7 @@ struct StyleCard: View {
 }
 
 #Preview {
-    ProtagonistStyleSelector(selectedStyle: .constant(.hero))
+    ProtagonistStyleSelector(selectedStyle: .constant(.boy))
         .padding()
         .preferredColorScheme(.dark)
 }

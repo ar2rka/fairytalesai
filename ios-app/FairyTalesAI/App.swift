@@ -14,23 +14,12 @@ struct FairyTalesAIApp: App {
         ThemeMode(rawValue: themeModeRaw) ?? .system
     }
     
-    // Check if initial data loading is complete
+    // Check if initial auth is complete (don't block on children load to avoid dismissing sheets)
     private var shouldShowLoadingScreen: Bool {
-        // Show loading screen if:
-        // 1. Auth is still loading (no user yet) OR
-        // 2. Children are still loading (when user exists)
-        if authService.currentUser == nil {
-            // Wait for auth to complete
-            return true
-        }
-        
-        // If children are loading, show loading screen
-        if childrenStore.isLoading {
-            return true
-        }
-        
-        // Loading is complete (either children loaded or determined empty)
-        return false
+        // Show loading screen only while auth is resolving (no user yet).
+        // Do not require children to finish loading: otherwise when user opens Create
+        // and children load runs, we'd switch back to loading and dismiss the sheet.
+        return authService.currentUser == nil
     }
     
     // SwiftData ModelContainer для кеширования ежедневных историй
