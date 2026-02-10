@@ -106,80 +106,25 @@ struct LibraryView: View {
     
     private var storiesListView: some View {
         VStack(spacing: 0) {
-                        // Search Bar
-                        HStack {
-                            Image(systemName: "magnifyingglass")
-                                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                            
-                            TextField(LocalizationManager.shared.librarySearchStories, text: $searchText)
-                                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
+            SearchBar(text: $searchText, colorScheme: colorScheme)
+                .padding(.horizontal)
+                .padding(.top)
+            StoriesList(
+                stories: filteredStories,
+                isLoadingMore: storiesStore.isLoadingMore,
+                hasMoreStories: storiesStore.hasMoreStories,
+                authService: authService,
+                onDelete: { story in
+                    Task { await storiesStore.softDeleteStory(story) }
+                },
+                onLoadMore: {
+                    Task {
+                        if let userId = authService.currentUser?.id {
+                            await storiesStore.loadMoreStories(userId: userId)
                         }
-                        .padding()
-                        .background(AppTheme.cardBackground(for: colorScheme))
-                        .cornerRadius(AppTheme.cornerRadius)
-                        .padding(.horizontal)
-                        .padding(.top)
-                        
-                        // Stories List (List нужен для жеста свайпа «удалить»)
-                        List {
-                            ForEach(filteredStories) { story in
-                                NavigationLink(value: story.id) {
-                                    StoryLibraryRow(story: story)
-                                        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                                        .listRowSeparator(.hidden)
-                                        .listRowBackground(Color.clear)
-                                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                            Button(role: .destructive) {
-                                                Task {
-                                                    await storiesStore.softDeleteStory(story)
-                                                }
-                                            } label: {
-                                                Label(LocalizationManager.shared.libraryDeleteStory, systemImage: "trash")
-                                            }
-                                        }
-                                        .onAppear {
-                                            if searchText.isEmpty,
-                                               let index = filteredStories.firstIndex(where: { $0.id == story.id }),
-                                               index >= max(0, filteredStories.count - 5),
-                                               !storiesStore.isLoadingMore,
-                                               storiesStore.hasMoreStories {
-                                                Task {
-                                                    if let userId = authService.currentUser?.id {
-                                                        await storiesStore.loadMoreStories(userId: userId)
-                                                    }
-                                                }
-                                            }
-                                        }
-                                }
-                                .buttonStyle(.plain)
-                            }
-                            
-                            if filteredStories.isEmpty {
-                                Text(LocalizationManager.shared.libraryNoStoriesFound)
-                                    .font(.system(size: 16))
-                                    .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                                    .frame(maxWidth: .infinity)
-                                    .listRowInsets(EdgeInsets(top: 24, leading: 16, bottom: 24, trailing: 16))
-                                    .listRowSeparator(.hidden)
-                                    .listRowBackground(Color.clear)
-                            }
-                            
-                            if storiesStore.isLoadingMore {
-                                HStack {
-                                    ProgressView()
-                                        .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.primaryPurple))
-                                    Text(LocalizationManager.shared.libraryLoadingMore)
-                                        .font(.system(size: 14))
-                                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                                }
-                                .frame(maxWidth: .infinity)
-                                .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
-                                .listRowSeparator(.hidden)
-                                .listRowBackground(Color.clear)
-                            }
-                        }
-                        .listStyle(.plain)
-                        .scrollContentBackground(.hidden)
+                    }
+                }
+            )
         }
     }
     
@@ -217,3 +162,111 @@ struct LibraryView: View {
         return child.name
     }
 }
+private struct SearchBar: View {
+    @Binding var text: String
+    var colorScheme: ColorScheme
+
+    var body: some View {
+        HStack {
+            Image(systemName: "magnifyingglass")
+                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+            TextField(LocalizationManager.shared.librarySearchStories, text: $text)
+                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
+        }
+        .padding()
+        .background(AppTheme.cardBackground(for: colorScheme))
+        .cornerRadius(AppTheme.cornerRadius)
+    }
+}
+
+private struct StoriesList: View {
+    let stories: [Story]
+    let isLoadingMore: Bool
+    let hasMoreStories: Bool
+    let authService: AuthService
+    var onDelete: (Story) -> Void
+    var onLoadMore: () -> Void
+
+    var body: some View {
+        List {
+            ForEach(stories) { story in
+                StoryRowLink(story: story,
+                             stories: stories,
+                             authService: authService,
+                             onDelete: onDelete,
+                             onLoadMore: onLoadMore)
+            }
+
+            if stories.isEmpty {
+                EmptySearchRow()
+            }
+
+            if isLoadingMore {
+                LoadingMoreRow()
+            }
+        }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+    }
+}
+
+private struct StoryRowLink: View {
+    let story: Story
+    let stories: [Story]
+    let authService: AuthService
+    var onDelete: (Story) -> Void
+    var onLoadMore: () -> Void
+
+    var body: some View {
+        NavigationLink(value: story.id) {
+            StoryLibraryRow(story: story)
+                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
+                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                    Button(role: .destructive) {
+                        onDelete(story)
+                    } label: {
+                        Label(LocalizationManager.shared.libraryDeleteStory, systemImage: "trash")
+                    }
+                }
+                .onAppear {
+                    guard let idx = stories.firstIndex(where: { $0.id == story.id }) else { return }
+                    // Trigger pagination when near the end
+                    if idx >= max(0, stories.count - 5) {
+                        onLoadMore()
+                    }
+                }
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+private struct EmptySearchRow: View {
+    var body: some View {
+        Text(LocalizationManager.shared.libraryNoStoriesFound)
+            .font(.system(size: 16))
+            .foregroundColor(AppTheme.textSecondary(for: .light))
+            .frame(maxWidth: .infinity)
+            .listRowInsets(EdgeInsets(top: 24, leading: 16, bottom: 24, trailing: 16))
+            .listRowSeparator(.hidden)
+            .listRowBackground(Color.clear)
+    }
+}
+
+private struct LoadingMoreRow: View {
+    var body: some View {
+        HStack {
+            ProgressView()
+                .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.primaryPurple))
+            Text(LocalizationManager.shared.libraryLoadingMore)
+                .font(.system(size: 14))
+                .foregroundColor(AppTheme.textSecondary(for: .light))
+        }
+        .frame(maxWidth: .infinity)
+        .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
+        .listRowSeparator(.hidden)
+        .listRowBackground(Color.clear)
+    }
+}
+
