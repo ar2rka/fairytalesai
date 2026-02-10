@@ -37,12 +37,17 @@ struct MainTabView: View {
     @EnvironmentObject var premiumManager: PremiumManager
     @EnvironmentObject var userSettings: UserSettings
     @EnvironmentObject var authService: AuthService
+    @Environment(\.colorScheme) var colorScheme
     
     @StateObject private var navigationCoordinator = NavigationCoordinator()
     @StateObject private var createStoryPresentation = CreateStoryPresentation()
     
     var body: some View {
         ZStack {
+            // Root background so no tab (especially Library) ever shows black
+            AppTheme.backgroundColor(for: colorScheme)
+                .ignoresSafeArea()
+            
             // Content Views — 4 tabs: Home(0), Library(1), Create(2) opens sheet, Profile(3)
             Group {
                 if navigationCoordinator.selectedTab == 0 {

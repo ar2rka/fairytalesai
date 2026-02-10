@@ -1,8 +1,20 @@
 import SwiftUI
 import SwiftData
+import UIKit
 
 @main
 struct FairyTalesAIApp: App {
+    init() {
+        // Force Library (and any NavigationStack) to use purple instead of black
+        let purple = UIColor(red: 0.12, green: 0.08, blue: 0.22, alpha: 1)
+        let navBarAppearance = UINavigationBarAppearance()
+        navBarAppearance.configureWithOpaqueBackground()
+        navBarAppearance.backgroundColor = purple
+        UINavigationBar.appearance().standardAppearance = navBarAppearance
+        UINavigationBar.appearance().scrollEdgeAppearance = navBarAppearance
+        UINavigationBar.appearance().compactAppearance = navBarAppearance
+        UITableView.appearance().backgroundColor = purple
+    }
     @StateObject private var childrenStore = ChildrenStore()
     @StateObject private var storiesStore = StoriesStore()
     @StateObject private var premiumManager = PremiumManager()

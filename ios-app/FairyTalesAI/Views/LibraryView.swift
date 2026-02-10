@@ -21,6 +21,7 @@ struct LibraryView: View {
     var body: some View {
         NavigationStack(path: $navigationPath) {
             ZStack {
+                // Match the same purple app background used on other tabs
                 AppTheme.backgroundColor(for: colorScheme)
                     .ignoresSafeArea()
                 
@@ -32,6 +33,12 @@ struct LibraryView: View {
                 }
             }
         }
+        // Ensure the navigation container itself also uses the themed background,
+        // so there are no black flashes behind the content or under the navigation bar.
+        .background(
+            AppTheme.backgroundColor(for: colorScheme)
+                .ignoresSafeArea()
+        )
     }
     
     private var contentView: some View {
@@ -46,7 +53,13 @@ struct LibraryView: View {
         }
         .navigationTitle(LocalizationManager.shared.libraryMyLibrary)
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
+        // Use the same themed background color for the navigation bar
+        // instead of the default black, so Library matches other tabs.
+        .toolbarBackground(
+            AppTheme.backgroundColor(for: colorScheme),
+            for: .navigationBar
+        )
+        .toolbarColorScheme(.dark, for: .navigationBar)
         .onAppear {
             if let userId = authService.currentUser?.id {
                 Task {
@@ -186,27 +199,30 @@ private struct StoriesList: View {
     let authService: AuthService
     var onDelete: (Story) -> Void
     var onLoadMore: () -> Void
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
-        List {
-            ForEach(stories) { story in
-                StoryRowLink(story: story,
-                             stories: stories,
-                             authService: authService,
-                             onDelete: onDelete,
-                             onLoadMore: onLoadMore)
-            }
+        ScrollView {
+            LazyVStack(spacing: 12) {
+                ForEach(stories) { story in
+                    StoryRowLink(story: story,
+                                 stories: stories,
+                                 authService: authService,
+                                 onDelete: onDelete,
+                                 onLoadMore: onLoadMore)
+                }
 
-            if stories.isEmpty {
-                EmptySearchRow()
-            }
+                if stories.isEmpty {
+                    EmptySearchRow(colorScheme: colorScheme)
+                }
 
-            if isLoadingMore {
-                LoadingMoreRow()
+                if isLoadingMore {
+                    LoadingMoreRow(colorScheme: colorScheme)
+                }
             }
+            .padding(.horizontal)
+            .padding(.bottom, 32)
         }
-        .listStyle(.plain)
-        .scrollContentBackground(.hidden)
     }
 }
 
@@ -220,53 +236,50 @@ private struct StoryRowLink: View {
     var body: some View {
         NavigationLink(value: story.id) {
             StoryLibraryRow(story: story)
-                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                .listRowSeparator(.hidden)
-                .listRowBackground(Color.clear)
-                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                    Button(role: .destructive) {
-                        onDelete(story)
-                    } label: {
-                        Label(LocalizationManager.shared.libraryDeleteStory, systemImage: "trash")
-                    }
-                }
-                .onAppear {
-                    guard let idx = stories.firstIndex(where: { $0.id == story.id }) else { return }
-                    // Trigger pagination when near the end
-                    if idx >= max(0, stories.count - 5) {
-                        onLoadMore()
-                    }
-                }
         }
         .buttonStyle(.plain)
+        .padding(.vertical, 8)
+        .onAppear {
+            guard let idx = stories.firstIndex(where: { $0.id == story.id }) else { return }
+            if idx >= max(0, stories.count - 5) {
+                onLoadMore()
+            }
+        }
+        .contextMenu {
+            Button(role: .destructive) {
+                onDelete(story)
+            } label: {
+                Label(LocalizationManager.shared.libraryDeleteStory, systemImage: "trash")
+            }
+        }
     }
 }
 
 private struct EmptySearchRow: View {
+    var colorScheme: ColorScheme
+
     var body: some View {
         Text(LocalizationManager.shared.libraryNoStoriesFound)
             .font(.system(size: 16))
-            .foregroundColor(AppTheme.textSecondary(for: .light))
+            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
             .frame(maxWidth: .infinity)
-            .listRowInsets(EdgeInsets(top: 24, leading: 16, bottom: 24, trailing: 16))
-            .listRowSeparator(.hidden)
-            .listRowBackground(Color.clear)
+            .padding(.vertical, 24)
     }
 }
 
 private struct LoadingMoreRow: View {
+    var colorScheme: ColorScheme
+
     var body: some View {
         HStack {
             ProgressView()
                 .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.primaryPurple))
             Text(LocalizationManager.shared.libraryLoadingMore)
                 .font(.system(size: 14))
-                .foregroundColor(AppTheme.textSecondary(for: .light))
+                .foregroundColor(AppTheme.textSecondary(for: colorScheme))
         }
         .frame(maxWidth: .infinity)
-        .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
-        .listRowSeparator(.hidden)
-        .listRowBackground(Color.clear)
+        .padding(.vertical, 16)
     }
 }
 
