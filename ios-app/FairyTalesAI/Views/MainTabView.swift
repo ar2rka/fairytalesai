@@ -16,6 +16,21 @@ final class CreateStoryPresentation: ObservableObject {
     }
 }
 
+/// Coordinates navigation between tabs and opening specific stories.
+final class NavigationCoordinator: ObservableObject {
+    @Published var selectedTab: Int = 0
+    @Published var storyToOpen: UUID? = nil
+    
+    func switchToLibrary() {
+        selectedTab = 1
+    }
+    
+    func switchToLibraryAndOpenStory(_ storyId: UUID) {
+        storyToOpen = storyId
+        selectedTab = 1
+    }
+}
+
 struct MainTabView: View {
     @EnvironmentObject var childrenStore: ChildrenStore
     @EnvironmentObject var storiesStore: StoriesStore
@@ -23,24 +38,22 @@ struct MainTabView: View {
     @EnvironmentObject var userSettings: UserSettings
     @EnvironmentObject var authService: AuthService
     
-    @State private var selectedTab = 0
+    @StateObject private var navigationCoordinator = NavigationCoordinator()
     @StateObject private var createStoryPresentation = CreateStoryPresentation()
     
     var body: some View {
         ZStack {
             // Content Views — 4 tabs: Home(0), Library(1), Create(2) opens sheet, Profile(3)
             Group {
-                if selectedTab == 0 {
+                if navigationCoordinator.selectedTab == 0 {
                     NavigationView {
                         HomeView()
                     }
                     .id(0)
-                } else if selectedTab == 1 {
-                    NavigationView {
-                        LibraryView()
-                    }
+                } else if navigationCoordinator.selectedTab == 1 {
+                    LibraryView()
                     .id(1)
-                } else if selectedTab == 3 {
+                } else if navigationCoordinator.selectedTab == 3 {
                     NavigationView {
                         SettingsView()
                     }
@@ -50,11 +63,12 @@ struct MainTabView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding(.bottom, 65) // Space for tab bar
             .environmentObject(createStoryPresentation)
+            .environmentObject(navigationCoordinator)
 
             // 4-tab liquid glass tab bar at the bottom
             VStack {
                 Spacer()
-                CustomTabBar(selectedTab: $selectedTab, onCreateTapped: {
+                CustomTabBar(selectedTab: $navigationCoordinator.selectedTab, onCreateTapped: {
                     createStoryPresentation.present(withTheme: nil)
                 })
             }
@@ -75,6 +89,7 @@ struct MainTabView: View {
             .environmentObject(premiumManager)
             .environmentObject(userSettings)
             .environmentObject(authService)
+            .environmentObject(navigationCoordinator)
         }
     }
 }

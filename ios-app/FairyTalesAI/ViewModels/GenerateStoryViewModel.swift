@@ -43,7 +43,8 @@ class GenerateStoryViewModel: ObservableObject {
     func generateStory(
         userSettings: UserSettings,
         storiesStore: StoriesStore,
-        childrenStore: ChildrenStore
+        childrenStore: ChildrenStore,
+        onSuccess: ((UUID) -> Void)? = nil
     ) {
         guard let theme = effectiveTheme else { return }
         
@@ -68,11 +69,20 @@ class GenerateStoryViewModel: ObservableObject {
             guard storiesStore.errorMessage == nil else { return }
             if let storyId = storiesStore.lastGeneratedStoryId,
                let latestStory = storiesStore.stories.first(where: { $0.id == storyId }) {
-                self.generatedStory = latestStory
-                self.showingStoryResult = true
+                if let onSuccess = onSuccess {
+                    onSuccess(storyId)
+                } else {
+                    self.generatedStory = latestStory
+                    self.showingStoryResult = true
+                }
             } else if let latestStory = storiesStore.stories.first {
-                self.generatedStory = latestStory
-                self.showingStoryResult = true
+                let storyId = latestStory.id
+                if let onSuccess = onSuccess {
+                    onSuccess(storyId)
+                } else {
+                    self.generatedStory = latestStory
+                    self.showingStoryResult = true
+                }
             }
         }
     }
