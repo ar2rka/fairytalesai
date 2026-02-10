@@ -374,10 +374,21 @@ struct HomeView: View {
                         }
                     }
                 } label: {
-                    HStack {
-                        Image(systemName: "book.fill")
-                        Text(LocalizationManager.shared.homeContinueLastNight)
-                            .font(.system(size: 16, weight: .semibold))
+                    Group {
+                        if storiesStore.isGenerating {
+                            HStack(spacing: 8) {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.primaryPurple))
+                                Text(LocalizationManager.shared.generateStoryGenerating)
+                                    .font(.system(size: 16, weight: .semibold))
+                            }
+                        } else {
+                            HStack {
+                                Image(systemName: "book.fill")
+                                Text(LocalizationManager.shared.homeContinueLastNight)
+                                    .font(.system(size: 16, weight: .semibold))
+                            }
+                        }
                     }
                     .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                     .frame(maxWidth: .infinity)
@@ -392,6 +403,7 @@ struct HomeView: View {
                             .shadow(color: AppTheme.primaryPurple.opacity(0.25), radius: 8, x: 0, y: 2)
                     )
                 }
+                .disabled(storiesStore.isGenerating)
                 .buttonStyle(PlainButtonStyle())
             }
         }
