@@ -202,27 +202,25 @@ private struct StoriesList: View {
     @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
-        ScrollView {
-            LazyVStack(spacing: 12) {
-                ForEach(stories) { story in
-                    StoryRowLink(story: story,
-                                 stories: stories,
-                                 authService: authService,
-                                 onDelete: onDelete,
-                                 onLoadMore: onLoadMore)
-                }
-
-                if stories.isEmpty {
-                    EmptySearchRow(colorScheme: colorScheme)
-                }
-
-                if isLoadingMore {
-                    LoadingMoreRow(colorScheme: colorScheme)
-                }
+        List {
+            ForEach(stories) { story in
+                StoryRowLink(story: story,
+                             stories: stories,
+                             authService: authService,
+                             onDelete: onDelete,
+                             onLoadMore: onLoadMore)
             }
-            .padding(.horizontal)
-            .padding(.bottom, 32)
+
+            if stories.isEmpty {
+                EmptySearchRow()
+            }
+
+            if isLoadingMore {
+                LoadingMoreRow()
+            }
         }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
     }
 }
 
@@ -238,14 +236,16 @@ private struct StoryRowLink: View {
             StoryLibraryRow(story: story)
         }
         .buttonStyle(.plain)
-        .padding(.vertical, 8)
+        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+        .listRowSeparator(.hidden)
+        .listRowBackground(Color.clear)
         .onAppear {
             guard let idx = stories.firstIndex(where: { $0.id == story.id }) else { return }
             if idx >= max(0, stories.count - 5) {
                 onLoadMore()
             }
         }
-        .contextMenu {
+        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
             Button(role: .destructive) {
                 onDelete(story)
             } label: {
@@ -256,19 +256,21 @@ private struct StoryRowLink: View {
 }
 
 private struct EmptySearchRow: View {
-    var colorScheme: ColorScheme
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         Text(LocalizationManager.shared.libraryNoStoriesFound)
             .font(.system(size: 16))
             .foregroundColor(AppTheme.textSecondary(for: colorScheme))
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 24)
+            .listRowInsets(EdgeInsets(top: 24, leading: 16, bottom: 24, trailing: 16))
+            .listRowSeparator(.hidden)
+            .listRowBackground(Color.clear)
     }
 }
 
 private struct LoadingMoreRow: View {
-    var colorScheme: ColorScheme
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         HStack {
@@ -279,7 +281,9 @@ private struct LoadingMoreRow: View {
                 .foregroundColor(AppTheme.textSecondary(for: colorScheme))
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 16)
+        .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
+        .listRowSeparator(.hidden)
+        .listRowBackground(Color.clear)
     }
 }
 
