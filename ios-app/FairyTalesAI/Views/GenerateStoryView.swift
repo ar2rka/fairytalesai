@@ -339,7 +339,34 @@ struct GenerateStoryView: View {
         }
         .padding(.horizontal)
     }
-    
+
+    private func errorAlertView(message: String) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundColor(.orange)
+                .font(.system(size: 20))
+            
+            Text(message)
+                .font(.system(size: 14))
+                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
+                .multilineTextAlignment(.leading)
+            
+            Spacer()
+            
+            Button(action: {
+                storiesStore.errorMessage = nil
+            }) {
+                Image(systemName: "xmark.circle.fill")
+                    .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                    .font(.system(size: 20))
+            }
+        }
+        .padding()
+        .background(AppTheme.cardBackground(for: colorScheme))
+        .cornerRadius(12)
+        .padding(.horizontal)
+    }
+
     private var generateButton: some View {
         VStack(spacing: 8) {
             Button(action: {
@@ -354,15 +381,16 @@ struct GenerateStoryView: View {
                     childrenStore: childrenStore
                 )
             }) {
-                HStack {
+                Group {
                     if storiesStore.isGenerating {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                        MagicGeneratingRow()
                     } else {
-                        Image(systemName: "wand.and.stars")
+                        HStack {
+                            Image(systemName: "wand.and.stars")
+                            Text(LocalizationManager.shared.generateStoryGenerateStory)
+                                .font(.system(size: 18, weight: .bold))
+                        }
                     }
-                    Text(storiesStore.isGenerating ? LocalizationManager.shared.generateStoryGenerating : LocalizationManager.shared.generateStoryGenerateStory)
-                        .font(.system(size: 18, weight: .bold))
                 }
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
@@ -398,7 +426,66 @@ struct GenerateStoryView: View {
             Text(LocalizationManager.shared.generateStoryPickThemeOrPlotAlert)
         }
     }
+}
+
+// MARK: - Magic generating content
+
+private struct MagicGeneratingRow: View {
+    @State private var currentPhraseIndex: Int = 0
+    private let timer = Timer.publish(every: 1.8, on: .main, in: .common).autoconnect()
     
+    private var phrases: [String] {
+        LocalizationManager.shared.generateStoryMagicPhrases
+    }
+    
+    private var currentPhrase: String {
+        guard !phrases.isEmpty else {
+            return LocalizationManager.shared.generateStoryGenerating
+        }
+        let index = currentPhraseIndex % phrases.count
+        return phrases[index]
+    }
+    
+    var body: some View {
+        HStack {
+            MagicGeneratingIcon()
+            Text(currentPhrase)
+                .font(.system(size: 18, weight: .bold))
+                .lineLimit(2)
+                .multilineTextAlignment(.leading)
+        }
+        .onAppear {
+            currentPhraseIndex = 0
+        }
+        .onReceive(timer) { _ in
+            guard !phrases.isEmpty else { return }
+            currentPhraseIndex = (currentPhraseIndex + 1) % phrases.count
+        }
+    }
+}
+
+private struct MagicGeneratingIcon: View {
+    @State private var isAnimating = false
+    
+    var body: some View {
+        Image(systemName: "wand.and.stars")
+            .font(.system(size: 20, weight: .bold))
+            .rotationEffect(.degrees(isAnimating ? 8 : -8))
+            .scaleEffect(isAnimating ? 1.1 : 0.95)
+            .animation(
+                .easeInOut(duration: 0.7)
+                    .repeatForever(autoreverses: true),
+                value: isAnimating
+            )
+            .onAppear {
+                isAnimating = true
+            }
+            .onDisappear {
+                isAnimating = false
+            }
+    }
+}
+
 // MARK: - Generate button background: static purple + conditional shimmer while generating
 private struct GenerateButtonBackground: View {
     @Binding var isGenerating: Bool
@@ -501,33 +588,5 @@ private struct GenerateButtonBackground: View {
         .opacity(0.92)
         .blendMode(.plusLighter)
         .clipShape(RoundedRectangle(cornerRadius: 25))
-    }
-}
-
-    private func errorAlertView(message: String) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: "exclamationmark.triangle.fill")
-                .foregroundColor(.orange)
-                .font(.system(size: 20))
-            
-            Text(message)
-                .font(.system(size: 14))
-                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
-                .multilineTextAlignment(.leading)
-            
-            Spacer()
-            
-            Button(action: {
-                storiesStore.errorMessage = nil
-            }) {
-                Image(systemName: "xmark.circle.fill")
-                    .foregroundColor(AppTheme.textSecondary(for: colorScheme))
-                    .font(.system(size: 20))
-            }
-        }
-        .padding()
-        .background(AppTheme.cardBackground(for: colorScheme))
-        .cornerRadius(12)
-        .padding(.horizontal)
     }
 }
