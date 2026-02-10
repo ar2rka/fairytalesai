@@ -1,1 +1,4 @@
+# Xcode user-specific state (avoids merge conflicts)
+xcuserdata/
+*.xcuserstate
 UserInterfaceState.xcuserstate

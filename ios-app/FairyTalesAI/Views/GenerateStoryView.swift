@@ -433,66 +433,39 @@ struct GenerateStoryView: View {
     }
 }
 
-// MARK: - Magic generating content
+// MARK: - Magic generating content (shared with HomeView Continue button)
 
-private struct MagicGeneratingRow: View {
-    @State private var currentPhraseIndex: Int = 0
-    private let timer = Timer.publish(every: 1.8, on: .main, in: .common).autoconnect()
-    
+struct MagicGeneratingRow: View {
+    /// One phrase per generation: set when row appears, never change during this generation.
+    @State private var phrase: String = ""
+
     private var phrases: [String] {
         LocalizationManager.shared.generateStoryMagicPhrases
     }
-    
-    private var currentPhrase: String {
-        guard !phrases.isEmpty else {
-            return LocalizationManager.shared.generateStoryGenerating
-        }
-        let index = currentPhraseIndex % phrases.count
-        return phrases[index]
-    }
-    
+
     var body: some View {
         HStack {
             MagicGeneratingIcon()
-            Text(currentPhrase)
+            Text(phrase.isEmpty ? LocalizationManager.shared.generateStoryGenerating : phrase)
                 .font(.system(size: 18, weight: .bold))
                 .lineLimit(2)
                 .multilineTextAlignment(.leading)
         }
         .onAppear {
-            currentPhraseIndex = 0
-        }
-        .onReceive(timer) { _ in
-            guard !phrases.isEmpty else { return }
-            currentPhraseIndex = (currentPhraseIndex + 1) % phrases.count
+            phrase = phrases.randomElement() ?? LocalizationManager.shared.generateStoryGenerating
         }
     }
 }
 
-private struct MagicGeneratingIcon: View {
-    @State private var isAnimating = false
-    
+struct MagicGeneratingIcon: View {
     var body: some View {
         Image(systemName: "wand.and.stars")
             .font(.system(size: 20, weight: .bold))
-            .rotationEffect(.degrees(isAnimating ? 8 : -8))
-            .scaleEffect(isAnimating ? 1.1 : 0.95)
-            .animation(
-                .easeInOut(duration: 0.7)
-                    .repeatForever(autoreverses: true),
-                value: isAnimating
-            )
-            .onAppear {
-                isAnimating = true
-            }
-            .onDisappear {
-                isAnimating = false
-            }
     }
 }
 
-// MARK: - Generate button background: static purple + conditional shimmer while generating
-private struct GenerateButtonBackground: View {
+// MARK: - Generate button background: static purple + conditional shimmer while generating (shared with HomeView)
+struct GenerateButtonBackground: View {
     @Binding var isGenerating: Bool
     let isEnabled: Bool
     @State private var shimmerStartTime = Date()
