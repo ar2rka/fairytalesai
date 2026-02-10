@@ -61,7 +61,7 @@ struct CustomTabBar: View {
             .frame(height: 64)
         }
         .frame(maxWidth: .infinity)
-        .overlay(
+        .overlay(alignment: .bottom) {
             // Tab buttons — all on same horizontal plane, equal width
             HStack(spacing: 0) {
                 TabBarButton(

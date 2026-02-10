@@ -112,6 +112,18 @@ class LocalizationManager: ObservableObject {
     var generateStoryNeedProfile: String { localized("You need to add a child profile before we can craft a tale.", "Нужно добавить профиль ребёнка, прежде чем мы сможем создать сказку.") }
     var generateStoryCreateProfile: String { localized("Create a Profile", "Создать профиль") }
     
+    /// Magic phrases shown while a story is being generated.
+    /// Kept intentionally short so they usually fit in one line.
+    var generateStoryMagicPhrases: [String] {
+        [
+            localized("Brewing a tiny spell...", "Варим маленькое заклинание..."),
+            localized("Catching a shooting star...", "Ловим падающую звезду..."),
+            localized("Sprinkling stardust on pages...", "Добавляем звёздной пыли..."),
+            localized("Waking up story dragons...", "Будим драконов истории..."),
+            localized("Filling the room with magic...", "Наполняем комнату магией...")
+        ]
+    }
+    
     // Library View
     var libraryMyLibrary: String { localized("My Library", "Моя библиотека") }
     var libraryLoadingStories: String { localized("Loading stories...", "Загружаем истории...") }
