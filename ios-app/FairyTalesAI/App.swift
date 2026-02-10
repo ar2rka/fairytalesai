@@ -21,17 +21,18 @@ struct FairyTalesAIApp: App {
     @StateObject private var userSettings = UserSettings()
     @StateObject private var authService = AuthService.shared
     @AppStorage("themeMode") private var themeModeRaw = ThemeMode.system.rawValue
+    @State private var isInitialLoadComplete = false
     
     private var themeMode: ThemeMode {
         ThemeMode(rawValue: themeModeRaw) ?? .system
     }
     
-    // Check if initial auth is complete (don't block on children load to avoid dismissing sheets)
+    // Check if initial auth and children loading is complete
     private var shouldShowLoadingScreen: Bool {
-        // Show loading screen only while auth is resolving (no user yet).
-        // Do not require children to finish loading: otherwise when user opens Create
-        // and children load runs, we'd switch back to loading and dismiss the sheet.
-        return authService.currentUser == nil
+        // Show loading screen while:
+        // 1. Auth is resolving (no user yet), OR
+        // 2. Initial load hasn't completed (waiting for children to load)
+        return authService.currentUser == nil || !isInitialLoadComplete
     }
     
     // SwiftData ModelContainer для кеширования ежедневных историй
@@ -100,6 +101,36 @@ struct FairyTalesAIApp: App {
                             Text("Loading...")
                                 .font(.system(size: 16))
                                 .foregroundColor(AppTheme.textSecondary(for: themeMode.colorScheme))
+                        }
+                    }
+                    .task {
+                        // Wait for auth to complete
+                        while authService.currentUser == nil {
+                            try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+                        }
+                        
+                        // Once auth is complete, ensure children are loaded
+                        // ChildrenStore automatically loads when currentUser is set via Combine subscription
+                        // Wait for the initial load to complete (isLoading becomes false)
+                        while childrenStore.isLoading {
+                            try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+                        }
+                        
+                        // Small delay to ensure children array is populated
+                        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+                        
+                        // Mark initial load as complete
+                        isInitialLoadComplete = true
+                    }
+                    .onChange(of: childrenStore.isLoading) { _, isLoading in
+                        // When children finish loading and we have a user, mark complete immediately
+                        // This handles the case where loading finishes before the task checks
+                        if !isLoading && authService.currentUser != nil && !isInitialLoadComplete {
+                            Task {
+                                // Small delay to ensure children array is populated
+                                try? await Task.sleep(nanoseconds: 100_000_000)
+                                isInitialLoadComplete = true
+                            }
                         }
                     }
                 } else {

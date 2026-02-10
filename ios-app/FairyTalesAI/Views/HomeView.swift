@@ -41,6 +41,14 @@ struct HomeView: View {
         return storiesStore.stories.filter { $0.childId == childId }
     }
 
+    /// Stories to show in "Recent Magic": selected child's stories when someone is chosen, otherwise all stories.
+    private var recentMagicStories: [Story] {
+        if childrenStore.selectedChildId != nil {
+            return childStoriesForSelected
+        }
+        return storiesStore.stories
+    }
+
     private static let recentStoryInterval: TimeInterval = 7 * 24 * 60 * 60
     
     private var isCompactDevice: Bool {
@@ -179,8 +187,8 @@ struct HomeView: View {
                             }
                         }
                         
-                        // Recent Stories
-                        if !storiesStore.stories.isEmpty {
+                        // Recent Stories: selected child's stories when someone is chosen, otherwise all stories
+                        if !recentMagicStories.isEmpty {
                             VStack(alignment: .leading, spacing: 12) {
                                 HStack {
                                     Text(LocalizationManager.shared.homeRecentMagic)
@@ -196,7 +204,7 @@ struct HomeView: View {
                                 
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     HStack(spacing: 16) {
-                                        ForEach(storiesStore.stories.prefix(5)) { story in
+                                        ForEach(recentMagicStories.sorted(by: { $0.createdAt > $1.createdAt }).prefix(5)) { story in
                                             NavigationLink(destination: StoryReadingView(story: story)) {
                                                 StoryCard(story: story)
                                             }
@@ -376,32 +384,45 @@ struct HomeView: View {
                 } label: {
                     Group {
                         if storiesStore.isGenerating {
-                            HStack(spacing: 8) {
-                                ProgressView()
-                                    .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.primaryPurple))
-                                Text(LocalizationManager.shared.generateStoryGenerating)
-                                    .font(.system(size: 16, weight: .semibold))
-                            }
+                            MagicGeneratingRow()
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(
+                                    GenerateButtonBackground(
+                                        isGenerating: Binding(
+                                            get: { storiesStore.isGenerating },
+                                            set: { _ in }
+                                        ),
+                                        isEnabled: true
+                                    )
+                                )
+                                .shadow(
+                                    color: AppTheme.primaryPurple.opacity(0.4),
+                                    radius: 12,
+                                    x: 0,
+                                    y: 4
+                                )
                         } else {
                             HStack {
                                 Image(systemName: "book.fill")
                                 Text(LocalizationManager.shared.homeContinueLastNight)
                                     .font(.system(size: 16, weight: .semibold))
                             }
+                            .foregroundColor(AppTheme.textPrimary(for: colorScheme))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .background(
+                                RoundedRectangle(cornerRadius: AppTheme.cornerRadius)
+                                    .fill(AppTheme.primaryPurple.opacity(0.2))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: AppTheme.cornerRadius)
+                                            .stroke(AppTheme.primaryPurple.opacity(0.4), lineWidth: 1)
+                                    )
+                                    .shadow(color: AppTheme.primaryPurple.opacity(0.25), radius: 8, x: 0, y: 2)
+                            )
                         }
                     }
-                    .foregroundColor(AppTheme.textPrimary(for: colorScheme))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(
-                        RoundedRectangle(cornerRadius: AppTheme.cornerRadius)
-                            .fill(AppTheme.primaryPurple.opacity(0.2))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: AppTheme.cornerRadius)
-                                    .stroke(AppTheme.primaryPurple.opacity(0.4), lineWidth: 1)
-                            )
-                            .shadow(color: AppTheme.primaryPurple.opacity(0.25), radius: 8, x: 0, y: 2)
-                    )
                 }
                 .disabled(storiesStore.isGenerating)
                 .buttonStyle(PlainButtonStyle())
