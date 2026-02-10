@@ -131,7 +131,8 @@ class StoriesStore: ObservableObject {
         theme: String,
         plot: String?,
         children: [Child] = [],
-        language: String = "en"
+        language: String = "en",
+        parentId: UUID? = nil
     ) async {
         guard let childId = childId else {
             errorMessage = "Please select a child"
@@ -157,13 +158,15 @@ class StoriesStore: ObservableObject {
             print("   - Theme: \(theme)")
             print("   - Length: \(length)")
             print("   - Language: \(language)")
+            print("   - Parent ID: \(parentId)")
             let story = try await storiesService.generateStory(
                 childId: childId,
                 storyType: "child",
                 storyLength: length,
                 language: language,
                 moral: plot,
-                accessToken: accessToken
+                accessToken: accessToken,
+                parentId: parentId
             )
             print("✅ История получена от API: \(story.title)")
             

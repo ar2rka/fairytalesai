@@ -166,7 +166,8 @@ class StoriesService: ObservableObject {
         storyLength: Int,
         language: String,
         moral: String? = nil,
-        accessToken: String
+        accessToken: String,
+        parentId: UUID? = nil
     ) async throws -> Story {
         guard let url = URL(string: "https://fairytalesai-production-6704.up.railway.app/api/v1/stories/generate") else {
             throw StoriesServiceError.invalidURL
@@ -181,6 +182,9 @@ class StoriesService: ObservableObject {
         
         if let moral = moral, !moral.isEmpty {
             requestBody["moral"] = moral
+        }
+        if let parentId = parentId {
+            requestBody["parent_id"] = parentId.uuidString
         }
         
         var request = URLRequest(url: url)

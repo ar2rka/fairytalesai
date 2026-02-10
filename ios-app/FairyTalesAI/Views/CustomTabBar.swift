@@ -95,7 +95,7 @@ struct CustomTabBar: View {
             .padding(.horizontal, 8)
             .padding(.top, 8)
             .padding(.bottom, 8)
-        )
+        }
         .frame(height: 64.5)
         .edgesIgnoringSafeArea(.bottom)
     }

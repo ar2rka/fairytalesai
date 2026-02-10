@@ -5,6 +5,7 @@ struct GenerateStoryView: View {
     @EnvironmentObject var storiesStore: StoriesStore
     @EnvironmentObject var premiumManager: PremiumManager
     @EnvironmentObject var userSettings: UserSettings
+    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) var dismiss
     
@@ -378,7 +379,11 @@ struct GenerateStoryView: View {
                 viewModel.generateStory(
                     userSettings: userSettings,
                     storiesStore: storiesStore,
-                    childrenStore: childrenStore
+                    childrenStore: childrenStore,
+                    onSuccess: { storyId in
+                        navigationCoordinator.switchToLibraryAndOpenStory(storyId)
+                        dismiss()
+                    }
                 )
             }) {
                 Group {

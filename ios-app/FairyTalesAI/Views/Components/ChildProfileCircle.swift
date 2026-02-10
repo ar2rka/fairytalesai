@@ -43,11 +43,22 @@ struct ChildProfileCircle: View {
                     )
                     .overlay(
                         Circle()
-                            .stroke(AppTheme.primaryPurple, lineWidth: isSelected ? 3 : 0)
+                            .strokeBorder(Color.white, lineWidth: isSelected ? 3 : 0)
                             .frame(width: childAvatarDiameter, height: childAvatarDiameter)
                     )
+                    .overlay(
+                        Circle()
+                            .stroke(AppTheme.primaryPurple, lineWidth: isSelected ? 5 : 0)
+                            .frame(width: childAvatarDiameter + 6, height: childAvatarDiameter + 6)
+                    )
+                    .shadow(
+                        color: isSelected ? AppTheme.primaryPurple.opacity(0.6) : .clear,
+                        radius: isSelected ? 8 : 0,
+                        x: 0,
+                        y: 0
+                    )
             }
-            .frame(width: childAvatarDiameter + 6, height: childAvatarDiameter + 6)
+            .frame(width: childAvatarDiameter + (isSelected ? 10 : 6), height: childAvatarDiameter + (isSelected ? 10 : 6))
             
             Text(child.name)
                 .font(.system(size: 12))

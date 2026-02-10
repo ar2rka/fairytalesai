@@ -14,6 +14,8 @@ struct HomeView: View {
     @EnvironmentObject var childrenStore: ChildrenStore
     @EnvironmentObject var storiesStore: StoriesStore
     @EnvironmentObject var createStoryPresentation: CreateStoryPresentation
+    @EnvironmentObject var userSettings: UserSettings
+    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.modelContext) private var modelContext
     
@@ -51,6 +53,15 @@ struct HomeView: View {
         let sevenDaysAgo = Date().addingTimeInterval(-Self.recentStoryInterval)
         return childStoriesForSelected
             .filter { $0.createdAt > sevenDaysAgo }
+            .sorted(by: { $0.createdAt > $1.createdAt })
+            .first
+    }
+
+    /// Last created story for the selected child (no time limit). Used to pass parent_id to API when continuing a story.
+    private var lastStoryForSelectedChild: Story? {
+        guard let childId = childrenStore.selectedChildId else { return nil }
+        return storiesStore.stories
+            .filter { $0.childId == childId }
             .sorted(by: { $0.createdAt > $1.createdAt })
             .first
     }
@@ -342,11 +353,26 @@ struct HomeView: View {
 
     private var continueStoryButton: some View {
         Group {
-            if let story = recentStoryForSelectedChild {
+            if let story = recentStoryForSelectedChild,
+               let lastStory = lastStoryForSelectedChild {
                 Button {
-                    let theme = themeFromStory(story)
-                    let summary = continuationSummary(from: story)
-                    createStoryPresentation.present(withTheme: theme, plot: summary)
+                    Task {
+                        await storiesStore.generateStory(
+                            childId: childrenStore.selectedChildId,
+                            length: lastStory.duration,
+                            theme: themeFromStory(story).name,
+                            plot: continuationSummary(from: story),
+                            children: childrenStore.children,
+                            language: userSettings.languageCode,
+                            parentId: lastStory.id
+                        )
+                        // Переключаемся на вкладку Library после успешной генерации
+                        if let generatedStoryId = storiesStore.lastGeneratedStoryId {
+                            navigationCoordinator.switchToLibraryAndOpenStory(generatedStoryId)
+                        } else {
+                            navigationCoordinator.switchToLibrary()
+                        }
+                    }
                 } label: {
                     HStack {
                         Image(systemName: "book.fill")
