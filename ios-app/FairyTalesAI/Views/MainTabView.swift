@@ -66,7 +66,7 @@ struct MainTabView: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .padding(.bottom, 65) // Space for tab bar
+            .padding(.bottom, 78) // Space for tab bar
             .environmentObject(createStoryPresentation)
             .environmentObject(navigationCoordinator)
 

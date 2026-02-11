@@ -34,7 +34,7 @@ struct CustomTabBar: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Liquid glass top edge — subtle inner glow / divider
+            // Top edge — subtle divider
             Rectangle()
                 .fill(
                     LinearGradient(
@@ -48,21 +48,17 @@ struct CustomTabBar: View {
                 )
                 .frame(height: 0.5)
 
-            // Liquid glass background: blur + dark purple tint
+            // Background: material + tint
             ZStack {
-                // Frosted glass blur
                 Rectangle()
                     .fill(.ultraThinMaterial)
-
-                // Dark purple / midnight blue tint to match app theme
                 Rectangle()
                     .fill(AppTheme.darkPurple.opacity(0.65))
             }
-            .frame(height: 64)
+            .frame(height: 76)
         }
         .frame(maxWidth: .infinity)
         .overlay(alignment: .bottom) {
-            // Tab buttons — all on same horizontal plane, equal width
             HStack(spacing: 0) {
                 TabBarButton(
                     icon: "house.fill",
@@ -70,21 +66,18 @@ struct CustomTabBar: View {
                     isSelected: selectedTab == 0,
                     action: { selectedTab = 0 }
                 )
-
                 TabBarButton(
                     icon: "book.closed.fill",
                     label: localizer.tabLibrary,
                     isSelected: selectedTab == 1,
                     action: { selectedTab = 1 }
                 )
-
                 TabBarButton(
                     icon: "wand.and.stars",
                     label: localizer.tabCreate,
-                    isSelected: false, // Create opens a sheet, never "selected" as a destination
+                    isSelected: false,
                     action: onCreateTapped
                 )
-
                 TabBarButton(
                     icon: "person.fill",
                     label: localizer.tabProfile,
@@ -94,9 +87,9 @@ struct CustomTabBar: View {
             }
             .padding(.horizontal, 8)
             .padding(.top, 8)
-            .padding(.bottom, 8)
+            .padding(.bottom, 20)
         }
-        .frame(height: 64.5)
+        .frame(height: 76.5)
         .edgesIgnoringSafeArea(.bottom)
     }
 }
