@@ -134,7 +134,16 @@ class StoriesStore: ObservableObject {
         language: String = "en",
         parentId: UUID? = nil
     ) async {
+        print("📍 StoriesStore.generateStory: ENTRY")
+        print("   - childId: \(childId?.uuidString ?? "nil")")
+        print("   - length: \(length)")
+        print("   - theme: \(theme)")
+        print("   - plot: \(plot ?? "nil")")
+        print("   - language: \(language)")
+        print("   - parentId: \(parentId?.uuidString ?? "nil")")
+        
         guard let childId = childId else {
+            print("📍 StoriesStore.generateStory: EXIT early - childId is nil")
             errorMessage = "Please select a child"
             return
         }
@@ -144,16 +153,17 @@ class StoriesStore: ObservableObject {
         
         defer {
             isGenerating = false
+            print("📍 StoriesStore.generateStory: EXIT (defer)")
         }
         
         do {
             // Получаем токен для авторизации
-            print("🔑 Получаем access token...")
+            print("🔑 StoriesStore.generateStory: Получаем access token...")
             let accessToken = try await getAccessToken()
-            print("✅ Access token получен")
+            print("✅ StoriesStore.generateStory: Access token получен")
             
             // Генерируем историю через API
-            print("📖 Начинаем генерацию истории через API...")
+            print("📖 StoriesStore.generateStory: Вызываем storiesService.generateStory()...")
             print("   - Child ID: \(childId)")
             print("   - Theme: \(theme)")
             print("   - Length: \(length)")
@@ -194,12 +204,13 @@ class StoriesStore: ObservableObject {
             }
         } catch {
             // Обрабатываем различные типы ошибок
+            print("📍 StoriesStore.generateStory: CATCH - ошибка: \(error)")
             if let storiesError = error as? StoriesServiceError {
                 errorMessage = storiesError.errorDescription ?? error.localizedDescription
             } else {
                 errorMessage = error.localizedDescription
             }
-            print("❌ Ошибка генерации истории: \(errorMessage ?? "Unknown error")")
+            print("❌ StoriesStore.generateStory: Ошибка генерации истории: \(errorMessage ?? "Unknown error")")
         }
     }
     

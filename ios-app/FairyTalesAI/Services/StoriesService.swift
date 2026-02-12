@@ -169,9 +169,21 @@ class StoriesService: ObservableObject {
         accessToken: String,
         parentId: UUID? = nil
     ) async throws -> Story {
+        print("📍 StoriesService.generateStory: ENTRY")
+        print("   - childId: \(childId)")
+        print("   - storyType: \(storyType)")
+        print("   - storyLength: \(storyLength)")
+        print("   - language: \(language)")
+        print("   - moral: \(moral ?? "nil")")
+        print("   - parentId: \(parentId?.uuidString ?? "nil")")
+        print("   - accessToken length: \(accessToken.count)")
+        
         guard let url = URL(string: "https://fairytalesai-production-6704.up.railway.app/api/v1/stories/generate") else {
+            print("❌ StoriesService.generateStory: Invalid URL")
             throw StoriesServiceError.invalidURL
         }
+        
+        print("📍 StoriesService.generateStory: URL создан, формируем request body...")
         
         var requestBody: [String: Any] = [
             "language": language,
@@ -194,13 +206,18 @@ class StoriesService: ObservableObject {
         
         request.httpBody = try JSONSerialization.data(withJSONObject: requestBody)
         
+        print("📍 StoriesService.generateStory: Отправляем HTTP POST запрос...")
+        print("   - URL: \(url.absoluteString)")
+        
         // Настраиваем таймаут для запроса (генерация истории может занять время)
         let configuration = URLSessionConfiguration.default
         configuration.timeoutIntervalForRequest = 120 // 2 минуты
         configuration.timeoutIntervalForResource = 120 // 2 минуты
         
         let session = URLSession(configuration: configuration)
+        print("📍 StoriesService.generateStory: Ждём ответа от API...")
         let (data, response) = try await session.data(for: request)
+        print("📍 StoriesService.generateStory: Ответ получен")
         if let jsonString = String(data: data, encoding: .utf8) {
             print("🔍 JSON: \(jsonString)")
         }

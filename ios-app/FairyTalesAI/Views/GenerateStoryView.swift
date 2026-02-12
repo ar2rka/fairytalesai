@@ -6,6 +6,7 @@ struct GenerateStoryView: View {
     @EnvironmentObject var premiumManager: PremiumManager
     @EnvironmentObject var userSettings: UserSettings
     @EnvironmentObject var navigationCoordinator: NavigationCoordinator
+    @EnvironmentObject var createStoryPresentation: CreateStoryPresentation
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) var dismiss
     
@@ -21,8 +22,8 @@ struct GenerateStoryView: View {
     var body: some View {
         ZStack {
             AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
-            
-            if !childrenStore.hasProfiles {
+                
+                if !childrenStore.hasProfiles {
                 // Empty State
                 VStack(spacing: 24) {
                     Image(systemName: "person.fill.badge.plus")
@@ -84,60 +85,60 @@ struct GenerateStoryView: View {
                 }
                 .contentMargins(.top, 0, for: .scrollContent)
             }
-        }
-        .navigationTitle(LocalizationManager.shared.generateStoryCreateStory)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: {
-                    dismiss()
-                }) {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+            }
+            .navigationTitle(LocalizationManager.shared.generateStoryCreateStory)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        dismiss()
+                    }) {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                    }
                 }
             }
-        }
-        .task {
-            await childrenStore.loadChildrenIfNeeded()
-        }
-        .onAppear {
-            if let homeSelectedId = childrenStore.selectedChildId,
-               childrenStore.children.contains(where: { $0.id == homeSelectedId }) {
-                viewModel.selectedChildId = homeSelectedId
-            } else if childrenStore.children.count == 1 {
-                viewModel.selectedChildId = childrenStore.children.first?.id
+            .task {
+                await childrenStore.loadChildrenIfNeeded()
             }
-            if let theme = preselectedTheme {
-                viewModel.selectedTheme = theme
+            .onAppear {
+                if let homeSelectedId = childrenStore.selectedChildId,
+                   childrenStore.children.contains(where: { $0.id == homeSelectedId }) {
+                    viewModel.selectedChildId = homeSelectedId
+                } else if childrenStore.children.count == 1 {
+                    viewModel.selectedChildId = childrenStore.children.first?.id
+                }
+                if let theme = preselectedTheme {
+                    viewModel.selectedTheme = theme
+                }
+                if let plot = preselectedPlot, !plot.isEmpty {
+                    viewModel.plot = plot
+                }
             }
-            if let plot = preselectedPlot, !plot.isEmpty {
-                viewModel.plot = plot
+            .onChange(of: childrenStore.children.count) { _, newCount in
+                if let homeSelectedId = childrenStore.selectedChildId,
+                   childrenStore.children.contains(where: { $0.id == homeSelectedId }) {
+                    viewModel.selectedChildId = homeSelectedId
+                } else if newCount == 1 {
+                    viewModel.selectedChildId = childrenStore.children.first?.id
+                }
             }
-        }
-        .onChange(of: childrenStore.children.count) { _, newCount in
-            if let homeSelectedId = childrenStore.selectedChildId,
-               childrenStore.children.contains(where: { $0.id == homeSelectedId }) {
-                viewModel.selectedChildId = homeSelectedId
-            } else if newCount == 1 {
-                viewModel.selectedChildId = childrenStore.children.first?.id
+            .onChange(of: viewModel.selectedChildId) { _, newId in
+                if let id = newId {
+                    childrenStore.selectedChildId = id
+                }
             }
-        }
-        .onChange(of: viewModel.selectedChildId) { _, newId in
-            if let id = newId {
-                childrenStore.selectedChildId = id
+            .sheet(isPresented: $viewModel.showingAddChild) {
+                AddChildView()
             }
-        }
-        .sheet(isPresented: $viewModel.showingAddChild) {
-            AddChildView()
-        }
-        .sheet(isPresented: $viewModel.showingStoryResult, onDismiss: {
-            dismiss()
-        }) {
-            if let story = viewModel.generatedStory {
-                StoryResultView(story: story)
+            .sheet(isPresented: $viewModel.showingStoryResult, onDismiss: {
+                dismiss()
+            }) {
+                if let story = viewModel.generatedStory {
+                    StoryResultView(story: story)
+                }
             }
-        }
     }
     
     // MARK: - Subviews
@@ -375,46 +376,60 @@ struct GenerateStoryView: View {
                     showDisabledGenerateAlert = true
                     return
                 }
-                storiesStore.errorMessage = nil
-                viewModel.generateStory(
-                    userSettings: userSettings,
-                    storiesStore: storiesStore,
-                    childrenStore: childrenStore,
-                    onSuccess: { storyId in
-                        navigationCoordinator.switchToLibraryAndOpenStory(storyId)
-                        dismiss()
-                    }
+                
+                guard let theme = viewModel.effectiveTheme else { return }
+                
+                // Prepare parameters for StoryGeneratingView
+                let params = StoryGeneratingParams(
+                    childId: viewModel.selectedChildId,
+                    duration: Int(viewModel.selectedDuration),
+                    theme: theme.name,
+                    plot: viewModel.plot.isEmpty ? nil : viewModel.plot,
+                    parentId: nil,
+                    children: childrenStore.children,
+                    language: userSettings.languageCode
                 )
+                
+                print("🎯 GenerateStoryView: Creating StoryGeneratingParams")
+                print("   - Child ID: \(params.childId?.uuidString ?? "nil")")
+                print("   - Duration: \(params.duration)")
+                print("   - Theme: \(params.theme)")
+                print("   - Plot: \(params.plot ?? "nil")")
+                print("   - Language: \(params.language)")
+                
+                // Avoid presenting a second fullScreenCover while this one is still visible.
+                // First dismiss Create Story screen, then present Generating screen.
+                dismiss()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    createStoryPresentation.presentGenerating(params: params)
+                }
             }) {
-                Group {
-                    if storiesStore.isGenerating {
-                        MagicGeneratingRow()
-                    } else {
-                        HStack {
-                            Image(systemName: "wand.and.stars")
-                            Text(LocalizationManager.shared.generateStoryGenerateStory)
-                                .font(.system(size: 18, weight: .bold))
-                        }
-                    }
+                HStack {
+                    Image(systemName: "wand.and.stars")
+                    Text(LocalizationManager.shared.generateStoryGenerateStory)
+                        .font(.system(size: 18, weight: .bold))
                 }
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .padding()
                 .background(
                     GenerateButtonBackground(
-                        isGenerating: $storiesStore.isGenerating,
+                        isGenerating: Binding(
+                            get: { false },
+                            set: { _ in }
+                        ),
                         isEnabled: viewModel.canGenerate
                     )
                 )
                 .shadow(
-                    color: (viewModel.canGenerate || storiesStore.isGenerating) ? AppTheme.primaryPurple.opacity(0.4) : .clear,
-                    radius: (viewModel.canGenerate || storiesStore.isGenerating) ? 12 : 0,
+                    color: viewModel.canGenerate ? AppTheme.primaryPurple.opacity(0.4) : .clear,
+                    radius: viewModel.canGenerate ? 12 : 0,
                     x: 0,
                     y: 4
                 )
-                .opacity(viewModel.canGenerate || storiesStore.isGenerating ? 1.0 : 0.5)
+                .opacity(viewModel.canGenerate ? 1.0 : 0.5)
             }
-            .disabled(storiesStore.isGenerating)
+            .disabled(!viewModel.canGenerate)
             .buttonStyle(PlainButtonStyle())
             .animation(.easeInOut(duration: 0.2), value: viewModel.canGenerate)
             if !viewModel.canGenerate {
@@ -568,3 +583,4 @@ struct GenerateButtonBackground: View {
         .clipShape(RoundedRectangle(cornerRadius: 25))
     }
 }
+
