@@ -95,9 +95,7 @@ struct PaywallView: View {
                         
                         // Primary CTA Button
                         Button(action: {
-                            // Haptic feedback
-                            let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
-                            impactFeedback.impactOccurred()
+                            HapticFeedback.impact(.medium)
                             
                             // If anonymous user, show sign up first
                             if authService.isAnonymousUser {

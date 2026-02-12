@@ -1,6 +1,5 @@
 import Foundation
 import SwiftUI
-import Supabase
 import Combine
 
 @MainActor
@@ -19,11 +18,9 @@ class StoriesStore: ObservableObject {
     private let pageSize = 10
     private var currentOffset = 0
     private var isLoadingPage = false
-    private var supabase: SupabaseClient?
     private var authCancellable: AnyCancellable?
     
     init() {
-        setupSupabase()
         // Show cached stories immediately so Home "Continue" button can appear without waiting for network
         loadStories()
         // Fetch stories when user becomes available (app launch or sign-in)
@@ -42,38 +39,8 @@ class StoriesStore: ObservableObject {
             }
     }
     
-    private func setupSupabase() {
-        guard SupabaseConfig.isConfigured else {
-            print("⚠️ Supabase не настроен. Заполните SupabaseConfig.swift")
-            return
-        }
-        
-        guard let url = URL(string: SupabaseConfig.supabaseURL) else {
-            print("⚠️ Неверный Supabase URL")
-            return
-        }
-        
-        supabase = SupabaseClient(
-            supabaseURL: url,
-            supabaseKey: SupabaseConfig.supabaseKey,
-            options: SupabaseClientOptions(
-                db: .init(
-                  schema: "tales"
-                ),
-                auth: .init(
-                    emitLocalSessionAsInitialSession: true
-                )
-              )
-        )
-    }
-    
     private func getAccessToken() async throws -> String {
-        guard let supabase = supabase else {
-            throw StoriesServiceError.supabaseNotConfigured
-        }
-        
-        let session = try await supabase.auth.session
-        return session.accessToken
+        try await authService.getAccessToken()
     }
     
     func loadStoriesFromSupabase(userId: UUID) async {

@@ -8,9 +8,7 @@ struct ChildSelectionButton: View {
     
     var body: some View {
         Button(action: {
-            // Haptic feedback
-            let impactFeedback = UIImpactFeedbackGenerator(style: .light)
-            impactFeedback.impactOccurred()
+            HapticFeedback.impact()
             action()
         }) {
             VStack(spacing: 8) {

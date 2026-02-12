@@ -1,8 +1,5 @@
 import SwiftUI
 
-/// Circle diameter for child avatar. Kept small enough to avoid clipping with padding.
-private let childAvatarDiameter: CGFloat = 50
-
 /// Button style for "Who is listening?" child selection: push-in scale + opacity pulse + subtle glow.
 struct ChildSelectionButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
@@ -19,6 +16,7 @@ struct ChildSelectionButtonStyle: ButtonStyle {
     }
 }
 
+/// Avatar circle with the child's name label underneath. Uses `ChildAvatarView` internally.
 struct ChildProfileCircle: View {
     let child: Child
     var isSelected: Bool = false
@@ -26,39 +24,7 @@ struct ChildProfileCircle: View {
     
     var body: some View {
         VStack(spacing: 6) {
-            ZStack {
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [AppTheme.primaryPurple, AppTheme.accentPurple],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: childAvatarDiameter, height: childAvatarDiameter)
-                    .overlay(
-                        Text(child.name.prefix(1).uppercased())
-                            .font(.system(size: 20, weight: .bold))
-                            .foregroundColor(.white)
-                    )
-                    .overlay(
-                        Circle()
-                            .strokeBorder(Color.white, lineWidth: isSelected ? 3 : 0)
-                            .frame(width: childAvatarDiameter, height: childAvatarDiameter)
-                    )
-                    .overlay(
-                        Circle()
-                            .stroke(AppTheme.primaryPurple, lineWidth: isSelected ? 5 : 0)
-                            .frame(width: childAvatarDiameter + 6, height: childAvatarDiameter + 6)
-                    )
-                    .shadow(
-                        color: isSelected ? AppTheme.primaryPurple.opacity(0.6) : .clear,
-                        radius: isSelected ? 8 : 0,
-                        x: 0,
-                        y: 0
-                    )
-            }
-            .frame(width: childAvatarDiameter + (isSelected ? 10 : 6), height: childAvatarDiameter + (isSelected ? 10 : 6))
+            ChildAvatarView(child: child, size: 50, isSelected: isSelected)
             
             Text(child.name)
                 .font(.system(size: 12))

@@ -6,36 +6,7 @@ import SwiftData
 class StoriesService: ObservableObject {
     static let shared = StoriesService()
     
-    private var supabase: SupabaseClient?
-    
-    init() {
-        setupSupabase()
-    }
-    
-    private func setupSupabase() {
-        guard SupabaseConfig.isConfigured else {
-            print("⚠️ Supabase не настроен. Заполните SupabaseConfig.swift")
-            return
-        }
-        
-        guard let url = URL(string: SupabaseConfig.supabaseURL) else {
-            print("⚠️ Неверный Supabase URL")
-            return
-        }
-        
-        supabase = SupabaseClient(
-            supabaseURL: url,
-            supabaseKey: SupabaseConfig.supabaseKey,
-            options: SupabaseClientOptions(
-                db: .init(
-                  schema: "tales"
-                ),
-                auth: .init(
-                    emitLocalSessionAsInitialSession: true
-                )
-              )
-        )
-    }
+    private let supabase = SupabaseConfig.client
     
     /// Загружает истории пользователя; исключает записи с status = "archived". В таблице stories должна быть колонка status (например default 'active').
     func fetchStories(userId: UUID) async throws -> [Story] {

@@ -7,24 +7,9 @@ struct ThemeSelectionButton: View {
     @Environment(\.colorScheme) var colorScheme
     @State private var tapScale: CGFloat = 1.0
     
-    private var themeColor: Color {
-        switch theme.name.lowercased() {
-        case "space": return Color(red: 1.0, green: 0.65, blue: 0.0) // Orange
-        case "pirates": return Color(red: 0.8, green: 0.6, blue: 0.2) // Gold
-        case "dinosaurs": return Color(red: 0.2, green: 0.8, blue: 0.2) // Green
-        case "mermaids": return Color(red: 0.2, green: 0.6, blue: 1.0) // Blue
-        case "animals": return Color(red: 0.4, green: 0.7, blue: 0.3) // Green
-        case "mystery": return Color(red: 0.6, green: 0.3, blue: 0.8) // Purple
-        case "magic school": return Color(red: 0.8, green: 0.3, blue: 0.8) // Magenta
-        case "robots": return Color(red: 0.5, green: 0.5, blue: 0.5) // Gray
-        default: return AppTheme.primaryPurple
-        }
-    }
-    
     var body: some View {
         Button(action: {
-            let impactFeedback = UIImpactFeedbackGenerator(style: .light)
-            impactFeedback.impactOccurred()
+            HapticFeedback.impact()
             withAnimation(.easeOut(duration: 0.2)) {
                 tapScale = 1.08
             }

@@ -6,34 +6,9 @@ struct ThemeButton: View {
     @State private var isSelected = false
     @State private var bounceScale: CGFloat = 1.0
     
-    private var themeColor: Color {
-        switch theme.name.lowercased() {
-        case "space":
-            return Color(red: 1.0, green: 0.65, blue: 0.0) // Orange
-        case "pirates":
-            return Color(red: 0.8, green: 0.6, blue: 0.2) // Gold
-        case "dinosaurs":
-            return Color(red: 0.2, green: 0.8, blue: 0.2) // Green
-        case "mermaids":
-            return Color(red: 0.2, green: 0.6, blue: 1.0) // Blue
-        case "animals":
-            return Color(red: 0.4, green: 0.7, blue: 0.3) // Green
-        case "mystery":
-            return Color(red: 0.6, green: 0.3, blue: 0.8) // Purple
-        case "magic school":
-            return Color(red: 0.8, green: 0.3, blue: 0.8) // Magenta
-        case "robots":
-            return Color(red: 0.5, green: 0.5, blue: 0.5) // Gray
-        default:
-            return AppTheme.primaryPurple
-        }
-    }
-    
     var body: some View {
         Button(action: {
-            // Haptic feedback
-            let impactFeedback = UIImpactFeedbackGenerator(style: .light)
-            impactFeedback.impactOccurred()
+            HapticFeedback.impact()
             
             // Toggle selection
             isSelected.toggle()
@@ -62,15 +37,15 @@ struct ThemeButton: View {
             .frame(maxWidth: .infinity)
             .padding(.vertical, 12)
             .padding(.horizontal, 8)
-            .background(themeColor.opacity(0.15))
+            .background(theme.color.opacity(0.15))
             .overlay(
                 RoundedRectangle(cornerRadius: AppTheme.cornerRadius)
                     .stroke(
-                        isSelected ? themeColor : themeColor.opacity(0.3),
+                        isSelected ? theme.color : theme.color.opacity(0.3),
                         lineWidth: isSelected ? 2 : 1
                     )
                     .shadow(
-                        color: isSelected ? themeColor.opacity(0.6) : .clear,
+                        color: isSelected ? theme.color.opacity(0.6) : .clear,
                         radius: isSelected ? 8 : 0
                     )
             )

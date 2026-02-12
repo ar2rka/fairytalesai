@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 struct Story: Identifiable, Codable {
     var id: UUID
@@ -60,6 +61,74 @@ struct StoryTheme: Identifiable, Hashable {
     
     var localizedName: String {
         LocalizationManager.shared.localizedThemeName(name)
+    }
+    
+    /// Цвет темы, используемый для акцентов в UI.
+    var color: Color {
+        Self.color(for: name)
+    }
+    
+    /// Градиент фона карточки темы.
+    var gradient: [Color] {
+        Self.gradient(for: name)
+    }
+    
+    // MARK: - Static helpers (для работы с raw-строками, например story.theme)
+    
+    static func color(for themeName: String) -> Color {
+        switch themeName.lowercased() {
+        case "space": return Color(red: 1.0, green: 0.65, blue: 0.0)
+        case "pirates": return Color(red: 0.8, green: 0.6, blue: 0.2)
+        case "dinosaurs": return Color(red: 0.2, green: 0.8, blue: 0.2)
+        case "mermaids": return Color(red: 0.2, green: 0.6, blue: 1.0)
+        case "animals": return Color(red: 0.4, green: 0.7, blue: 0.3)
+        case "mystery": return Color(red: 0.6, green: 0.3, blue: 0.8)
+        case "magic school": return Color(red: 0.8, green: 0.3, blue: 0.8)
+        case "robots": return Color(red: 0.5, green: 0.5, blue: 0.5)
+        default: return AppTheme.primaryPurple
+        }
+    }
+    
+    static func emoji(for themeName: String) -> String {
+        if let theme = allThemes.first(where: { $0.name.lowercased() == themeName.lowercased() }) {
+            return theme.emoji
+        }
+        // Дополнительные темы для ежедневных бесплатных историй
+        switch themeName.lowercased() {
+        case "fairies": return "🧚"
+        case "forest", "adventure": return "🌲"
+        case "dragon", "dragons": return "🐉"
+        default: return "📖"
+        }
+    }
+    
+    static func gradient(for themeName: String) -> [Color] {
+        switch themeName.lowercased() {
+        case "space":
+            return [Color(red: 0.1, green: 0.2, blue: 0.4), Color(red: 0.2, green: 0.1, blue: 0.3)]
+        case "pirates":
+            return [Color(red: 0.3, green: 0.2, blue: 0.1), Color(red: 0.4, green: 0.3, blue: 0.15)]
+        case "animals":
+            return [Color(red: 0.2, green: 0.4, blue: 0.2), Color(red: 0.15, green: 0.35, blue: 0.15)]
+        case "fairies":
+            return [Color(red: 0.4, green: 0.2, blue: 0.4), Color(red: 0.5, green: 0.3, blue: 0.5)]
+        case "forest", "adventure":
+            return [Color(red: 0.1, green: 0.3, blue: 0.2), Color(red: 0.15, green: 0.4, blue: 0.25)]
+        case "dragon", "dragons":
+            return [Color(red: 0.4, green: 0.1, blue: 0.1), Color(red: 0.5, green: 0.15, blue: 0.15)]
+        case "dinosaurs":
+            return [Color(red: 0.15, green: 0.35, blue: 0.15), Color(red: 0.2, green: 0.4, blue: 0.2)]
+        case "mermaids":
+            return [Color(red: 0.1, green: 0.2, blue: 0.4), Color(red: 0.15, green: 0.3, blue: 0.5)]
+        case "mystery":
+            return [Color(red: 0.25, green: 0.1, blue: 0.35), Color(red: 0.35, green: 0.15, blue: 0.45)]
+        case "magic school":
+            return [Color(red: 0.3, green: 0.1, blue: 0.3), Color(red: 0.4, green: 0.15, blue: 0.4)]
+        case "robots":
+            return [Color(red: 0.2, green: 0.2, blue: 0.25), Color(red: 0.3, green: 0.3, blue: 0.35)]
+        default:
+            return [AppTheme.primaryPurple.opacity(0.6), AppTheme.accentPurple.opacity(0.6)]
+        }
     }
     
     var localizedDescription: String {

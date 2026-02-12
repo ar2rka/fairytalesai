@@ -14,10 +14,7 @@ struct ProtagonistStyleSelector: View {
                         style: style,
                         isSelected: selectedStyle == style
                     ) {
-                        // Haptic feedback
-                        let impactFeedback = UIImpactFeedbackGenerator(style: .light)
-                        impactFeedback.impactOccurred()
-                        
+                        HapticFeedback.impact()
                         withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
                             selectedStyle = style
                         }

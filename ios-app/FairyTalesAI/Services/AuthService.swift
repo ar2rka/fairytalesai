@@ -21,40 +21,23 @@ class AuthService: ObservableObject {
         return currentUser?.isAnonymous ?? false
     }
     
-    private var supabase: SupabaseClient?
+    private let supabase = SupabaseConfig.client
     private var authStateTask: Task<Void, Never>?
     private var isSigningInAnonymously = false // Защита от повторных вызовов
     
     init() {
         print("🚀 AuthService: Инициализация...")
-        setupSupabase()
         checkAuthState()
         observeAuthState()
     }
     
-    private func setupSupabase() {
-        guard SupabaseConfig.isConfigured else {
-            print("⚠️ Supabase не настроен. Заполните SupabaseConfig.swift")
-            return
+    /// Возвращает access token текущей сессии.
+    func getAccessToken() async throws -> String {
+        guard let supabase = supabase else {
+            throw AuthError.supabaseNotConfigured
         }
-        
-        guard let url = URL(string: SupabaseConfig.supabaseURL) else {
-            print("⚠️ Неверный Supabase URL")
-            return
-        }
-        
-        supabase = SupabaseClient(
-            supabaseURL: url,
-            supabaseKey: SupabaseConfig.supabaseKey,
-            options: SupabaseClientOptions(
-                db: .init(
-                  schema: "tales"
-                ),
-                auth: .init(
-                    emitLocalSessionAsInitialSession: true
-                )
-              )
-        )
+        let session = try await supabase.auth.session
+        return session.accessToken
     }
     
     private func checkAuthState() {

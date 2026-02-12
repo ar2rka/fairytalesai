@@ -49,10 +49,7 @@ struct MagicSegmentedSelector: View {
                 HStack(spacing: 0) {
                     ForEach(Array(ageOptions.enumerated()), id: \.element.category) { index, option in
                         Button(action: {
-                            // Haptic feedback
-                            let impactFeedback = UIImpactFeedbackGenerator(style: .light)
-                            impactFeedback.impactOccurred()
-                            
+                            HapticFeedback.impact()
                             selectedIndex = index
                             selectedCategory = option.category
                         }) {

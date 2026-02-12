@@ -130,96 +130,32 @@ struct HomeView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: sectionSpacing) {
                         // 1. Welcome Header
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text(LocalizationManager.shared.homeWelcome)
-                                .font(.system(size: welcomeSize, weight: .medium))
-                                .foregroundColor(Color(white: 0.85))
-                            
-                            Text(LocalizationManager.shared.homeCreateMagicalStories)
-                                .font(.system(size: headerTitleSize, weight: .bold))
-                                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
-                        }
-                        .padding(.top, isCompactPhone ? 6 : 10)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal)
-                        .padding(.top, isCompactPhone ? 4 : 8)
-                        .background(
-                            GeometryReader { headerGeo in
-                                Color.clear.preference(
-                                    key: ContentMinYPreferenceKey.self,
-                                    value: headerGeo.frame(in: .named("scroll")).minY
-                                )
-                            }
+                        HomeWelcomeHeader(
+                            headerTitleSize: headerTitleSize,
+                            welcomeSize: welcomeSize,
+                            isCompactPhone: isCompactPhone
                         )
                         
-                        // 2. Who is listening? (moved up)
+                        // 2. Who is listening?
                         whoIsListeningSection
                         
                         // 3. Daily Free Story
-                        if !freeDemoStories.isEmpty || isLoadingFreeStories {
-                            VStack(alignment: .leading, spacing: 16) {
-                                Text(LocalizationManager.shared.homeDailyFreeStory)
-                                    .font(.system(size: sectionTitleSize, weight: .semibold))
-                                    .foregroundColor(AppTheme.textPrimary(for: colorScheme))
-                                    .padding(.horizontal)
-                                
-                                if isLoadingFreeStories {
-                                    HStack {
-                                        Spacer()
-                                        ProgressView()
-                                            .padding()
-                                        Spacer()
-                                    }
-                                    .padding(.horizontal)
-                                } else {
-                                    ScrollView(.horizontal, showsIndicators: false) {
-                                        HStack(alignment: .top, spacing: 16) {
-                                            ForEach(freeDemoStories) { story in
-                                                NavigationLink(destination: StoryReadingView(story: story)) {
-                                                    FreeDemoStoryCard(story: story)
-                                                }
-                                                .buttonStyle(PlainButtonStyle())
-                                            }
-                                        }
-                                        .padding(.horizontal)
-                                    }
-                                }
-                            }
-                        }
+                        DailyFreeStorySection(
+                            stories: freeDemoStories,
+                            isLoading: isLoadingFreeStories,
+                            sectionTitleSize: sectionTitleSize
+                        )
                         
-                        // Recent Stories: selected child's stories when someone is chosen, otherwise all stories
-                        if !recentMagicStories.isEmpty {
-                            VStack(alignment: .leading, spacing: 12) {
-                                HStack {
-                                    Text(LocalizationManager.shared.homeRecentMagic)
-                                        .font(.system(size: sectionTitleSize, weight: .semibold))
-                                        .foregroundColor(AppTheme.textPrimary(for: colorScheme))
-                                    
-                                    Spacer()
-                                    
-                                    NavigationLink(LocalizationManager.shared.homeViewAll, destination: LibraryView())
-                                        .foregroundColor(AppTheme.primaryPurple)
-                                }
-                                .padding(.horizontal)
-                                
-                                ScrollView(.horizontal, showsIndicators: false) {
-                                    HStack(spacing: 16) {
-                                        ForEach(recentMagicStories.sorted(by: { $0.createdAt > $1.createdAt }).prefix(5)) { story in
-                                            NavigationLink(destination: StoryReadingView(story: story)) {
-                                                StoryCard(story: story)
-                                            }
-                                            .buttonStyle(PlainButtonStyle())
-                                        }
-                                    }
-                                    .padding(.horizontal)
-                                }
-                            }
-                        }
+                        // 4. Recent Stories
+                        RecentMagicSection(
+                            stories: recentMagicStories,
+                            sectionTitleSize: sectionTitleSize
+                        )
                         
-                        // 4. Tonight's Pick (single recommendation)
+                        // 5. Tonight's Pick
                         tonightsPickSection
                         
-                        // Continue Last Night's Adventure (only if selected child has a story in last 7 days)
+                        // 6. Continue Last Night's Adventure
                         if shouldShowContinueButton {
                             continueStoryButton
                         }

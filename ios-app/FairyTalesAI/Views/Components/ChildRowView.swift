@@ -6,20 +6,7 @@ struct ChildRowView: View {
     
     var body: some View {
         HStack(spacing: 16) {
-            Circle()
-                .fill(
-                    LinearGradient(
-                        colors: [AppTheme.primaryPurple, AppTheme.accentPurple],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .frame(width: 50, height: 50)
-                .overlay(
-                    Text(child.name.prefix(1).uppercased())
-                        .font(.system(size: 20, weight: .bold))
-                        .foregroundColor(.white)
-                )
+            ChildAvatarView(child: child, size: 50)
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(child.name)

@@ -7,20 +7,7 @@ struct ProfileSwitcherButton: View {
     var body: some View {
         if let firstChild = childrenStore.children.first {
             Button(action: { showingChildPicker = true }) {
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [AppTheme.primaryPurple, AppTheme.accentPurple],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 36, height: 36)
-                    .overlay(
-                        Text(firstChild.name.prefix(1).uppercased())
-                            .font(.system(size: 16, weight: .bold))
-                            .foregroundColor(.white)
-                    )
+                ChildAvatarView(child: firstChild, size: 36)
             }
             .sheet(isPresented: $showingChildPicker) {
                 ChildPickerView()

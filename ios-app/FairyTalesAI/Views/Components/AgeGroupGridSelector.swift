@@ -23,10 +23,7 @@ struct AgeGroupGridSelector: View {
                     range: option.range,
                     isSelected: selectedIndex == index
                 ) {
-                    // Haptic feedback
-                    let impactFeedback = UIImpactFeedbackGenerator(style: .light)
-                    impactFeedback.impactOccurred()
-                    
+                    HapticFeedback.impact()
                     selectedIndex = index
                     selectedCategory = option.category
                 }

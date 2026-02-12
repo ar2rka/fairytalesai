@@ -16,20 +16,7 @@ struct ChildDetailView: View {
                 VStack(spacing: 24) {
                     // Profile Header
                     VStack(spacing: 16) {
-                        Circle()
-                            .fill(
-                                LinearGradient(
-                                    colors: [AppTheme.primaryPurple, AppTheme.accentPurple],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                            .frame(width: 100, height: 100)
-                            .overlay(
-                                Text(child.name.prefix(1).uppercased())
-                                    .font(.system(size: 40, weight: .bold))
-                                    .foregroundColor(.white)
-                            )
+                        ChildAvatarView(child: child, size: 100)
                         
                         Text(child.name)
                             .font(.system(size: 28, weight: .bold))
