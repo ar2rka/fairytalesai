@@ -4,9 +4,24 @@ struct StoryReadingView: View {
     let story: Story
     @EnvironmentObject var premiumManager: PremiumManager
     @EnvironmentObject var userSettings: UserSettings
+    @EnvironmentObject var childrenStore: ChildrenStore
+    @EnvironmentObject var createStoryPresentation: CreateStoryPresentation
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
     @State private var showShareSheet = false
+
+    private var canContinueStory: Bool {
+        story.childId != nil
+    }
+
+    private func continuationSummary(from story: Story) -> String {
+        if let plot = story.plot, !plot.trimmingCharacters(in: .whitespaces).isEmpty {
+            return "Continue the adventure. Previous story: \"\(story.title)\". Summary: \(plot). Write a new chapter that continues this story."
+        }
+        let snippet = String(story.content.prefix(500)).trimmingCharacters(in: .whitespacesAndNewlines)
+        let suffix = story.content.count > 500 ? "…" : ""
+        return "Continue the adventure. Previous story: \"\(story.title)\". Here is how it went: \(snippet)\(suffix) Write a new chapter that continues this story."
+    }
     
     var body: some View {
         ZStack {
@@ -58,7 +73,7 @@ struct StoryReadingView: View {
                     
                     // Story Content
                     Text(story.content)
-                        .font(.system(size: 18))
+                        .font(.system(size: userSettings.storyFontSize))
                         .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                         .lineSpacing(12)
                         .fixedSize(horizontal: false, vertical: true)
@@ -71,15 +86,49 @@ struct StoryReadingView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 HStack(spacing: 16) {
+                    Button(action: {
+                        if userSettings.storyFontSize > 12 {
+                            userSettings.storyFontSize -= 2
+                        }
+                    }) {
+                        Image(systemName: "textformat.size.smaller")
+                            .foregroundColor(userSettings.storyFontSize > 12 ? AppTheme.primaryPurple : AppTheme.textSecondary(for: colorScheme))
+                    }
+                    .disabled(userSettings.storyFontSize <= 12)
+
+                    Button(action: {
+                        if userSettings.storyFontSize < 24 {
+                            userSettings.storyFontSize += 2
+                        }
+                    }) {
+                        Image(systemName: "textformat.size.larger")
+                            .foregroundColor(userSettings.storyFontSize < 24 ? AppTheme.primaryPurple : AppTheme.textSecondary(for: colorScheme))
+                    }
+                    .disabled(userSettings.storyFontSize >= 24)
+
                     Button(action: { showShareSheet = true }) {
                         Image(systemName: "square.and.arrow.up")
                             .foregroundColor(AppTheme.textPrimary(for: colorScheme))
                     }
-                    
-                    Button(action: { dismiss() }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+
+                    Button(action: {
+                        guard let childId = story.childId else { return }
+                        let params = StoryGeneratingParams(
+                            childId: childId,
+                            duration: story.duration,
+                            theme: story.theme,
+                            plot: continuationSummary(from: story),
+                            parentId: story.id,
+                            children: childrenStore.children,
+                            language: userSettings.languageCode
+                        )
+                        createStoryPresentation.presentGenerating(params: params)
+                    }) {
+                        Image(systemName: "book.pages")
+                            .foregroundColor(canContinueStory ? AppTheme.primaryPurple : AppTheme.textSecondary(for: colorScheme))
                     }
+                    .disabled(!canContinueStory)
+                    .accessibilityLabel(LocalizationManager.shared.homeContinueLastNight)
                 }
             }
         }

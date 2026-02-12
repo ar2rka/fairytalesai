@@ -39,7 +39,6 @@
 		A1000116 /* ChildProfileCircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000117 /* ChildProfileCircle.swift */; };
 		A1000118 /* StoryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000119 /* StoryCard.swift */; };
 		A100011A /* ThemeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100011B /* ThemeButton.swift */; };
-		A1000136 /* TonightsPickCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000135 /* TonightsPickCard.swift */; };
 		A100011C /* StoryReadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100011D /* StoryReadingView.swift */; };
 		A100011E /* ProfileSwitcherButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100011F /* ProfileSwitcherButton.swift */; };
 		A1000120 /* ChildPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000121 /* ChildPickerView.swift */; };
@@ -52,6 +51,7 @@
 		A100012E /* HeroInterestChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100012F /* HeroInterestChip.swift */; };
 		A1000130 /* StarParticleAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000131 /* StarParticleAnimation.swift */; };
 		A1000132 /* EditChildView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000133 /* EditChildView.swift */; };
+		A1000136 /* TonightsPickCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000135 /* TonightsPickCard.swift */; };
 		D9E2D5DB2EFD60A40082D3B4 /* StoriesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5D12EFD60A40082D3B4 /* StoriesStore.swift */; };
 		D9E2D5DC2EFD60A40082D3B4 /* ChildrenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5D02EFD60A40082D3B4 /* ChildrenStore.swift */; };
 		D9E2D5DE2EFD60A40082D3B4 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5CE2EFD60A40082D3B4 /* AppTheme.swift */; };
@@ -75,6 +75,7 @@
 		D9E2D5FA2EFD60A40082D3BF /* LanguageSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5FB2EFD60A40082D3BF /* LanguageSelectionView.swift */; };
 		D9E2D5FC2EFD60A40082D3C0 /* SettingsPlaceholderViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5FD2EFD60A40082D3C0 /* SettingsPlaceholderViews.swift */; };
 		D9E2D5FE2EFD60A40082D3C1 /* ThemeSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5FF2EFD60A40082D3C1 /* ThemeSelectionView.swift */; };
+		E7A1C2D3E4F5A6B700112233 /* StoryGeneratingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A1C2D3E4F5A6B700112234 /* StoryGeneratingView.swift */; };
 		D9E2D6062EFD60A40082D3C6 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D6072EFD60A40082D3C6 /* SignUpView.swift */; };
 		D9E2D60A2EFD60A40082D3C8 /* CustomTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D60B2EFD60A40082D3C8 /* CustomTabBar.swift */; };
 		D9E2D60C2EFD60A40082D3C9 /* MagicSegmentedSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D60D2EFD60A40082D3C9 /* MagicSegmentedSelector.swift */; };
@@ -113,7 +114,6 @@
 		A1000117 /* ChildProfileCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChildProfileCircle.swift; sourceTree = "<group>"; };
 		A1000119 /* StoryCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryCard.swift; sourceTree = "<group>"; };
 		A100011B /* ThemeButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeButton.swift; sourceTree = "<group>"; };
-		A1000135 /* TonightsPickCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TonightsPickCard.swift; sourceTree = "<group>"; };
 		A100011D /* StoryReadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryReadingView.swift; sourceTree = "<group>"; };
 		A100011F /* ProfileSwitcherButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSwitcherButton.swift; sourceTree = "<group>"; };
 		A1000121 /* ChildPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChildPickerView.swift; sourceTree = "<group>"; };
@@ -126,6 +126,7 @@
 		A100012F /* HeroInterestChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroInterestChip.swift; sourceTree = "<group>"; };
 		A1000131 /* StarParticleAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarParticleAnimation.swift; sourceTree = "<group>"; };
 		A1000133 /* EditChildView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditChildView.swift; sourceTree = "<group>"; };
+		A1000135 /* TonightsPickCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TonightsPickCard.swift; sourceTree = "<group>"; };
 		D9E2D5CB2EFD60A40082D3B4 /* Child.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Child.swift; sourceTree = "<group>"; };
 		D9E2D5CC2EFD60A40082D3B4 /* Story.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Story.swift; sourceTree = "<group>"; };
 		D9E2D5CE2EFD60A40082D3B4 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
@@ -149,6 +150,7 @@
 		D9E2D5FB2EFD60A40082D3BF /* LanguageSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageSelectionView.swift; sourceTree = "<group>"; };
 		D9E2D5FD2EFD60A40082D3C0 /* SettingsPlaceholderViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPlaceholderViews.swift; sourceTree = "<group>"; };
 		D9E2D5FF2EFD60A40082D3C1 /* ThemeSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeSelectionView.swift; sourceTree = "<group>"; };
+		E7A1C2D3E4F5A6B700112234 /* StoryGeneratingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryGeneratingView.swift; sourceTree = "<group>"; };
 		D9E2D6072EFD60A40082D3C6 /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
 		D9E2D60B2EFD60A40082D3C8 /* CustomTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabBar.swift; sourceTree = "<group>"; };
 		D9E2D60D2EFD60A40082D3C9 /* MagicSegmentedSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MagicSegmentedSelector.swift; sourceTree = "<group>"; };
@@ -271,6 +273,7 @@
 				D9E2D5D72EFD60A40082D3B4 /* LibraryView.swift */,
 				70E32FB058A04056809C1CBD /* LoginView.swift */,
 				D9E2D5D82EFD60A40082D3B4 /* MainTabView.swift */,
+				E7A1C2D3E4F5A6B700112234 /* StoryGeneratingView.swift */,
 				D9E2D5D92EFD60A40082D3B4 /* SettingsView.swift */,
 				D9E2D6072EFD60A40082D3C6 /* SignUpView.swift */,
 				D9E2D60B2EFD60A40082D3C8 /* CustomTabBar.swift */,
@@ -432,6 +435,7 @@
 				F1A2B3C4D5E6F7A8B9C0D1E2F3 /* Services/LocalizationManager.swift in Sources */,
 				D9E2D5E42EFD60A40082D3B4 /* SettingsView.swift in Sources */,
 				D9E2D5E52EFD60A40082D3B4 /* MainTabView.swift in Sources */,
+				E7A1C2D3E4F5A6B700112233 /* StoryGeneratingView.swift in Sources */,
 				D9E2D5E62EFD60A40082D3B4 /* Child.swift in Sources */,
 				A1000001 /* App.swift in Sources */,
 				D9E2D5EE2EFD60A40082D3B9 /* StoryResultView.swift in Sources */,

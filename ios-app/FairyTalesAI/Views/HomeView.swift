@@ -364,67 +364,37 @@ struct HomeView: View {
             if let story = recentStoryForSelectedChild,
                let lastStory = lastStoryForSelectedChild {
                 Button {
-                    Task {
-                        await storiesStore.generateStory(
-                            childId: childrenStore.selectedChildId,
-                            length: lastStory.duration,
-                            theme: themeFromStory(story).name,
-                            plot: continuationSummary(from: story),
-                            children: childrenStore.children,
-                            language: userSettings.languageCode,
-                            parentId: lastStory.id
-                        )
-                        // Переключаемся на вкладку Library после успешной генерации
-                        if let generatedStoryId = storiesStore.lastGeneratedStoryId {
-                            navigationCoordinator.switchToLibraryAndOpenStory(generatedStoryId)
-                        } else {
-                            navigationCoordinator.switchToLibrary()
-                        }
-                    }
+                    // Open StoryGeneratingView with continue parameters
+                    let params = StoryGeneratingParams(
+                        childId: childrenStore.selectedChildId,
+                        duration: lastStory.duration,
+                        theme: themeFromStory(story).name,
+                        plot: continuationSummary(from: story),
+                        parentId: lastStory.id,
+                        children: childrenStore.children,
+                        language: userSettings.languageCode
+                    )
+                    
+                    createStoryPresentation.presentGenerating(params: params)
                 } label: {
-                    Group {
-                        if storiesStore.isGenerating {
-                            MagicGeneratingRow()
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(
-                                    GenerateButtonBackground(
-                                        isGenerating: Binding(
-                                            get: { storiesStore.isGenerating },
-                                            set: { _ in }
-                                        ),
-                                        isEnabled: true
-                                    )
-                                )
-                                .shadow(
-                                    color: AppTheme.primaryPurple.opacity(0.4),
-                                    radius: 12,
-                                    x: 0,
-                                    y: 4
-                                )
-                        } else {
-                            HStack {
-                                Image(systemName: "book.fill")
-                                Text(LocalizationManager.shared.homeContinueLastNight)
-                                    .font(.system(size: 16, weight: .semibold))
-                            }
-                            .foregroundColor(AppTheme.textPrimary(for: colorScheme))
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
-                            .background(
-                                RoundedRectangle(cornerRadius: AppTheme.cornerRadius)
-                                    .fill(AppTheme.primaryPurple.opacity(0.2))
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: AppTheme.cornerRadius)
-                                            .stroke(AppTheme.primaryPurple.opacity(0.4), lineWidth: 1)
-                                    )
-                                    .shadow(color: AppTheme.primaryPurple.opacity(0.25), radius: 8, x: 0, y: 2)
-                            )
-                        }
+                    HStack {
+                        Image(systemName: "book.fill")
+                        Text(LocalizationManager.shared.homeContinueLastNight)
+                            .font(.system(size: 16, weight: .semibold))
                     }
+                    .foregroundColor(AppTheme.textPrimary(for: colorScheme))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(
+                        RoundedRectangle(cornerRadius: AppTheme.cornerRadius)
+                            .fill(AppTheme.primaryPurple.opacity(0.2))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: AppTheme.cornerRadius)
+                                    .stroke(AppTheme.primaryPurple.opacity(0.4), lineWidth: 1)
+                            )
+                            .shadow(color: AppTheme.primaryPurple.opacity(0.25), radius: 8, x: 0, y: 2)
+                    )
                 }
-                .disabled(storiesStore.isGenerating)
                 .buttonStyle(PlainButtonStyle())
             }
         }

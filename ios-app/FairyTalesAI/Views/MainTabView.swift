@@ -5,14 +5,63 @@ final class CreateStoryPresentation: ObservableObject {
     @Published var isPresented = false
     @Published var preselectedTheme: StoryTheme?
     @Published var preselectedPlot: String?
+    
+    // Story generating page presentation
+    @Published var isGeneratingPresented = false
+    @Published var generatingParams: StoryGeneratingParams?
+    
     func present(withTheme theme: StoryTheme?, plot: String? = nil) {
         preselectedTheme = theme
         preselectedPlot = plot
         isPresented = true
     }
+    
+    func presentGenerating(params: StoryGeneratingParams) {
+        generatingParams = params
+        isGeneratingPresented = true
+    }
+    
     func clearPreselected() {
         preselectedTheme = nil
         preselectedPlot = nil
+    }
+    
+    func clearGenerating() {
+        generatingParams = nil
+        isGeneratingPresented = false
+    }
+}
+
+/// Parameters for story generation
+struct StoryGeneratingParams: Identifiable, Hashable {
+    // Use a stable identity derived from a subset of hashable parameters
+    var id: Int { var hasher = Hasher(); self.hash(into: &hasher); return hasher.finalize() }
+
+    let childId: UUID?
+    let duration: Int
+    let theme: String
+    let plot: String?
+    let parentId: UUID?
+    let children: [Child]
+    let language: String
+
+    // Only compare/hash stable, hashable fields. Avoid hashing `children` if `Child` isn't Hashable.
+    static func == (lhs: StoryGeneratingParams, rhs: StoryGeneratingParams) -> Bool {
+        return lhs.childId == rhs.childId &&
+        lhs.duration == rhs.duration &&
+        lhs.theme == rhs.theme &&
+        lhs.plot == rhs.plot &&
+        lhs.parentId == rhs.parentId &&
+        lhs.language == rhs.language
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(childId)
+        hasher.combine(duration)
+        hasher.combine(theme)
+        hasher.combine(plot)
+        hasher.combine(parentId)
+        hasher.combine(language)
     }
 }
 
@@ -83,18 +132,29 @@ struct MainTabView: View {
         .fullScreenCover(isPresented: $createStoryPresentation.isPresented, onDismiss: {
             createStoryPresentation.clearPreselected()
         }) {
-            NavigationView {
-                GenerateStoryView(
-                    preselectedTheme: createStoryPresentation.preselectedTheme,
-                    preselectedPlot: createStoryPresentation.preselectedPlot
-                )
-            }
+            GenerateStoryView(
+                preselectedTheme: createStoryPresentation.preselectedTheme,
+                preselectedPlot: createStoryPresentation.preselectedPlot
+            )
             .environmentObject(childrenStore)
             .environmentObject(storiesStore)
             .environmentObject(premiumManager)
             .environmentObject(userSettings)
             .environmentObject(authService)
             .environmentObject(navigationCoordinator)
+            .environmentObject(createStoryPresentation)
+        }
+        .fullScreenCover(isPresented: $createStoryPresentation.isGeneratingPresented, onDismiss: {
+            createStoryPresentation.clearGenerating()
+        }) {
+            if let params = createStoryPresentation.generatingParams {
+                StoryGeneratingView(
+                    params: params,
+                    storiesStore: storiesStore,
+                    userSettings: userSettings,
+                    navigationCoordinator: navigationCoordinator
+                )
+            }
         }
     }
 }

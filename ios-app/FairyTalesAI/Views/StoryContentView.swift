@@ -4,8 +4,15 @@ struct StoryContentView: View {
     let story: Story
     @EnvironmentObject var premiumManager: PremiumManager
     @EnvironmentObject var userSettings: UserSettings
+    @EnvironmentObject var childrenStore: ChildrenStore
+    @EnvironmentObject var createStoryPresentation: CreateStoryPresentation
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
+
+    private var canContinueStory: Bool {
+        story.childId != nil
+    }
+
     var body: some View {
         ZStack {
             AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
@@ -72,6 +79,31 @@ struct StoryContentView: View {
         .navigationTitle(LocalizationManager.shared.storyReadingStory)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    guard let childId = story.childId else { return }
+                    let params = StoryGeneratingParams(
+                        childId: childId,
+                        duration: story.duration,
+                        theme: story.theme,
+                        plot: nil,
+                        parentId: story.id,
+                        children: childrenStore.children,
+                        language: userSettings.languageCode
+                    )
+                    createStoryPresentation.presentGenerating(params: params)
+                }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "book.pages")
+                        Text("Continue")
+                            .font(.system(size: 11, weight: .semibold))
+                            .lineLimit(1)
+                    }
+                    .foregroundColor(canContinueStory ? AppTheme.primaryPurple : AppTheme.textSecondary(for: colorScheme))
+                }
+                .disabled(!canContinueStory)
+                .accessibilityLabel(LocalizationManager.shared.homeContinueLastNight)
+            }
             ToolbarItem(placement: .navigationBarTrailing) {
                 HStack(spacing: 16) {
                     // Decrease font size button
