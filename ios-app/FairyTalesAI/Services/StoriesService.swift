@@ -137,6 +137,7 @@ class StoriesService: ObservableObject {
         storyLength: Int,
         language: String,
         moral: String? = nil,
+        theme: String? = nil,
         accessToken: String,
         parentId: UUID? = nil
     ) async throws -> Story {
@@ -146,6 +147,7 @@ class StoriesService: ObservableObject {
         print("   - storyLength: \(storyLength)")
         print("   - language: \(language)")
         print("   - moral: \(moral ?? "nil")")
+        print("   - theme: \(theme ?? "nil")")
         print("   - parentId: \(parentId?.uuidString ?? "nil")")
         print("   - accessToken length: \(accessToken.count)")
         
@@ -165,6 +167,9 @@ class StoriesService: ObservableObject {
         
         if let moral = moral, !moral.isEmpty {
             requestBody["moral"] = moral
+        }
+        if let theme = theme, !theme.isEmpty {
+            requestBody["theme"] = theme
         }
         if let parentId = parentId {
             requestBody["parent_id"] = parentId.uuidString

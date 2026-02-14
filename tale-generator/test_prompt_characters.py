@@ -70,17 +70,16 @@ class TestChildCharacter:
                 interests=["reading"]
             )
     
-    def test_child_no_interests_fails(self):
-        """Test that empty interests raises validation error."""
-        with pytest.raises(ValidationError) as exc_info:
-            ChildCharacter(
-                name="Test",
-                age=7,
-                gender="female",
-                interests=[]
-            )
-        assert "at least one interest" in str(exc_info.value)
-    
+    def test_child_empty_interests_allowed(self):
+        """Test that empty interests list is allowed (interests are optional)."""
+        child = ChildCharacter(
+            name="Test",
+            age_category="6-7",
+            gender="female",
+            interests=[]
+        )
+        assert child.interests == []
+
     def test_get_description_data(self):
         """Test getting child description data."""
         child = ChildCharacter(

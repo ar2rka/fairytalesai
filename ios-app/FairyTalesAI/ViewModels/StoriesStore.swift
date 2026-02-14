@@ -142,6 +142,7 @@ class StoriesStore: ObservableObject {
                 storyLength: length,
                 language: language,
                 moral: plot,
+                theme: theme,
                 accessToken: accessToken,
                 parentId: parentId
             )
