@@ -139,8 +139,13 @@ private struct SupabaseChild: Codable {
             }
         }
         
-        guard let ageCategory = AgeCategory(rawValue: ageCategory) else {
-            // Fallback to default if parsing fails
+        // Backend and DB use "8-12"; legacy or API may still return "8+" for Big Kid
+        let ageCategoryEnum: AgeCategory
+        if ageCategory == "8+" || ageCategory == "8-12" {
+            ageCategoryEnum = .eightPlus
+        } else if let parsed = AgeCategory(rawValue: ageCategory) {
+            ageCategoryEnum = parsed
+        } else {
             fatalError("Invalid age category: \(ageCategory)")
         }
         
@@ -159,7 +164,7 @@ private struct SupabaseChild: Codable {
             id: id,
             name: name,
             gender: normalizedGender,
-            ageCategory: ageCategory,
+            ageCategory: ageCategoryEnum,
             interests: interests,
             userId: userId,
             createdAt: createdAtDate,

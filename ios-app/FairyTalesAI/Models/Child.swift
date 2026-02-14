@@ -36,7 +36,8 @@ enum AgeCategory: String, Codable, CaseIterable {
     case twoThree = "2-3"
     case threeFive = "3-5"
     case fiveSeven = "5-7"
-    case eightPlus = "8+"
+    /// Stored as "8-12" in DB/API for compatibility; shown as "8+" / "9+ years" in UI.
+    case eightPlus = "8-12"
     
     var displayName: String {
         let localizer = getLocalizer()
@@ -56,8 +57,12 @@ enum AgeCategory: String, Codable, CaseIterable {
         return LocalizationManager.shared
     }
     
+    /// For UI (cards, selectors). EightPlus shows "8+" instead of "8-12".
     var shortName: String {
-        return self.rawValue
+        switch self {
+        case .eightPlus: return "8+"
+        default: return self.rawValue
+        }
     }
 }
 

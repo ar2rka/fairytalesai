@@ -21,7 +21,7 @@ final class StoryGenerationRunner: ObservableObject {
         storiesStore.errorMessage = nil
 
         Task {
-            print("📞 StoryGenerationRunner: calling storiesStore.generateStory()")
+            print("📞 StoryGenerationRunner: calling storiesStore.generateStory(theme: \(params.theme), plot: \(params.plot ?? "nil"))")
             await storiesStore.generateStory(
                 childId: params.childId,
                 length: params.duration,

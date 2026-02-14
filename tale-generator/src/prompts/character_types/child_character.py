@@ -42,12 +42,6 @@ class ChildCharacter(BaseCharacter):
         
         if not self.gender or not self.gender.strip():
             raise ValidationError("Child gender cannot be empty", field="gender")
-        
-        if not self.interests:
-            raise ValidationError(
-                "Child must have at least one interest",
-                field="interests"
-            )
     
     def get_description_data(self) -> Dict[str, Any]:
         """Get child data for prompt rendering.

@@ -51,7 +51,11 @@ def normalize_age_category(age_category: str) -> str:
     if re.match(r'^\d{1,2}-\d{1,2}$', age_category):
         return age_category
     
-    raise ValueError(f"Cannot normalize age category: '{age_category}'. Expected format: 'X-Y' or 'X-Y года/лет/years'")
+    # Support "8+" / "9+" (Big Kid) — normalize to range 8-12 for pipeline compatibility
+    if re.match(r'^(\d{1,2})\s*\+\s*$', age_category):
+        return "8-12"
+    
+    raise ValueError(f"Cannot normalize age category: '{age_category}'. Expected format: 'X-Y', '8+', or 'X-Y года/лет/years'")
 
 
 def get_age_category_display(age_category: str, language: Language = Language.ENGLISH) -> str:
@@ -68,12 +72,14 @@ def get_age_category_display(age_category: str, language: Language = Language.EN
         Language.ENGLISH: {
             '2-3': '2-3 years',
             '3-5': '3-5 years',
-            '5-7': '5-7 years'
+            '5-7': '5-7 years',
+            '8-12': '9+ years'
         },
         Language.RUSSIAN: {
             '2-3': '2-3 года',
             '3-5': '3-5 лет',
-            '5-7': '5-7 лет'
+            '5-7': '5-7 лет',
+            '8-12': '9+ лет'
         }
     }
     
@@ -87,16 +93,20 @@ def get_age_category_for_prompt(age_category: str, language: Language = Language
     """Get age category text for use in prompts.
     
     Args:
-        age_category: Age category (normalized format like '2-3', '4-5', etc.)
+        age_category: Age category (normalized format like '2-3', '4-5', '8-12', or '8+')
         language: Target language
         
     Returns:
         Age category text formatted for prompts
     """
-    # Normalize first to ensure consistent format
+    # Normalize first to ensure consistent format (e.g. '8+' -> '8-12')
     normalized = normalize_age_category(age_category)
     
-    # Extract age range
+    # Use display map for 8-12 so we show "9+ years" in prompts
+    if normalized == "8-12":
+        return get_age_category_display(normalized, language)
+    
+    # Extract age range for X-Y format
     match = re.match(r'(\d+)-(\d+)', normalized)
     if not match:
         return age_category
@@ -145,11 +155,13 @@ def age_to_category(age: int) -> str:
         age: Numeric age value
         
     Returns:
-        Age category string ('2-3', '3-5', or '5-7')
+        Age category string ('2-3', '3-5', '5-7', or '8-12')
     """
     if age <= 3:
         return '2-3'
     elif age <= 5:
         return '3-5'
-    else:
+    elif age <= 7:
         return '5-7'
+    else:
+        return '8-12'
