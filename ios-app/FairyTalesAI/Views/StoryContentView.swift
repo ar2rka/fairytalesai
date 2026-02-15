@@ -93,13 +93,9 @@ struct StoryContentView: View {
                     )
                     createStoryPresentation.presentGenerating(params: params)
                 }) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "book.pages")
-                        Text("Continue")
-                            .font(.system(size: 11, weight: .semibold))
-                            .lineLimit(1)
-                    }
-                    .foregroundColor(canContinueStory ? AppTheme.primaryPurple : AppTheme.textSecondary(for: colorScheme))
+                    Image(systemName: "wand.and.stars")
+                        .font(.system(size: 16))
+                        .foregroundColor(canContinueStory ? AppTheme.primaryPurple : AppTheme.textSecondary(for: colorScheme))
                 }
                 .disabled(!canContinueStory)
                 .accessibilityLabel(LocalizationManager.shared.homeContinueLastNight)
