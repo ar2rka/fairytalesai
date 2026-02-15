@@ -54,8 +54,8 @@ class StoriesStore: ObservableObject {
         
         do {
             let fetchedStories = try await storiesService.fetchStories(userId: userId, limit: pageSize, offset: 0)
-            stories = fetchedStories
-            currentOffset = fetchedStories.count
+            stories = Self.deduplicatedPreservingOrder(from: fetchedStories)
+            currentOffset = stories.count
             hasMoreStories = fetchedStories.count >= pageSize
             saveStories()
         } catch {
@@ -82,7 +82,9 @@ class StoriesStore: ObservableObject {
             if fetchedStories.isEmpty {
                 hasMoreStories = false
             } else {
-                stories.append(contentsOf: fetchedStories)
+                let existingIds = Set(stories.map(\.id))
+                let newStories = fetchedStories.filter { !existingIds.contains($0.id) }
+                stories.append(contentsOf: newStories)
                 currentOffset += fetchedStories.count
                 hasMoreStories = fetchedStories.count >= pageSize
             }
@@ -160,8 +162,10 @@ class StoriesStore: ObservableObject {
                 print("✅ История успешно сгенерирована: \(story.title) (ID: \(story.id))")
             }
             
-            // Добавляем историю в список
-            stories.insert(finalStory, at: 0)
+            // Добавляем историю в список (избегаем дубликата если уже есть)
+            if !stories.contains(where: { $0.id == finalStory.id }) {
+                stories.insert(finalStory, at: 0)
+            }
             
             // Сохраняем ID для автоматического открытия в Library
             lastGeneratedStoryId = finalStory.id
@@ -208,8 +212,14 @@ class StoriesStore: ObservableObject {
     private func loadStories() {
         if let data = UserDefaults.standard.data(forKey: storageKey),
            let decoded = try? JSONDecoder().decode([Story].self, from: data) {
-            stories = decoded
+            stories = Self.deduplicatedPreservingOrder(from: decoded)
         }
+    }
+    
+    /// Removes duplicate stories by id, preserving order (keeps first occurrence).
+    private static func deduplicatedPreservingOrder(from stories: [Story]) -> [Story] {
+        var seen = Set<UUID>()
+        return stories.filter { seen.insert($0.id).inserted }
     }
 }
 

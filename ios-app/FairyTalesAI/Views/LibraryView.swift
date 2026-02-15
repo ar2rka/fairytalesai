@@ -11,8 +11,10 @@ struct LibraryView: View {
     @State private var navigationPath = NavigationPath()
     
     var filteredStories: [Story] {
-        guard !searchText.isEmpty else { return storiesStore.stories }
-        return storiesStore.stories.filter { story in
+        var seen = Set<UUID>()
+        let unique = storiesStore.stories.filter { seen.insert($0.id).inserted }
+        guard !searchText.isEmpty else { return unique }
+        return unique.filter { story in
             story.title.localizedCaseInsensitiveContains(searchText) ||
             story.theme.localizedCaseInsensitiveContains(searchText)
         }

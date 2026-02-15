@@ -549,6 +549,7 @@ class SupabaseClient:
                 'status': 'status',
                 'generation_id': 'generation_id',
                 'parent_id': 'parent_id',
+                'theme': 'theme',
             }
             
             for py_key, db_key in key_mapping.items():
@@ -632,7 +633,8 @@ class SupabaseClient:
                     'user_id': 'user_id',
                     'status': 'status',
                     'generation_id': 'generation_id',
-                    'parent_id': 'parent_id'
+                    'parent_id': 'parent_id',
+                    'theme': 'theme',
                 }
                 
                 model_story_data = {}
@@ -675,6 +677,7 @@ class SupabaseClient:
                 'title': 'title',
                 'content': 'content',
                 'summary': 'summary',
+                'moral': 'moral',
                 'full_response': 'full_response',
                 'generation_info': 'generation_info',
                 'language': 'language',
@@ -683,7 +686,8 @@ class SupabaseClient:
                 'audio_file_url': 'audio_file_url',
                 'audio_provider': 'audio_provider',
                 'audio_generation_metadata': 'audio_generation_metadata',
-                'user_id': 'user_id'
+                'user_id': 'user_id',
+                'theme': 'theme',
             }
             
             for story_data in response.data:
@@ -739,7 +743,10 @@ class SupabaseClient:
                 'generation_info': 'generation_info',
                 'language': 'language',
                 'rating': 'rating',
-                'user_id': 'user_id'
+                'story_length': 'story_length',
+                'generation_id': 'generation_id',
+                'user_id': 'user_id',
+                'theme': 'theme',
             }
             
             for story_data in response.data:
@@ -805,7 +812,10 @@ class SupabaseClient:
                 'audio_provider': 'audio_provider',
                 'audio_generation_metadata': 'audio_generation_metadata',
                 'user_id': 'user_id',
-                'status': 'status'
+                'status': 'status',
+                'generation_id': 'generation_id',
+                'parent_id': 'parent_id',
+                'theme': 'theme',
             }
             
             for story_data in response.data:
@@ -870,7 +880,12 @@ class SupabaseClient:
                 'story_length': 'story_length',
                 'audio_file_url': 'audio_file_url',
                 'audio_provider': 'audio_provider',
-                'audio_generation_metadata': 'audio_generation_metadata'
+                'audio_generation_metadata': 'audio_generation_metadata',
+                'user_id': 'user_id',
+                'status': 'status',
+                'generation_id': 'generation_id',
+                'parent_id': 'parent_id',
+                'theme': 'theme',
             }
             
             for story_data in response.data:
@@ -940,9 +955,15 @@ class SupabaseClient:
                     'generation_info': 'generation_info',
                     'language': 'language',
                     'rating': 'rating',
+                    'story_length': 'story_length',
                     'audio_file_url': 'audio_file_url',
                     'audio_provider': 'audio_provider',
-                    'audio_generation_metadata': 'audio_generation_metadata'
+                    'audio_generation_metadata': 'audio_generation_metadata',
+                    'user_id': 'user_id',
+                    'status': 'status',
+                    'generation_id': 'generation_id',
+                    'parent_id': 'parent_id',
+                    'theme': 'theme',
                 }
                 
                 model_story_data = {}
@@ -1019,7 +1040,10 @@ class SupabaseClient:
                     'audio_provider': 'audio_provider',
                     'audio_generation_metadata': 'audio_generation_metadata',
                     'user_id': 'user_id',
-                    'status': 'status'
+                    'status': 'status',
+                    'generation_id': 'generation_id',
+                    'parent_id': 'parent_id',
+                    'theme': 'theme',
                 }
                 
                 model_story_data = {}
@@ -1108,7 +1132,9 @@ class SupabaseClient:
                     'audio_provider': 'audio_provider',
                     'audio_generation_metadata': 'audio_generation_metadata',
                     'user_id': 'user_id',
-                    'status': 'status'
+                    'status': 'status',
+                    'parent_id': 'parent_id',
+                    'theme': 'theme',
                 }
                 
                 model_story_data = {}

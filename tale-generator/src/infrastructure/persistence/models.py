@@ -76,6 +76,8 @@ class StoryDB(BaseModel):
     parent_id: Optional[str] = None
     # Requested length of the story in minutes (denormalized from generations)
     story_length: Optional[int] = None
+    # Story theme/type (e.g. adventure, space, fantasy)
+    theme: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
