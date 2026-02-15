@@ -68,6 +68,7 @@ struct LibraryView: View {
                     await storiesStore.loadStoriesFromSupabase(userId: userId)
                 }
             }
+            checkForStoryToOpen()
         }
         .onChange(of: navigationCoordinator.storyToOpen) { _, storyId in
             handleStoryToOpen(storyId)

@@ -69,7 +69,7 @@ struct StoryGeneratingView: View {
     
     var body: some View {
         ZStack {
-            AppTheme.backgroundColor(for: colorScheme)
+            ShimmeringGradientBackground(colorScheme: colorScheme)
                 .ignoresSafeArea()
             
             VStack(spacing: 40) {
@@ -77,68 +77,44 @@ struct StoryGeneratingView: View {
                 
                 // Magic generating icon and text
                 VStack(spacing: 24) {
-                    MagicGeneratingIcon()
-                        .font(.system(size: 60, weight: .bold))
-                        .foregroundColor(.white)
                     
-                    MagicGeneratingRow()
+                    MagicGeneratingRow(textSize: 24)
                         .foregroundColor(.white)
+                        .shadow(color: .black.opacity(0.35), radius: 4, x: 0, y: 2)
                 }
                 .padding(.horizontal, 40)
                 
-                // Generating button background animation
-                VStack(spacing: 16) {
-                    GenerateButtonBackground(
-                        isGenerating: Binding(
-                            get: { storiesStore.isGenerating },
-                            set: { _ in }
-                        ),
-                        isEnabled: true
-                    )
-                    .frame(height: 60)
-                    .overlay(
-                        MagicGeneratingRow()
-                            .foregroundColor(.white)
-                    )
-                    .shadow(
-                        color: AppTheme.primaryPurple.opacity(0.4),
-                        radius: 12,
-                        x: 0,
-                        y: 4
-                    )
-                    .padding(.horizontal, 40)
-                    
-                    // Error message if any
-                    if let errorMessage = storiesStore.errorMessage {
-                        VStack(spacing: 12) {
-                            HStack(spacing: 12) {
-                                Image(systemName: "exclamationmark.triangle.fill")
-                                    .foregroundColor(.orange)
-                                    .font(.system(size: 20))
-                                
-                                Text(errorMessage)
-                                    .font(.system(size: 14))
-                                    .foregroundColor(AppTheme.textPrimary(for: colorScheme))
-                                    .multilineTextAlignment(.leading)
-                            }
-                            .padding()
-                            .background(AppTheme.cardBackground(for: colorScheme))
-                            .cornerRadius(12)
+                // Error message if any
+                if let errorMessage = storiesStore.errorMessage {
+                    VStack(spacing: 12) {
+                        HStack(spacing: 12) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundColor(.orange)
+                                .font(.system(size: 20))
                             
-                            Button(action: {
-                                dismiss()
-                            }) {
-                                Text(LocalizationManager.shared.generateStoryGotIt)
-                                    .font(.system(size: 16, weight: .semibold))
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity)
-                                    .padding()
-                                    .background(AppTheme.primaryPurple)
-                                    .cornerRadius(12)
-                            }
-                            .padding(.horizontal, 40)
+                            Text(errorMessage)
+                                .font(.system(size: 14))
+                                .foregroundColor(AppTheme.textPrimary(for: colorScheme))
+                                .multilineTextAlignment(.leading)
                         }
+                        .padding()
+                        .background(AppTheme.cardBackground(for: colorScheme))
+                        .cornerRadius(12)
+                        
+                        Button(action: {
+                            dismiss()
+                        }) {
+                            Text(LocalizationManager.shared.generateStoryGotIt)
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(AppTheme.primaryPurple)
+                                .cornerRadius(12)
+                        }
+                        .padding(.horizontal, 40)
                     }
+                    .padding(.top, 16)
                 }
                 
                 Spacer()
