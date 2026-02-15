@@ -67,9 +67,7 @@ struct SettingsView: View {
                     supportLegalSection
                     
                     // Version Info
-                    Text("Version 1.0.2 (Build 2024)")
-                        .font(.system(size: 12))
-                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                    versionInfoView
                         .padding(.bottom, 100)
                 }
                 .animation(.easeInOut(duration: 0.3), value: authService.isAnonymousUser)
@@ -95,6 +93,15 @@ struct SettingsView: View {
     }
     
     // MARK: - Sections
+    
+    private var versionInfoView: some View {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "—"
+        let iosVersion = UIDevice.current.systemVersion
+        return Text("Version \(version) (\(build)) · iOS \(iosVersion)")
+            .font(.system(size: 12))
+            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+    }
     
     private var childrenSection: some View {
         VStack(alignment: .leading, spacing: 16) {
