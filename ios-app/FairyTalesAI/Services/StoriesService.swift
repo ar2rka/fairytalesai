@@ -20,6 +20,7 @@ class StoriesService: ObservableObject {
             .eq("user_id", value: userId.uuidString)
             .neq("status", value: "archived")
             .order("created_at", ascending: false)
+            .order("id", ascending: true)
             .execute()
             .value
         
@@ -37,6 +38,7 @@ class StoriesService: ObservableObject {
             .eq("user_id", value: userId.uuidString)
             .neq("status", value: "archived")
             .order("created_at", ascending: false)
+            .order("id", ascending: true)
             .range(from: offset, to: offset + limit - 1)
             .execute()
             .value

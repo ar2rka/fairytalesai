@@ -46,7 +46,8 @@ async def save_story(
     user_id: str,
     supabase_client: AsyncSupabaseClient,
     parent_id: Optional[str] = None,
-    story_length: Optional[int] = None
+    story_length: Optional[int] = None,
+    theme: Optional[str] = None
 ) -> Optional[StoryDB]:
     """Save story to database.
     
@@ -69,6 +70,7 @@ async def save_story(
         audio_file_url=audio_file_url,
         parent_id=parent_id,
         story_length=story_length,
+        theme=theme,
         created_at=now,
         updated_at=now
     )

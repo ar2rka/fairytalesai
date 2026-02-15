@@ -209,7 +209,8 @@ async def generate_story(
             user_id=user.user_id,
             supabase_client=supabase_client,
             parent_id=request.parent_id,
-            story_length=story_length.minutes
+            story_length=story_length.minutes,
+            theme=request.theme
         )
         
         # Get story ID (fallback to uuid if save failed)
