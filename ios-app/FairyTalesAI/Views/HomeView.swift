@@ -214,7 +214,7 @@ struct HomeView: View {
             if !supabaseChildren.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 16) {
-                        ForEach(supabaseChildren.prefix(3)) { child in
+                        ForEach(supabaseChildren) { child in
                             Button {
                                 childrenStore.selectedChildId = childrenStore.selectedChildId == child.id ? nil : child.id
                             } label: {
