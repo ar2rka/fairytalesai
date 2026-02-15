@@ -311,6 +311,7 @@ private struct SupabaseStory: Codable {
     let rating: Int?
     let ageCategory: String
     let storyLength: Int?
+    let theme: String?
     
     enum CodingKeys: String, CodingKey {
         case id
@@ -322,6 +323,7 @@ private struct SupabaseStory: Codable {
         case rating
         case ageCategory = "age_category"
         case storyLength = "story_length"
+        case theme
     }
     
     func toStory() -> Story {
@@ -340,12 +342,20 @@ private struct SupabaseStory: Codable {
             }
         }
         
+        // Use stored theme when available; otherwise extract from title/content for older stories
+        let resolvedTheme: String
+        if let theme = theme, !theme.isEmpty {
+            resolvedTheme = theme
+        } else {
+            resolvedTheme = extractTheme(from: title + " " + content)
+        }
+        
         return Story(
             id: id,
             title: title,
             content: content,
             childId: childId,
-            theme: "Adventure", // Default theme, можно извлечь из других полей если нужно
+            theme: resolvedTheme,
             duration: storyLength ?? estimateDuration(from: content),
             plot: nil,
             createdAt: createdAtDate,
@@ -355,6 +365,21 @@ private struct SupabaseStory: Codable {
             ageCategory: ageCategory
             
         )
+    }
+    
+    private func extractTheme(from text: String) -> String {
+        let lowercased = text.lowercased()
+        if lowercased.contains("space") || lowercased.contains("astronaut") || lowercased.contains("planet") { return "Space" }
+        if lowercased.contains("pirate") || lowercased.contains("treasure") || lowercased.contains("ship") { return "Pirates" }
+        if lowercased.contains("fairy") || lowercased.contains("magic") || lowercased.contains("spell") { return "Fairies" }
+        if lowercased.contains("animal") || lowercased.contains("forest") || lowercased.contains("jungle") { return "Animals" }
+        if lowercased.contains("dragon") || lowercased.contains("castle") { return "Dragons" }
+        if lowercased.contains("mermaid") || lowercased.contains("ocean") || lowercased.contains("sea") { return "Mermaids" }
+        if lowercased.contains("dinosaur") { return "Dinosaurs" }
+        if lowercased.contains("mystery") || lowercased.contains("detective") { return "Mystery" }
+        if lowercased.contains("robot") || lowercased.contains("machine") { return "Robots" }
+        if lowercased.contains("adventure") || lowercased.contains("quest") { return "Adventure" }
+        return "Adventure"
     }
     
     private func estimateDuration(from content: String) -> Int {
@@ -376,7 +401,8 @@ private struct SupabaseStory: Codable {
             language: story.language,
             rating: story.rating,
             ageCategory: story.ageCategory,
-            storyLength: story.duration
+            storyLength: story.duration,
+            theme: story.theme.isEmpty ? nil : story.theme
         )
     }
 }
