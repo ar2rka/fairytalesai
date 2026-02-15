@@ -5,6 +5,7 @@ import SwiftUI
 struct MagicGeneratingRow: View {
     /// One phrase per generation: set when row appears, never change during this generation.
     @State private var phrase: String = ""
+    var textSize: CGFloat = 18
 
     private var phrases: [String] {
         LocalizationManager.shared.generateStoryMagicPhrases
@@ -14,7 +15,7 @@ struct MagicGeneratingRow: View {
         HStack {
             MagicGeneratingIcon()
             Text(phrase.isEmpty ? LocalizationManager.shared.generateStoryGenerating : phrase)
-                .font(.system(size: 18, weight: .bold))
+                .font(.system(size: textSize, weight: .bold))
                 .lineLimit(2)
                 .multilineTextAlignment(.leading)
         }
@@ -28,6 +29,78 @@ struct MagicGeneratingIcon: View {
     var body: some View {
         Image(systemName: "wand.and.stars")
             .font(.system(size: 20, weight: .bold))
+    }
+}
+
+// MARK: - Shimmering full-screen gradient background (e.g. StoryGeneratingView)
+struct ShimmeringGradientBackground: View {
+    var colorScheme: ColorScheme?
+    @State private var startTime = Date()
+    
+    private var isDark: Bool {
+        colorScheme != .light
+    }
+    
+    var body: some View {
+        TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { context in
+            shimmeringGradient(now: context.date)
+        }
+        .onAppear {
+            startTime = Date()
+        }
+    }
+    
+    private func shimmeringGradient(now: Date) -> some View {
+        let elapsed = now.timeIntervalSince(startTime)
+        let t = CGFloat((elapsed / 3.0).truncatingRemainder(dividingBy: 1.0))
+        let t2 = CGFloat((elapsed / 4.2).truncatingRemainder(dividingBy: 1.0))
+        let angle = Angle.degrees(elapsed * 36.0)
+        
+        let startA = UnitPoint(x: -0.2 + 1.4 * t, y: 0.0)
+        let endA = UnitPoint(x: 1.2 - 1.4 * t, y: 1.0)
+        let startB = UnitPoint(x: 1.0 - 1.2 * t2, y: 0.3)
+        let endB = UnitPoint(x: 0.0 + 1.2 * t2, y: 0.7)
+        
+        let baseColor = isDark ? AppTheme.darkPurple : AppTheme.lightPurple
+        let layerOpacity: Double = isDark ? 0.5 : 0.35
+        
+        return ZStack {
+            baseColor
+            
+            LinearGradient(
+                colors: [
+                    AppTheme.primaryPurple.opacity(layerOpacity),
+                    AppTheme.accentPurple.opacity(layerOpacity * 0.8),
+                    AppTheme.pastelBlue.opacity(layerOpacity * 0.6),
+                    AppTheme.pastelPink.opacity(layerOpacity * 0.5),
+                    AppTheme.primaryPurple.opacity(layerOpacity)
+                ],
+                startPoint: startA,
+                endPoint: endA
+            )
+            
+            LinearGradient(
+                colors: [
+                    AppTheme.pastelBlue.opacity(0),
+                    AppTheme.pastelBlue.opacity(layerOpacity * 0.4),
+                    AppTheme.primaryPurple.opacity(0)
+                ],
+                startPoint: startB,
+                endPoint: endB
+            )
+            
+            AngularGradient(
+                gradient: Gradient(colors: [
+                    AppTheme.primaryPurple.opacity(layerOpacity * 0.3),
+                    AppTheme.pastelPink.opacity(layerOpacity * 0.25),
+                    AppTheme.accentPurple.opacity(layerOpacity * 0.3),
+                    AppTheme.primaryPurple.opacity(layerOpacity * 0.3)
+                ]),
+                center: .center,
+                angle: angle
+            )
+        }
+        .ignoresSafeArea()
     }
 }
 
