@@ -760,6 +760,7 @@ class OpenRouterClient:
         story_length_minutes: Optional[int] = 5,
         user_id: str = "",
         theme: Optional[str] = None,
+        plot: Optional[str] = None,
         quality_threshold: Optional[int] = None,
         max_generation_attempts: Optional[int] = None
     ) -> StoryGenerationResult:
@@ -873,17 +874,22 @@ class OpenRouterClient:
                 hero_id=None,
                 hero_name=None,
                 hero_description=None,
-                theme=theme
+                theme=theme,
+                plot=plot
             )
             
             # Create prompt service (needed for workflow)
             prompt_service = PromptService()
             
             # Create workflow with configuration
+            effective_quality_threshold = quality_threshold or workflow_settings.quality_threshold
+            # Keep theme adherence strict even if general quality threshold is lowered.
+            effective_theme_threshold = max(7, effective_quality_threshold)
             workflow = create_workflow(
                 openrouter_client=self,
                 prompt_service=prompt_service,
-                quality_threshold=quality_threshold or workflow_settings.quality_threshold,
+                quality_threshold=effective_quality_threshold,
+                theme_threshold=effective_theme_threshold,
                 max_generation_attempts=max_generation_attempts or workflow_settings.max_generation_attempts,
                 validation_model=workflow_settings.validation_model,
                 assessment_model=workflow_settings.assessment_model,

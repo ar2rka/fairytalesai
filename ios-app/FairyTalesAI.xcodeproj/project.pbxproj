@@ -52,6 +52,17 @@
 		A1000130 /* StarParticleAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000131 /* StarParticleAnimation.swift */; };
 		A1000132 /* EditChildView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000133 /* EditChildView.swift */; };
 		A1000136 /* TonightsPickCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000135 /* TonightsPickCard.swift */; };
+		B1000001 /* HapticFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000002 /* HapticFeedback.swift */; };
+		B1000003 /* ChildAvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000004 /* ChildAvatarView.swift */; };
+		B1000005 /* GenerateStoryComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000006 /* GenerateStoryComponents.swift */; };
+		B1000007 /* GenerateStoryEmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000008 /* GenerateStoryEmptyStateView.swift */; };
+		B1000009 /* DurationSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000A /* DurationSectionView.swift */; };
+		B100000B /* ThemeSelectionSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000C /* ThemeSelectionSection.swift */; };
+		B100000D /* PlotSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000E /* PlotSectionView.swift */; };
+		B100000F /* HomeWelcomeHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000010 /* HomeWelcomeHeader.swift */; };
+		B1000011 /* DailyFreeStorySection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000012 /* DailyFreeStorySection.swift */; };
+		B1000013 /* RecentMagicSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000014 /* RecentMagicSection.swift */; };
+		B1000015 /* LibraryComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000016 /* LibraryComponents.swift */; };
 		D9E2D5DB2EFD60A40082D3B4 /* StoriesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5D12EFD60A40082D3B4 /* StoriesStore.swift */; };
 		D9E2D5DC2EFD60A40082D3B4 /* ChildrenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5D02EFD60A40082D3B4 /* ChildrenStore.swift */; };
 		D9E2D5DE2EFD60A40082D3B4 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5CE2EFD60A40082D3B4 /* AppTheme.swift */; };
@@ -75,24 +86,13 @@
 		D9E2D5FA2EFD60A40082D3BF /* LanguageSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5FB2EFD60A40082D3BF /* LanguageSelectionView.swift */; };
 		D9E2D5FC2EFD60A40082D3C0 /* SettingsPlaceholderViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5FD2EFD60A40082D3C0 /* SettingsPlaceholderViews.swift */; };
 		D9E2D5FE2EFD60A40082D3C1 /* ThemeSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D5FF2EFD60A40082D3C1 /* ThemeSelectionView.swift */; };
-		E7A1C2D3E4F5A6B700112233 /* StoryGeneratingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A1C2D3E4F5A6B700112234 /* StoryGeneratingView.swift */; };
 		D9E2D6062EFD60A40082D3C6 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D6072EFD60A40082D3C6 /* SignUpView.swift */; };
 		D9E2D60A2EFD60A40082D3C8 /* CustomTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D60B2EFD60A40082D3C8 /* CustomTabBar.swift */; };
 		D9E2D60C2EFD60A40082D3C9 /* MagicSegmentedSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D60D2EFD60A40082D3C9 /* MagicSegmentedSelector.swift */; };
 		D9E2D60E2EFD60A40082D3CA /* ProtagonistStyleSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D60F2EFD60A40082D3CA /* ProtagonistStyleSelector.swift */; };
 		D9E2D6102EFD60A40082D3CB /* AgeGroupGridSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E2D6112EFD60A40082D3CB /* AgeGroupGridSelector.swift */; };
+		E7A1C2D3E4F5A6B700112233 /* StoryGeneratingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A1C2D3E4F5A6B700112234 /* StoryGeneratingView.swift */; };
 		F1A2B3C4D5E6F7A8B9C0D1E2F3 /* Services/LocalizationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E6F7A8B9C0D1E2F4 /* Services/LocalizationManager.swift */; };
-		B1000001 /* HapticFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000002 /* HapticFeedback.swift */; };
-		B1000003 /* ChildAvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000004 /* ChildAvatarView.swift */; };
-		B1000005 /* GenerateStoryComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000006 /* GenerateStoryComponents.swift */; };
-		B1000007 /* GenerateStoryEmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000008 /* GenerateStoryEmptyStateView.swift */; };
-		B1000009 /* DurationSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000A /* DurationSectionView.swift */; };
-		B100000B /* ThemeSelectionSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000C /* ThemeSelectionSection.swift */; };
-		B100000D /* PlotSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000E /* PlotSectionView.swift */; };
-		B100000F /* HomeWelcomeHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000010 /* HomeWelcomeHeader.swift */; };
-		B1000011 /* DailyFreeStorySection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000012 /* DailyFreeStorySection.swift */; };
-		B1000013 /* RecentMagicSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000014 /* RecentMagicSection.swift */; };
-		B1000015 /* LibraryComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000016 /* LibraryComponents.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -138,6 +138,17 @@
 		A1000131 /* StarParticleAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarParticleAnimation.swift; sourceTree = "<group>"; };
 		A1000133 /* EditChildView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditChildView.swift; sourceTree = "<group>"; };
 		A1000135 /* TonightsPickCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TonightsPickCard.swift; sourceTree = "<group>"; };
+		B1000002 /* HapticFeedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticFeedback.swift; sourceTree = "<group>"; };
+		B1000004 /* ChildAvatarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChildAvatarView.swift; sourceTree = "<group>"; };
+		B1000006 /* GenerateStoryComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateStoryComponents.swift; sourceTree = "<group>"; };
+		B1000008 /* GenerateStoryEmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateStoryEmptyStateView.swift; sourceTree = "<group>"; };
+		B100000A /* DurationSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationSectionView.swift; sourceTree = "<group>"; };
+		B100000C /* ThemeSelectionSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeSelectionSection.swift; sourceTree = "<group>"; };
+		B100000E /* PlotSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlotSectionView.swift; sourceTree = "<group>"; };
+		B1000010 /* HomeWelcomeHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeWelcomeHeader.swift; sourceTree = "<group>"; };
+		B1000012 /* DailyFreeStorySection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyFreeStorySection.swift; sourceTree = "<group>"; };
+		B1000014 /* RecentMagicSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentMagicSection.swift; sourceTree = "<group>"; };
+		B1000016 /* LibraryComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryComponents.swift; sourceTree = "<group>"; };
 		D9E2D5CB2EFD60A40082D3B4 /* Child.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Child.swift; sourceTree = "<group>"; };
 		D9E2D5CC2EFD60A40082D3B4 /* Story.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Story.swift; sourceTree = "<group>"; };
 		D9E2D5CE2EFD60A40082D3B4 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
@@ -161,24 +172,13 @@
 		D9E2D5FB2EFD60A40082D3BF /* LanguageSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageSelectionView.swift; sourceTree = "<group>"; };
 		D9E2D5FD2EFD60A40082D3C0 /* SettingsPlaceholderViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPlaceholderViews.swift; sourceTree = "<group>"; };
 		D9E2D5FF2EFD60A40082D3C1 /* ThemeSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeSelectionView.swift; sourceTree = "<group>"; };
-		E7A1C2D3E4F5A6B700112234 /* StoryGeneratingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryGeneratingView.swift; sourceTree = "<group>"; };
 		D9E2D6072EFD60A40082D3C6 /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
 		D9E2D60B2EFD60A40082D3C8 /* CustomTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabBar.swift; sourceTree = "<group>"; };
 		D9E2D60D2EFD60A40082D3C9 /* MagicSegmentedSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MagicSegmentedSelector.swift; sourceTree = "<group>"; };
 		D9E2D60F2EFD60A40082D3CA /* ProtagonistStyleSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtagonistStyleSelector.swift; sourceTree = "<group>"; };
 		D9E2D6112EFD60A40082D3CB /* AgeGroupGridSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgeGroupGridSelector.swift; sourceTree = "<group>"; };
+		E7A1C2D3E4F5A6B700112234 /* StoryGeneratingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryGeneratingView.swift; sourceTree = "<group>"; };
 		F1A2B3C4D5E6F7A8B9C0D1E2F4 /* Services/LocalizationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/LocalizationManager.swift; sourceTree = "<group>"; };
-		B1000002 /* HapticFeedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticFeedback.swift; sourceTree = "<group>"; };
-		B1000004 /* ChildAvatarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChildAvatarView.swift; sourceTree = "<group>"; };
-		B1000006 /* GenerateStoryComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateStoryComponents.swift; sourceTree = "<group>"; };
-		B1000008 /* GenerateStoryEmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateStoryEmptyStateView.swift; sourceTree = "<group>"; };
-		B100000A /* DurationSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationSectionView.swift; sourceTree = "<group>"; };
-		B100000C /* ThemeSelectionSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeSelectionSection.swift; sourceTree = "<group>"; };
-		B100000E /* PlotSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlotSectionView.swift; sourceTree = "<group>"; };
-		B1000010 /* HomeWelcomeHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeWelcomeHeader.swift; sourceTree = "<group>"; };
-		B1000012 /* DailyFreeStorySection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyFreeStorySection.swift; sourceTree = "<group>"; };
-		B1000014 /* RecentMagicSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentMagicSection.swift; sourceTree = "<group>"; };
-		B1000016 /* LibraryComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryComponents.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -659,7 +659,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"FairyTalesAI/Preview Content\"";
-				DEVELOPMENT_TEAM = P4J8268M9L;
+				DEVELOPMENT_TEAM = 53J2SZ9ST2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -693,7 +693,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"FairyTalesAI/Preview Content\"";
-				DEVELOPMENT_TEAM = P4J8268M9L;
+				DEVELOPMENT_TEAM = 53J2SZ9ST2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

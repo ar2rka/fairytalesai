@@ -16,6 +16,10 @@
 
 Отношения: {{ relationship }}
 - Тема / тип истории: {{ theme | translate_theme(language) }}
+{% if plot %}
+- Направление сюжета: {{ plot }}
+Совмести этот сюжет с темой «{{ theme | translate_theme(language) }}» — место действия и атмосфера должны соответствовать теме.
+{% endif %}
 
 {% if parent_story %}
 Предыдущая история:

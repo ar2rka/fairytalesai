@@ -50,7 +50,8 @@ class PromptTemplateService:
         story_length: int,
         story_type: str,
         parent_story: Optional[StoryDB] = None,
-        theme: Optional[str] = None
+        theme: Optional[str] = None,
+        plot: Optional[str] = None
     ) -> str:
         """Render complete prompt from templates.
         
@@ -91,7 +92,8 @@ class PromptTemplateService:
             word_count=word_count,
             story_type=story_type,
             parent_story=parent_story,
-            theme=theme
+            theme=theme,
+            plot=plot
         )
         
         # Render each prompt part
@@ -131,7 +133,8 @@ class PromptTemplateService:
         word_count: int,
         story_type: str,
         parent_story: Optional[StoryDB],
-        theme: Optional[str] = None
+        theme: Optional[str] = None,
+        plot: Optional[str] = None
     ) -> Dict[str, Any]:
         """Build context dictionary for Jinja templates.
         
@@ -156,6 +159,7 @@ class PromptTemplateService:
             "story_type": story_type,
             "parent_story": parent_story,
             "theme": theme or "adventure",  # API sends English; templates use translate_theme(language)
+            "plot": plot,
         }
         
         # Add character data based on type

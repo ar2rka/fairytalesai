@@ -7,6 +7,10 @@ Create a bedtime story featuring a heroic character with the following character
 - Strengths: {{ hero.strengths | join(', ') }}
 - Interests: {{ hero.interests | join(', ') }}
 - Story theme / type: {{ theme | translate_theme(language) }}
+{% if plot %}
+- Plot direction: {{ plot }}
+Combine this plot with the theme "{{ theme | translate_theme(language) }}" — setting and atmosphere must stay true to the theme.
+{% endif %}
 
 {% if parent_story %}
 Previous Story:

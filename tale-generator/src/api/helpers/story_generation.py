@@ -18,14 +18,75 @@ from src.infrastructure.persistence.models import GenerationDB
 logger = logging.getLogger("tale_generator.api.helpers")
 
 
-def determine_moral(request: GenerateStoryRequestDTO) -> str:
-    """Determine the moral value for the story."""
+PREDEFINED_MORALS = {
+    "kindness", "honesty", "bravery", "friendship",
+    "perseverance", "empathy", "respect", "responsibility",
+}
+
+THEME_KEYWORDS = {
+    "en": {
+        "space": ["space", "planet", "star", "galaxy", "astronaut", "rocket", "cosmic"],
+        "pirates": ["pirate", "ship", "treasure", "map", "captain", "island", "ocean"],
+        "dinosaurs": ["dinosaur", "dinosaurs", "t-rex", "trex", "triceratops", "fossil", "prehistoric", "jurassic"],
+        "mermaids": ["mermaid", "mermaids", "underwater", "coral", "sea", "ocean", "tail"],
+        "animals": ["animal", "animals", "forest", "jungle", "habitat", "creature"],
+        "mystery": ["mystery", "clue", "detective", "puzzle", "secret", "investigate"],
+        "magic school": ["magic school", "wizard", "spell", "classroom", "wand", "academy"],
+        "robots": ["robot", "robots", "machine", "circuit", "android", "mechanical"],
+    },
+    "ru": {
+        "space": ["космос", "планета", "звезда", "галактика", "астронавт", "ракета"],
+        "pirates": ["пират", "корабль", "сокровищ", "карта", "капитан", "остров", "океан"],
+        "dinosaurs": ["динозавр", "динозавры", "тираннозавр", "трекс", "т-рекс", "ископаем", "доисторичес"],
+        "mermaids": ["русалк", "подводн", "коралл", "море", "океан"],
+        "animals": ["животн", "лес", "джунгл", "звер", "существ"],
+        "mystery": ["тайн", "улик", "детектив", "загадк", "расслед"],
+        "magic school": ["школа магии", "маг", "заклинан", "волшебн", "академ"],
+        "robots": ["робот", "машин", "механичес", "андроид", "схем"],
+    },
+}
+
+
+def _passes_theme_guard(content: str, theme: Optional[str], language: Language) -> bool:
+    """Cheap deterministic theme guard. Returns True when theme is absent/unknown."""
+    if not theme or not theme.strip():
+        return True
+
+    lang_key = "ru" if language == Language.RUSSIAN else "en"
+    keywords = THEME_KEYWORDS.get(lang_key, {}).get(theme.lower().strip())
+    if not keywords:
+        return True
+
+    text = content.lower()
+    hits = sum(1 for kw in keywords if kw in text)
+    return hits >= 2
+
+
+def determine_moral_and_plot(request: GenerateStoryRequestDTO) -> tuple:
+    """Separate moral (predefined value) from plot (free-text direction).
+
+    Returns:
+        (moral: str, plot: Optional[str])
+    """
+    plot = request.plot  # new field; None for old clients
+
     if request.custom_moral:
-        return request.custom_moral
+        moral_candidate = request.custom_moral
     elif request.moral:
-        return request.moral
+        moral_candidate = request.moral
     else:
-        return "kindness"
+        moral_candidate = None
+
+    if moral_candidate and moral_candidate.lower().strip() in PREDEFINED_MORALS:
+        moral = moral_candidate
+    elif moral_candidate and not plot:
+        # Backward compat: old iOS sends free-text as moral — treat it as plot
+        plot = moral_candidate
+        moral = "kindness"
+    else:
+        moral = "kindness"
+
+    return moral, plot
 
 
 def generate_prompt(
@@ -37,18 +98,19 @@ def generate_prompt(
     story_length: StoryLength,
     prompt_service: PromptService,
     parent_story: Optional[StoryDB] = None,
-    theme: Optional[str] = None
+    theme: Optional[str] = None,
+    plot: Optional[str] = None
 ) -> str:
     """Generate appropriate prompt based on story type."""
     if story_type == "child":
         logger.info(f"Generating child story for {child.name}")
-        prompt = prompt_service.generate_child_prompt(child, moral, language, story_length, parent_story, theme)
+        prompt = prompt_service.generate_child_prompt(child, moral, language, story_length, parent_story, theme, plot)
     elif story_type == "hero":
         logger.info(f"Generating hero story for {hero.name}")
-        prompt = prompt_service.generate_hero_prompt(hero, moral, story_length, parent_story, theme)
+        prompt = prompt_service.generate_hero_prompt(hero, moral, story_length, parent_story, theme, plot)
     else:  # combined
         logger.info(f"Generating combined story for {child.name} and {hero.name}")
-        prompt = prompt_service.generate_combined_prompt(child, hero, moral, language, story_length, parent_story, theme)
+        prompt = prompt_service.generate_combined_prompt(child, hero, moral, language, story_length, parent_story, theme, plot)
 
     return prompt
 
@@ -175,10 +237,11 @@ async def generate_story_content(
     language: Language,
     openrouter_client: OpenRouterClient,
     supabase_client: AsyncSupabaseClient,
-    theme: Optional[str] = None
+    theme: Optional[str] = None,
+    plot: Optional[str] = None
 ) -> StoryGenerationResult:
     """Generate story content using LangGraph workflow with retry and tracking."""
-    
+
     try:
         result = await openrouter_client.generate_story(
             prompt,
@@ -192,8 +255,15 @@ async def generate_story_content(
             language=language.value,
             story_length_minutes=story_length,
             user_id=user_id,
-            theme=theme
+            theme=theme,
+            plot=plot
         )
+
+        if theme and not _passes_theme_guard(result.content, theme, language):
+            raise Exception(
+                f"Generated story failed theme guard for theme '{theme}'. "
+                "The content does not contain enough theme-specific elements."
+            )
         
         # Update with success
         await update_generation_success(
@@ -326,4 +396,3 @@ Summary (2-3 sentences):"""
     except Exception as e:
         logger.error(f"Error generating summary: {str(e)}", exc_info=True)
         return ""  # Return empty string on error, don't fail the whole request
-

@@ -168,7 +168,7 @@ class StoriesService: ObservableObject {
         ]
         
         if let moral = moral, !moral.isEmpty {
-            requestBody["moral"] = moral
+            requestBody["plot"] = moral
         }
         if let theme = theme, !theme.isEmpty {
             requestBody["theme"] = theme
@@ -244,7 +244,8 @@ class StoriesService: ObservableObject {
             title: apiResponse.title,
             content: apiResponse.content,
             childId: childId,
-            theme: apiResponse.storyType,
+            // API response currently doesn't return theme explicitly; preserve requested theme when available.
+            theme: (theme?.isEmpty == false ? (theme ?? apiResponse.storyType) : apiResponse.storyType),
             duration: apiResponse.storyLength,
             plot: apiResponse.moral,
             createdAt: createdAtDate,
@@ -553,4 +554,3 @@ enum StoriesServiceError: LocalizedError {
         }
     }
 }
-

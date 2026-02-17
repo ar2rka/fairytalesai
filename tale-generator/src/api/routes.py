@@ -39,7 +39,7 @@ from src.api.helpers.entities import (
     fetch_and_convert_hero
 )
 from src.api.helpers.story_generation import (
-    determine_moral,
+    determine_moral_and_plot,
     generate_prompt,
     create_generation_record,
     generate_story_content,
@@ -117,10 +117,10 @@ async def generate_story(
             hero = await fetch_and_convert_hero(request.hero_id, language, supabase_client)
         
         # Determine story parameters
-        moral = determine_moral(request)
+        moral, plot = determine_moral_and_plot(request)
         story_length = StoryLength(minutes=request.story_length or 5)
-        
-        logger.debug(f"Using moral: {moral}")
+
+        logger.debug(f"Using moral: {moral}, plot: {plot}")
         
         # Fetch parent story if parent_id is provided
         parent_story = None
@@ -143,7 +143,8 @@ async def generate_story(
             story_length,
             prompt_service,
             parent_story,
-            request.theme
+            request.theme,
+            plot
         )
         
         # Generate story content
@@ -173,7 +174,8 @@ async def generate_story(
             language=language,
             openrouter_client=openrouter_client,
             supabase_client=supabase_client,
-            theme=request.theme
+            theme=request.theme,
+            plot=plot
         )
         
         # Clean the content to remove formatting markers

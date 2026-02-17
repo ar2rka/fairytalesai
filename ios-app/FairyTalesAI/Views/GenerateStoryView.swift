@@ -24,7 +24,7 @@ struct GenerateStoryView: View {
             AppTheme.backgroundColor(for: colorScheme).ignoresSafeArea()
                 
                 if !childrenStore.hasProfiles {
-                GenerateStoryEmptyStateView(showingAddChild: $viewModel.showingAddChild)
+                GenerateStoryEmptyStateView(showingAddChild: $viewModel.showingAddChild, onClose: { dismiss() })
             } else {
                 ScrollView {
                     VStack(spacing: 24) {
@@ -50,20 +50,61 @@ struct GenerateStoryView: View {
                 }
                 .contentMargins(.top, 0, for: .scrollContent)
             }
-            }
-            .navigationTitle(LocalizationManager.shared.generateStoryCreateStory)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
+            
+            // Liquid Glass Close Button - top right
+            VStack {
+                HStack {
+                    Spacer()
                     Button(action: {
+                        HapticFeedback.impact()
                         dismiss()
                     }) {
                         Image(systemName: "xmark")
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundColor(AppTheme.textSecondary(for: colorScheme))
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(AppTheme.textPrimary(for: colorScheme))
+                            .frame(width: 36, height: 36)
+                            .background(
+                                ZStack {
+                                    // Glass effect with blur
+                                    RoundedRectangle(cornerRadius: 18)
+                                        .fill(.ultraThinMaterial)
+                                    
+                                    // Subtle border
+                                    RoundedRectangle(cornerRadius: 18)
+                                        .stroke(
+                                            LinearGradient(
+                                                colors: [
+                                                    AppTheme.textPrimary(for: colorScheme).opacity(0.3),
+                                                    AppTheme.textPrimary(for: colorScheme).opacity(0.1)
+                                                ],
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            ),
+                                            lineWidth: 1
+                                        )
+                                }
+                            )
+                            .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 3)
                     }
+                    .padding(.trailing, 20)
+                }
+                Spacer()
+            }
+            .padding(.top, 8)
+        }
+        .navigationTitle(LocalizationManager.shared.generateStoryCreateStory)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: {
+                    dismiss()
+                }) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundColor(AppTheme.textSecondary(for: colorScheme))
                 }
             }
+        }
             .task {
                 await childrenStore.loadChildrenIfNeeded()
             }

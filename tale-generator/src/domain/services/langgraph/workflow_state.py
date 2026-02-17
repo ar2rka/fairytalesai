@@ -45,6 +45,7 @@ class ValidationResult:
 class QualityAssessment:
     """Quality assessment result for a story."""
     overall_score: int  # 1-10
+    theme_adherence_score: int
     age_appropriateness_score: int
     moral_clarity_score: int
     narrative_coherence_score: int
@@ -59,6 +60,7 @@ class QualityAssessment:
         """Convert to dictionary for JSON storage."""
         return {
             "overall_score": self.overall_score,
+            "theme_adherence_score": self.theme_adherence_score,
             "age_appropriateness_score": self.age_appropriateness_score,
             "moral_clarity_score": self.moral_clarity_score,
             "narrative_coherence_score": self.narrative_coherence_score,
@@ -124,6 +126,7 @@ class WorkflowState(TypedDict, total=False):
     language: str  # 'en', 'ru'
     moral: str
     theme: Optional[str]  # story theme / type (e.g. adventure, space)
+    plot: Optional[str]  # free-text plot direction from user
     story_length: int  # in minutes
     expected_word_count: int
     user_id: str
@@ -183,6 +186,7 @@ def create_initial_state(
     hero_name: Optional[str] = None,
     hero_description: Optional[str] = None,
     theme: Optional[str] = None,
+    plot: Optional[str] = None,
 ) -> WorkflowState:
     """Create initial workflow state with input parameters.
     
@@ -224,6 +228,7 @@ def create_initial_state(
         "language": language,
         "moral": moral,
         "theme": theme,
+        "plot": plot,
         "story_length": story_length,
         "expected_word_count": expected_word_count,
         "user_id": user_id,

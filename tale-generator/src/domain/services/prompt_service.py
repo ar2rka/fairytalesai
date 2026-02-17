@@ -54,7 +54,8 @@ class PromptService:
         language: Language,
         story_length: StoryLength,
         parent_story: Optional[StoryDB] = None,
-        theme: Optional[str] = None
+        theme: Optional[str] = None,
+        plot: Optional[str] = None
     ) -> str:
         """Generate a story prompt based on child profile.
         
@@ -91,7 +92,8 @@ class PromptService:
                     story_length=story_length.minutes,
                     story_type="child",
                     parent_story=parent_story,
-                    theme=theme
+                    theme=theme,
+                    plot=plot
                 )
                 logger.debug(f"Generated prompt via template (length={len(prompt)} chars)")
                 return prompt
@@ -112,7 +114,8 @@ class PromptService:
         moral: str,
         story_length: StoryLength,
         parent_story: Optional[StoryDB] = None,
-        theme: Optional[str] = None
+        theme: Optional[str] = None,
+        plot: Optional[str] = None
     ) -> str:
         """Generate a story prompt based on hero profile.
         
@@ -152,13 +155,14 @@ class PromptService:
                     story_length=story_length.minutes,
                     story_type="hero",
                     parent_story=parent_story,
-                    theme=theme
+                    theme=theme,
+                    plot=plot
                 )
                 logger.info(f"Successfully generated prompt using PromptTemplateService (length={len(prompt)} chars)")
                 return prompt
             except Exception as e:
                 logger.warning(f"Template service failed, falling back to built-in methods: {e}", exc_info=True)
-        
+
         # Fallback to built-in methods
         if hero.language == Language.RUSSIAN:
             return self._generate_russian_hero_prompt(hero, moral, story_length, parent_story)
@@ -173,7 +177,8 @@ class PromptService:
         language: Language,
         story_length: StoryLength,
         parent_story: Optional[StoryDB] = None,
-        theme: Optional[str] = None
+        theme: Optional[str] = None,
+        plot: Optional[str] = None
     ) -> str:
         """Generate a story prompt for combined child + hero story.
         
@@ -235,13 +240,14 @@ class PromptService:
                     story_length=story_length.minutes,
                     story_type="combined",
                     parent_story=parent_story,
-                    theme=theme
+                    theme=theme,
+                    plot=plot
                 )
                 logger.info(f"Successfully generated prompt using PromptTemplateService (length={len(prompt)} chars)")
                 return prompt
             except Exception as e:
                 logger.warning(f"Template service failed, falling back to built-in methods: {e}", exc_info=True)
-        
+
         # Fallback to built-in methods
         if language == Language.RUSSIAN:
             return self._generate_russian_combined_prompt(child, hero, moral, story_length, parent_story)

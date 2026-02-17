@@ -148,6 +148,7 @@ class GenerateStoryRequestDTO(BaseModel):
     moral: Optional[str] = Field(None, description="Predefined moral value")
     custom_moral: Optional[str] = Field(None, description="Custom moral value")
     theme: Optional[str] = Field(None, description="Story theme / type (e.g. adventure, space, fantasy)")
+    plot: Optional[str] = Field(None, description="Free-text plot/story direction from the user")
     parent_id: Optional[str] = Field(None, description="Parent story ID for continuation narratives")
     generate_audio: Optional[bool] = Field(default=False, description="Generate audio narration")
     voice_provider: Optional[str] = Field(None, description="Voice provider name")

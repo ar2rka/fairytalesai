@@ -239,6 +239,7 @@ def create_workflow(
     openrouter_client,
     prompt_service: PromptService,
     quality_threshold: int = 7,
+    theme_threshold: int = 7,
     max_generation_attempts: int = 3,
     validation_model: str = "openai/gpt-4o-mini",
     assessment_model: str = "openai/gpt-4o-mini",
@@ -255,6 +256,7 @@ def create_workflow(
         prompt_service: PromptService instance
         quality_threshold: Minimum quality score to accept (1-10)
         max_generation_attempts: Maximum generation attempts
+        theme_threshold: Minimum theme adherence score to accept (1-10)
         validation_model: Model for prompt validation
         assessment_model: Model for quality assessment
         generation_model: Model for story generation (None = use default)
@@ -267,6 +269,7 @@ def create_workflow(
     """
     config = {
         "quality_threshold": quality_threshold,
+        "theme_threshold": theme_threshold,
         "max_attempts": max_generation_attempts,
         "validation_model": validation_model,
         "assessment_model": assessment_model,

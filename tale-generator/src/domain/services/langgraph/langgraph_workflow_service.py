@@ -223,6 +223,7 @@ class LangGraphWorkflowService:
                 openrouter_client=self.openrouter_client,
                 prompt_service=self.prompt_service,
                 quality_threshold=self.workflow_settings.quality_threshold,
+                theme_threshold=max(7, self.workflow_settings.quality_threshold),
                 max_generation_attempts=self.workflow_settings.max_generation_attempts,
                 validation_model=self.workflow_settings.validation_model,
                 assessment_model=self.workflow_settings.assessment_model,

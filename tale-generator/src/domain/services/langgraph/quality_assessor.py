@@ -14,15 +14,39 @@ logger = get_logger("langgraph.quality_assessor")
 
 class QualityAssessorService:
     """Service for assessing story quality using LLM-based evaluation."""
+
+    THEME_KEYWORDS = {
+        "en": {
+            "space": ["space", "planet", "star", "galaxy", "astronaut", "rocket", "cosmic"],
+            "pirates": ["pirate", "ship", "treasure", "map", "captain", "island", "ocean"],
+            "dinosaurs": ["dinosaur", "dinosaurs", "t-rex", "trex", "triceratops", "fossil", "prehistoric", "jurassic"],
+            "mermaids": ["mermaid", "mermaids", "underwater", "coral", "sea", "ocean", "tail"],
+            "animals": ["animal", "animals", "forest", "jungle", "habitat", "creature"],
+            "mystery": ["mystery", "clue", "detective", "puzzle", "secret", "investigate"],
+            "magic school": ["magic school", "wizard", "spell", "classroom", "wand", "academy"],
+            "robots": ["robot", "robots", "machine", "circuit", "android", "mechanical"],
+        },
+        "ru": {
+            "space": ["космос", "планета", "звезда", "галактика", "астронавт", "ракета"],
+            "pirates": ["пират", "корабль", "сокровищ", "карта", "капитан", "остров", "океан"],
+            "dinosaurs": ["динозавр", "динозавры", "тираннозавр", "трекс", "т-рекс", "ископаем", "доисторичес"],
+            "mermaids": ["русалк", "подводн", "коралл", "море", "океан"],
+            "animals": ["животн", "лес", "джунгл", "звер", "существ"],
+            "mystery": ["тайн", "улик", "детектив", "загадк", "расслед"],
+            "magic school": ["школа магии", "маг", "заклинан", "волшебн", "академ"],
+            "robots": ["робот", "машин", "механичес", "андроид", "схем"],
+        }
+    }
     
     # Quality criteria weights for calculating overall score
     CRITERIA_WEIGHTS = {
-        "age_appropriateness_score": 0.20,  # High weight
-        "moral_clarity_score": 0.20,  # High weight
-        "narrative_coherence_score": 0.20,  # High weight
-        "character_consistency_score": 0.15,  # Medium weight
-        "engagement_score": 0.15,  # Medium weight
-        "language_quality_score": 0.10,  # Medium weight
+        "theme_adherence_score": 0.20,  # High weight
+        "age_appropriateness_score": 0.17,  # High weight
+        "moral_clarity_score": 0.17,  # High weight
+        "narrative_coherence_score": 0.17,  # High weight
+        "character_consistency_score": 0.11,  # Medium weight
+        "engagement_score": 0.10,  # Medium weight
+        "language_quality_score": 0.08,  # Medium weight
     }
     
     def __init__(self, openrouter_client):
@@ -39,9 +63,11 @@ class QualityAssessorService:
         title: str,
         age_category: str,
         moral: str,
+        theme: Optional[str],
         language: str,
         expected_word_count: int,
-        model: str = "openai/gpt-4o-mini"
+        model: str = "openai/gpt-4o-mini",
+        plot: Optional[str] = None
     ) -> QualityAssessment:
         """Assess story quality across multiple criteria.
         
@@ -61,7 +87,7 @@ class QualityAssessorService:
         
         # Build assessment prompt for LLM
         assessment_prompt = self._build_assessment_prompt(
-            story_content, title, age_category, moral, language, expected_word_count
+            story_content, title, age_category, moral, theme, language, expected_word_count, plot
         )
         
         try:
@@ -77,14 +103,35 @@ class QualityAssessorService:
             
             # Parse LLM response
             assessment_data = self._parse_assessment_response(result.content)
-            
-            # Calculate weighted overall score if not provided
-            if "overall_score" not in assessment_data or assessment_data["overall_score"] == 0:
-                assessment_data["overall_score"] = self._calculate_weighted_score(assessment_data)
+
+            # Deterministic guard: if theme-specific vocabulary is absent, cap theme score.
+            heuristic_theme_score = self._heuristic_theme_score(
+                story_content=story_content,
+                theme=theme,
+                language=language
+            )
+            if heuristic_theme_score is not None:
+                model_theme_score = assessment_data.get("theme_adherence_score", 5)
+                adjusted_theme_score = min(model_theme_score, heuristic_theme_score)
+                assessment_data["theme_adherence_score"] = adjusted_theme_score
+                if adjusted_theme_score < model_theme_score:
+                    assessment_data["feedback"] = (
+                        f"{assessment_data.get('feedback', '').strip()} "
+                        f"Theme adherence adjusted by keyword check."
+                    ).strip()
+                    suggestions = assessment_data.get("improvement_suggestions", [])
+                    if not isinstance(suggestions, list):
+                        suggestions = [str(suggestions)]
+                    suggestions.append(f"Make the '{theme}' theme explicit with concrete themed elements.")
+                    assessment_data["improvement_suggestions"] = suggestions
+
+            # Always recompute weighted overall score so theme adherence affects regeneration decisions.
+            assessment_data["overall_score"] = self._calculate_weighted_score(assessment_data)
             
             # Create quality assessment
             quality_assessment = QualityAssessment(
                 overall_score=assessment_data.get("overall_score", 5),
+                theme_adherence_score=assessment_data.get("theme_adherence_score", 5),
                 age_appropriateness_score=assessment_data.get("age_appropriateness_score", 5),
                 moral_clarity_score=assessment_data.get("moral_clarity_score", 5),
                 narrative_coherence_score=assessment_data.get("narrative_coherence_score", 5),
@@ -107,6 +154,7 @@ class QualityAssessorService:
             # Return default mid-range assessment on error
             return QualityAssessment(
                 overall_score=5,
+                theme_adherence_score=5,
                 age_appropriateness_score=5,
                 moral_clarity_score=5,
                 narrative_coherence_score=5,
@@ -124,8 +172,10 @@ class QualityAssessorService:
         title: str,
         age_category: str,
         moral: str,
+        theme: Optional[str],
         language: str,
-        expected_word_count: int
+        expected_word_count: int,
+        plot: Optional[str] = None
     ) -> str:
         """Build assessment prompt for LLM.
         
@@ -157,16 +207,19 @@ Story Content:
 Story Requirements:
 - Target Age: {age_display}
 - Moral: {moral}
+- Theme: {theme or "adventure"}
+- Plot Direction: {plot or "None specified"}
 - Language: {lang_name}
 - Expected Length: {expected_word_count} words
 
 Evaluation Criteria (score each 1-10):
-1. Age Appropriateness (1-10): Does the language complexity, themes, and content match children aged {age_display} developmental level?
-2. Moral Clarity (1-10): Is the moral lesson about "{moral}" clearly and naturally integrated into the story?
-3. Narrative Coherence (1-10): Does the story have a clear beginning, middle, and end with logical flow?
-4. Character Consistency (1-10): Do characters behave believably and consistently throughout?
-5. Engagement (1-10): Is the story interesting and likely to maintain a child's attention?
-6. Language Quality (1-10): Is the grammar correct, vocabulary appropriate, and style engaging?
+1. Theme Adherence (1-10): Does the story clearly match the requested theme "{theme or 'adventure'}" in setting, events, and imagery{f', while also incorporating the plot direction "{plot}"' if plot else ''}?
+2. Age Appropriateness (1-10): Does the language complexity, themes, and content match children aged {age_display} developmental level?
+3. Moral Clarity (1-10): Is the moral lesson about "{moral}" clearly and naturally integrated into the story?
+4. Narrative Coherence (1-10): Does the story have a clear beginning, middle, and end with logical flow?
+5. Character Consistency (1-10): Do characters behave believably and consistently throughout?
+6. Engagement (1-10): Is the story interesting and likely to maintain a child's attention?
+7. Language Quality (1-10): Is the grammar correct, vocabulary appropriate, and style engaging?
 
 Additional Considerations:
 - Does the story length approximately match the expected word count?
@@ -176,6 +229,7 @@ Additional Considerations:
 
 Provide your assessment in the following JSON format:
 {{
+    "theme_adherence_score": <1-10>,
     "age_appropriateness_score": <1-10>,
     "moral_clarity_score": <1-10>,
     "narrative_coherence_score": <1-10>,
@@ -248,6 +302,7 @@ IMPORTANT: Be critical but fair. A score of 7+ means high quality. Scores of 5-6
                     
                     # Extract all score fields
                     score_fields = [
+                        "theme_adherence_score",
                         "age_appropriateness_score",
                         "moral_clarity_score",
                         "narrative_coherence_score",
@@ -294,6 +349,7 @@ IMPORTANT: Be critical but fair. A score of 7+ means high quality. Scores of 5-6
             
             # Validate and clamp scores to 1-10 range
             score_fields = [
+                "theme_adherence_score",
                 "age_appropriateness_score",
                 "moral_clarity_score",
                 "narrative_coherence_score",
@@ -357,6 +413,7 @@ IMPORTANT: Be critical but fair. A score of 7+ means high quality. Scores of 5-6
             Default assessment data
         """
         return {
+            "theme_adherence_score": 5,
             "age_appropriateness_score": 5,
             "moral_clarity_score": 5,
             "narrative_coherence_score": 5,
@@ -367,3 +424,30 @@ IMPORTANT: Be critical but fair. A score of 7+ means high quality. Scores of 5-6
             "feedback": "Unable to parse quality assessment response, using default scores",
             "improvement_suggestions": ["Re-assessment may be needed"]
         }
+
+    def _heuristic_theme_score(self, story_content: str, theme: Optional[str], language: str) -> Optional[int]:
+        """Return a conservative theme score using keyword coverage, or None if theme is unknown."""
+        if not theme or not theme.strip():
+            return None
+
+        lang = "ru" if str(language).lower().startswith("ru") else "en"
+        theme_key = theme.lower().strip()
+        keywords = self.THEME_KEYWORDS.get(lang, {}).get(theme_key)
+        if not keywords:
+            return None
+
+        text = story_content.lower()
+        hits = 0
+        for kw in keywords:
+            if kw in text:
+                hits += 1
+
+        if hits == 0:
+            return 1
+        if hits == 1:
+            return 3
+        if hits == 2:
+            return 5
+        if hits == 3:
+            return 7
+        return 9

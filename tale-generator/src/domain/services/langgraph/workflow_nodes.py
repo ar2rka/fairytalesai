@@ -216,37 +216,44 @@ async def generate_story_node(
     logger.info(f"Expected word count: {state.get('expected_word_count', 'N/A')}")
     
     try:
-        # Create child entity for prompt generation
-        child = Child(
-            name=state["child_name"],
-            age_category=state.get("age_category", "3-5"),  # Default for backward compatibility
-            gender=Gender(state["child_gender"]),
-            interests=state["child_interests"]
-        )
-        
-        # Create hero entity if needed
-        hero = None
-        if state["story_type"] in ["hero", "combined"] and state.get("hero_id"):
-            hero = Hero(
-                id=state["hero_id"],
-                name=state["hero_name"],
-                description=state.get("hero_description", "")
+        # Preserve the original prompt built at API layer (already includes theme, story type, and continuation context).
+        prompt = state.get("original_prompt", "")
+        if not prompt or not prompt.strip():
+            # Fallback for safety if original prompt is unexpectedly missing.
+            child = Child(
+                name=state["child_name"],
+                age_category=state.get("age_category", "3-5"),
+                gender=Gender(state["child_gender"]),
+                interests=state["child_interests"]
             )
-        
-        # Build prompt based on story type
-        # Safely convert language - it might already be a Language enum or a string
-        language_str = state["language"]
-        if isinstance(language_str, Language):
-            language = language_str
-        elif isinstance(language_str, str):
-            language = Language(language_str)
-        else:
-            # Fallback
-            language = Language.ENGLISH
-        
-        story_length = StoryLength(minutes=state["story_length"])
-        moral = state["moral"]
-        theme = state.get("theme")
+
+            hero = None
+            if state["story_type"] in ["hero", "combined"] and state.get("hero_id"):
+                hero = Hero(
+                    id=state["hero_id"],
+                    name=state["hero_name"],
+                    description=state.get("hero_description", "")
+                )
+
+            language_str = state["language"]
+            if isinstance(language_str, Language):
+                language = language_str
+            elif isinstance(language_str, str):
+                language = Language(language_str)
+            else:
+                language = Language.ENGLISH
+
+            story_length = StoryLength(minutes=state["story_length"])
+            moral = state["moral"]
+            theme = state.get("theme")
+            plot = state.get("plot")
+
+            if state["story_type"] == "child":
+                prompt = prompt_service.generate_child_prompt(child, moral, language, story_length, theme=theme, plot=plot)
+            elif state["story_type"] == "hero":
+                prompt = prompt_service.generate_hero_prompt(hero, moral, story_length, theme=theme, plot=plot)
+            else:  # combined
+                prompt = prompt_service.generate_combined_prompt(child, hero, moral, language, story_length, theme=theme, plot=plot)
         
         # Get previous quality feedback if this is a retry
         previous_feedback = None
@@ -265,14 +272,6 @@ async def generate_story_node(
                     "suggestions": suggestions
                 }
         
-        # Generate prompt with feedback if available
-        if state["story_type"] == "child":
-            prompt = prompt_service.generate_child_prompt(child, moral, language, story_length, theme=theme)
-        elif state["story_type"] == "hero":
-            prompt = prompt_service.generate_hero_prompt(hero, moral, story_length, theme=theme)
-        else:  # combined
-            prompt = prompt_service.generate_combined_prompt(child, hero, moral, language, story_length, theme=theme)
-        
         # Add feedback for regeneration attempts
         if previous_feedback:
             feedback_text = f"\n\nPrevious Attempt Feedback:\n"
@@ -284,6 +283,17 @@ async def generate_story_node(
                 suggestions_str = ', '.join(str(s) for s in suggestions)
                 feedback_text += f"Please address these points: {suggestions_str}\n"
             prompt += feedback_text
+
+        # Enforce explicit theme adherence at generation time, regardless of template source.
+        requested_theme = (state.get("theme") or "").strip()
+        if requested_theme:
+            prompt += (
+                f"\n\nMANDATORY THEME CONSTRAINT:\n"
+                f"- The story must clearly follow the '{requested_theme}' theme.\n"
+                f"- Theme must appear in setting, events, and imagery.\n"
+                f"- Include at least 3 concrete theme-specific details.\n"
+                f"- Do not switch to another main theme."
+            )
         
         # Store prompt in state for database tracking
         state["current_prompt"] = prompt
@@ -522,9 +532,11 @@ async def assess_quality_node(
             title=current_gen["title"],
             age_category=state.get("age_category", "3-5"),  # Default for backward compatibility
             moral=state["moral"],
+            theme=state.get("theme"),
             language=state["language"],
             expected_word_count=state["expected_word_count"],
-            model=config.get("assessment_model", "openai/gpt-4o-mini")
+            model=config.get("assessment_model", "openai/gpt-4o-mini"),
+            plot=state.get("plot")
         )
         
         # Store assessment
@@ -577,6 +589,7 @@ async def assess_quality_node(
                 logger.warning(f"⚠️ Failed to update generation record with quality: {str(db_error)}")
         logger.info(f"")
         logger.info(f"📊 Detailed Scores:")
+        logger.info(f"  🎨 Theme Adherence: {quality_assessment.theme_adherence_score}/10")
         logger.info(f"  👶 Age Appropriateness: {quality_assessment.age_appropriateness_score}/10")
         logger.info(f"  🎓 Moral Clarity: {quality_assessment.moral_clarity_score}/10")
         logger.info(f"  📖 Narrative Coherence: {quality_assessment.narrative_coherence_score}/10")
@@ -645,40 +658,73 @@ async def select_best_story_node(
         
         logger.info(f"Evaluating {len(generation_attempts)} generation attempts")
         
-        # Find attempt with highest quality score
+        requested_theme = (state.get("theme") or "").strip()
+        theme_threshold = config.get("theme_threshold", 7)
+
+        # Collect scored, valid attempts.
+        scored_attempts = []
+        for i, attempt in enumerate(generation_attempts, 1):
+            if not attempt.get("content") or attempt.get("error"):
+                logger.info(f"  Attempt {i}: invalid (empty content or error)")
+                continue
+
+            quality_assessment = attempt.get("quality_assessment") or {}
+            score = quality_assessment.get("overall_score", 0)
+            theme_score = quality_assessment.get("theme_adherence_score", 0)
+            logger.info(
+                f"  Attempt {i}: Score {score}/10"
+                + (f", Theme {theme_score}/10" if requested_theme else "")
+            )
+            scored_attempts.append((attempt, score, theme_score))
+
+        if not scored_attempts:
+            raise ValueError("No valid stories generated")
+
         best_attempt = None
         best_score = 0
+        best_theme_score = 0
         best_attempt_number = 0
-        
-        for i, attempt in enumerate(generation_attempts, 1):
-            quality_assessment = attempt.get("quality_assessment")
-            if quality_assessment:
-                score = quality_assessment.get("overall_score", 0)
-                logger.info(f"  Attempt {i}: Score {score}/10")
-                # Prefer later attempts if scores are equal (shows improvement)
-                if score >= best_score:
-                    best_score = score
-                    best_attempt = attempt
-                    best_attempt_number = attempt.get("attempt_number", 0)
+
+        if requested_theme:
+            # First prefer attempts that satisfy theme threshold.
+            themed = [item for item in scored_attempts if item[2] >= theme_threshold]
+            if themed:
+                best_attempt, best_score, best_theme_score = max(
+                    themed,
+                    key=lambda x: (x[1], x[2], x[0].get("attempt_number", 0))
+                )
+                best_attempt_number = best_attempt.get("attempt_number", 0)
+                state["selection_reason"] = (
+                    f"Selected attempt {best_attempt_number} with score {best_score}/10 "
+                    f"and theme score {best_theme_score}/10"
+                )
             else:
-                logger.info(f"  Attempt {i}: No quality assessment")
-        
-        if not best_attempt:
-            # No quality assessments, use first non-error attempt
-            logger.warning("No quality assessments found, using first valid attempt")
-            for attempt in generation_attempts:
-                if attempt.get("content") and not attempt.get("error"):
-                    best_attempt = attempt
-                    best_attempt_number = attempt.get("attempt_number", 0)
-                    break
-        
-        if not best_attempt:
-            raise ValueError("No valid stories generated")
-        
+                # No attempts satisfy requested theme. Fail instead of returning off-theme content.
+                best_attempt, best_score, best_theme_score = max(
+                    scored_attempts,
+                    key=lambda x: (x[2], x[1], x[0].get("attempt_number", 0))
+                )
+                best_attempt_number = best_attempt.get("attempt_number", 0)
+                state["workflow_status"] = WorkflowStatus.FAILED.value
+                state["fatal_error"] = (
+                    f"Theme adherence below threshold after {len(scored_attempts)} attempts "
+                    f"(best {best_theme_score}/10, required {theme_threshold}/10, theme '{requested_theme}')"
+                )
+                state["error_messages"].append(state["fatal_error"])
+                logger.error(f"❌ {state['fatal_error']}")
+                logger.info("="*80)
+                return state
+        else:
+            best_attempt, best_score, best_theme_score = max(
+                scored_attempts,
+                key=lambda x: (x[1], x[0].get("attempt_number", 0))
+            )
+            best_attempt_number = best_attempt.get("attempt_number", 0)
+            state["selection_reason"] = f"Selected attempt {best_attempt_number} with score {best_score}/10"
+
         # Store selection
         state["best_story"] = best_attempt
         state["selected_attempt_number"] = best_attempt_number
-        state["selection_reason"] = f"Selected attempt {best_attempt_number} with score {best_score}/10"
         state["workflow_status"] = WorkflowStatus.SUCCESS.value
         
         # Calculate total duration
@@ -686,6 +732,8 @@ async def select_best_story_node(
         
         logger.info(f"✅ Best story selected: Attempt {best_attempt_number}")
         logger.info(f"🎯 Final Score: {best_score}/10")
+        if requested_theme:
+            logger.info(f"🎨 Theme Score: {best_theme_score}/10 (threshold: {theme_threshold}/10)")
         logger.info(f"⏱️ Total Workflow Duration: {state['total_duration']:.2f}s")
         logger.info(f"All scores: {state.get('all_scores', [])}")
         
@@ -797,6 +845,21 @@ def should_regenerate(state: WorkflowState, config: Dict[str, Any]) -> bool:
             return False
     
     current_score = current_assessment.get("overall_score", 0)
+    requested_theme = (state.get("theme") or "").strip()
+    if requested_theme:
+        theme_score = current_assessment.get("theme_adherence_score", 0)
+        theme_threshold = config.get("theme_threshold", quality_threshold)
+        logger.info(f"Theme score: {theme_score}/10 (threshold: {theme_threshold}/10, theme: {requested_theme})")
+        if theme_score < theme_threshold:
+            if num_attempts_made < max_attempts:
+                logger.info(f"🔁 Theme adherence below threshold ({theme_score} < {theme_threshold}), will regenerate")
+                logger.info("Decision: YES - improve theme adherence")
+                logger.info("="*80)
+                return True
+            logger.info(f"⚠️ Theme adherence below threshold ({theme_score} < {theme_threshold}) but max attempts reached")
+            logger.info("Decision: NO - max attempts reached, selecting best")
+            logger.info("="*80)
+            return False
     
     logger.info(f"Current score: {current_score}/10")
     logger.info(f"Quality threshold: {quality_threshold}/10")

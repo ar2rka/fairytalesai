@@ -51,6 +51,9 @@ THEME_TRANSLATIONS = {
         "fantasy": "fantasy",
         "pirates": "pirates",
         "dinosaurs": "dinosaurs",
+        "mermaids": "mermaids",
+        "mystery": "mystery",
+        "magic school": "magic school",
         "magic": "magic",
         "ocean": "ocean",
         "forest": "forest",
@@ -65,6 +68,9 @@ THEME_TRANSLATIONS = {
         "fantasy": "фэнтези",
         "pirates": "пираты",
         "dinosaurs": "динозавры",
+        "mermaids": "русалки",
+        "mystery": "тайна",
+        "magic school": "школа магии",
         "magic": "магия",
         "ocean": "океан",
         "forest": "лес",
@@ -216,4 +222,3 @@ def register_jinja_filters(environment):
     environment.filters['format_age_category'] = format_age_category
     environment.filters['join'] = join_list
     environment.filters['truncate'] = truncate_text
-

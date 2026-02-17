@@ -35,7 +35,6 @@ struct MagicGeneratingIcon: View {
 // MARK: - Shimmering full-screen gradient background (e.g. StoryGeneratingView)
 struct ShimmeringGradientBackground: View {
     var colorScheme: ColorScheme?
-    @State private var startTime = Date()
     
     private var isDark: Bool {
         colorScheme != .light
@@ -45,15 +44,17 @@ struct ShimmeringGradientBackground: View {
         TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { context in
             shimmeringGradient(now: context.date)
         }
-        .onAppear {
-            startTime = Date()
-        }
     }
     
     private func shimmeringGradient(now: Date) -> some View {
-        let elapsed = now.timeIntervalSince(startTime)
-        let t = CGFloat((elapsed / 3.0).truncatingRemainder(dividingBy: 1.0))
-        let t2 = CGFloat((elapsed / 4.2).truncatingRemainder(dividingBy: 1.0))
+        // Use absolute time and smooth sinusoidal movement so the animation
+        // loops seamlessly without obvious “reset” jumps.
+        let elapsed = now.timeIntervalSinceReferenceDate
+        
+        // 3s and 4.2s cycles, but with sine curves instead of hard modulo,
+        // so the motion is continuous and never snaps back to the start.
+        let t = CGFloat(0.5 * (1 + sin((elapsed / 3.0) * 2 * .pi)))
+        let t2 = CGFloat(0.5 * (1 + sin((elapsed / 4.2) * 2 * .pi)))
         let angle = Angle.degrees(elapsed * 36.0)
         
         let startA = UnitPoint(x: -0.2 + 1.4 * t, y: 0.0)
